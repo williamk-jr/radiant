@@ -25,6 +25,7 @@ add_executable(Radiant
   src/css/css_parser.cpp
   src/css/ast/abstract_syntax_tree.cpp
   src/util/string_util.cpp
+  src/util/logger/Logger.cpp
 
   src/core/render/vulkan/VulkanInstance.cpp
   src/core/render/vulkan/VulkanPhysicalDevice.cpp

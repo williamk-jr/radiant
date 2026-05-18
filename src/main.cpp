@@ -18,21 +18,26 @@
 #include "radiant/core/render/Renderer.h"
 #include "radiant/core/render/Window.h"
 
+#include "radiant/util/logger/Logger.h"
 bool physicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
   return true;
 }
 
 int main() {
-  std::cout << "Hello World\n";
+  Radiant::Logger::shouldAllowColor(true);
+  Radiant::Logger::shouldAllowExceptions(true);
 
   const std::string applicationName = "Test";
-
   Radiant::Window window(applicationName, 500, 500);
   Radiant::Renderer renderer(window, true);
 
   while (!window.shouldClose()) {
     window.pollEvents(); 
   }
+
+  Radiant::Logger::info("Hello World");
+  Radiant::Logger::warn("Hello World");
+  Radiant::Logger::error("Hello World");
 
   // Create Instance
   //std::vector<const char*> enabledExtensionNames = {VK_KHR_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_EXTENSION_NAME};

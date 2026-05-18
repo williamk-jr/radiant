@@ -1,4 +1,6 @@
 #pragma once
+#include "radiant/util/logger/Logger.h"
+#include "radiant/util/logger/MessageStyle.h"
 #include <vector>
 #include <iostream>
 #include <string>
@@ -26,13 +28,21 @@ namespace Radiant {
         void* pUserData
       ) {
         if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
-          std::cout << "[INFO] " << "[" << pCallbackData->pMessageIdName << "] " << pCallbackData->pMessage << "\n";
+          Logger::info(pCallbackData->pMessage, {
+            {pCallbackData->pMessageIdName, MessageStyle::WHITE},
+            LogPrefixes::time(MessageStyle::WHITE)
+          });
         } else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-          std::cout << "[WARN]" << "[" << pCallbackData->pMessageIdName << "] " << pCallbackData->pMessage << "\n";
+          Logger::warn(pCallbackData->pMessage, {
+            {pCallbackData->pMessageIdName, MessageStyle::WHITE},
+            LogPrefixes::time(MessageStyle::WHITE)
+          });
         } else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-          std::cerr << "[ERROR]" << "[" << pCallbackData->pMessageIdName << "] " << pCallbackData->pMessage << "\n";
+          Logger::error(pCallbackData->pMessage, {
+            {pCallbackData->pMessageIdName, MessageStyle::WHITE},
+            LogPrefixes::time(MessageStyle::WHITE)
+          });
         }
-
         return VK_FALSE;
       }
   };
