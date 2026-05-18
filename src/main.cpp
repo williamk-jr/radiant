@@ -15,6 +15,8 @@
 #include "radiant/core/render/vulkan/VulkanInstance.h"
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include "radiant/core/render/Renderer.h"
+#include "radiant/core/render/Window.h"
 
 bool physicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
   return true;
@@ -23,44 +25,52 @@ bool physicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
 int main() {
   std::cout << "Hello World\n";
 
+  const std::string applicationName = "Test";
+
+  Radiant::Window window(applicationName, 500, 500);
+  Radiant::Renderer renderer(window, true);
+
+  while (!window.shouldClose()) {
+    window.pollEvents(); 
+  }
+
   // Create Instance
-  std::string applicationName = "Test";
-  std::vector<const char*> enabledExtensionNames = {VK_KHR_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_EXTENSION_NAME};
-  std::vector<const char*> enabledLayerNames = {"VK_LAYER_KHRONOS_validation"};
+  //std::vector<const char*> enabledExtensionNames = {VK_KHR_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_EXTENSION_NAME};
+  //std::vector<const char*> enabledLayerNames = {"VK_LAYER_KHRONOS_validation"};
 
-  GLFWwindow* window;
-  glfwInit();
-  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-  window = glfwCreateWindow(500, 500, "Render test", NULL, NULL);
+  //GLFWwindow* window;
+  //glfwInit();
+  //glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+  //window = glfwCreateWindow(500, 500, "Render test", NULL, NULL);
 
-  // Add glfw extensions to instance extensions.
-  uint32_t glfwExtensionCount;
-  const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+  //// Add glfw extensions to instance extensions.
+  //uint32_t glfwExtensionCount;
+  //const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-  for (int i = 0; i < glfwExtensionCount; i++) {
-    enabledExtensionNames.push_back(glfwExtensions[i]);
-  }
+  //for (int i = 0; i < glfwExtensionCount; i++) {
+  //  enabledExtensionNames.push_back(glfwExtensions[i]);
+  //}
 
-  Radiant::VulkanInstance instance(applicationName, enabledExtensionNames, enabledLayerNames);
-  Radiant::VulkanSurface surface(instance, window);
-  Radiant::VulkanPhysicalDevice physicalDevice(instance, physicalDeviceRequirements);
+  //Radiant::VulkanInstance instance(applicationName, enabledExtensionNames, enabledLayerNames);
+  //Radiant::VulkanSurface surface(instance, window);
+  //Radiant::VulkanPhysicalDevice physicalDevice(instance, physicalDeviceRequirements);
 
-  VkPhysicalDeviceProperties2 deviceProperties = {};
-  deviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-  physicalDevice.getProperties(&deviceProperties);
-  std::cout << "Selected Device: " << deviceProperties.properties.deviceName << "\n";
+  //VkPhysicalDeviceProperties2 deviceProperties = {};
+  //deviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+  //physicalDevice.getProperties(&deviceProperties);
+  //std::cout << "Selected Device: " << deviceProperties.properties.deviceName << "\n";
 
-  std::vector<const char*> enabledDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-  Radiant::VulkanDevice device(physicalDevice, surface, enabledDeviceExtensions); 
+  //std::vector<const char*> enabledDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+  //Radiant::VulkanDevice device(physicalDevice, surface, enabledDeviceExtensions); 
 
-  glfwMakeContextCurrent(window);
+  //glfwMakeContextCurrent(window);
 
-  while (!glfwWindowShouldClose(window)) {
-    glfwSwapBuffers(window);
-    glfwPollEvents();
-  }
+  //while (!glfwWindowShouldClose(window)) {
+  //  glfwSwapBuffers(window);
+  //  glfwPollEvents();
+  //}
 
-  glfwTerminate();
+  //glfwTerminate();
   //CssParser parser;
 
   //std::vector<Token> tokens = parser.tokenize("./assets/test.css");

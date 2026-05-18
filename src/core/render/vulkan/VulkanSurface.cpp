@@ -17,9 +17,9 @@ namespace Radiant {
 #ifdef HAS_SDL3
     SDL_Vulkan_CreateSurface(window, instance, nullptr, &surface)
 #endif
-    VulkanSurface::~VulkanSurface() {
-      vkDestroySurfaceKHR(this->instance.get(), this->surface, nullptr);
-    }
+  VulkanSurface::~VulkanSurface() {
+    vkDestroySurfaceKHR(this->instance.get(), this->surface, nullptr);
+  }
   
   VkSurfaceKHR& VulkanSurface::get() {
     return this->surface;
