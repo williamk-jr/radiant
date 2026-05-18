@@ -1,0 +1,45 @@
+cmake_minimum_required(VERSION 3.10)
+
+# Set the project name and version
+project(Radiant VERSION 1.0 LANGUAGES CXX)
+
+# Specify the C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "") # Required by clangd
+
+# Find the GLM package
+find_package(Vulkan REQUIRED)
+find_package(glfw3 REQUIRED)
+find_package(slang REQUIRED)
+
+if (glfw3_FOUND)
+  add_definitions(-DHAS_GLFW)
+elseif (SDL3_FOUND)
+  add_definitions(-DHAS_SDL3)
+endif()
+
+# Add the executable
+add_executable(Radiant 
+  src/main.cpp 
+  src/css/css_parser.cpp
+  src/css/ast/abstract_syntax_tree.cpp
+  src/util/string_util.cpp
+
+  src/core/render/vulkan/VulkanInstance.cpp
+  src/core/render/vulkan/VulkanPhysicalDevice.cpp
+  src/core/render/vulkan/VulkanDevice.cpp
+  src/core/render/vulkan/VulkanSurface.cpp
+)
+
+target_link_libraries(Radiant 
+  PRIVATE Vulkan::Vulkan
+  PRIVATE glfw
+)
+
+target_include_directories(Radiant 
+  PUBLIC ${CMAKE_SOURCE_DIR}/include
+  PRIVATE ${Vulkan_INCLUDE_DIRS}  
+)
+
+
