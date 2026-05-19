@@ -13,25 +13,28 @@ namespace Radiant {
   class Logger {
     public: 
       static void info(const std::string& message);
+      static void info(const std::string& message, unsigned short verbosity);
       static void warn(const std::string& message);
       static void error(const std::string& message);
       static void fatal(const std::string& message);
 
       static void info(const std::string& message, std::vector<LogPrefix> prefixes);
+      static void info(const std::string& message, std::vector<LogPrefix> prefixes, unsigned short verbosity);
       static void warn(const std::string& message, std::vector<LogPrefix> prefixes);
       static void error(const std::string& message, std::vector<LogPrefix> prefixes);
       static void fatal(const std::string& message, std::vector<LogPrefix> prefixes);
 
       static void shouldAllowExceptions(bool value);
       static void shouldAllowColor(bool value);
-      static void setVerbosity();
+      static void setVerbosity(unsigned short verbosity);
 
       static bool canThrowExceptions();
       static bool canShowColor();
+      static unsigned short getVerbosity();
     private:
       static bool allowExceptions;
       static bool allowColor;
-      static int verbosity;
+      static unsigned short verbosity;
 
       static std::string formatAll(std::vector<LogPrefix> prefixes);
   };

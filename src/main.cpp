@@ -12,9 +12,6 @@
 
 #include "radiant/css/ast/abstract_syntax_tree.h"
 #include "radiant/css/css_parser.h"
-#include "radiant/core/render/vulkan/VulkanInstance.h"
-#include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
-#include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/Renderer.h"
 #include "radiant/core/render/Window.h"
 
@@ -26,6 +23,7 @@ bool physicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
 int main() {
   Radiant::Logger::shouldAllowColor(true);
   Radiant::Logger::shouldAllowExceptions(true);
+  Radiant::Logger::setVerbosity(1);
 
   const std::string applicationName = "Test";
   Radiant::Window window(applicationName, 500, 500);
@@ -34,10 +32,6 @@ int main() {
   while (!window.shouldClose()) {
     window.pollEvents(); 
   }
-
-  Radiant::Logger::info("Hello World");
-  Radiant::Logger::warn("Hello World");
-  Radiant::Logger::error("Hello World");
 
   // Create Instance
   //std::vector<const char*> enabledExtensionNames = {VK_KHR_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_EXTENSION_NAME};

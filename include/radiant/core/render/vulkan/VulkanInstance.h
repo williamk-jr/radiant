@@ -31,7 +31,7 @@ namespace Radiant {
           Logger::info(pCallbackData->pMessage, {
             {pCallbackData->pMessageIdName, MessageStyle::WHITE},
             LogPrefixes::time(MessageStyle::WHITE)
-          });
+          }, 1);
         } else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
           Logger::warn(pCallbackData->pMessage, {
             {pCallbackData->pMessageIdName, MessageStyle::WHITE},

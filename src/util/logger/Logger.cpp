@@ -15,10 +15,14 @@ namespace Radiant {
 
   bool Logger::allowExceptions = false;
   bool Logger::allowColor = false;
-  int Logger::verbosity = 0;
+  unsigned short Logger::verbosity = 0;
 
   void Logger::info(const std::string& message) {
     Logger::info(message, {});
+  }
+
+  void Logger::info(const std::string& message, unsigned short verbosity) {
+    Logger::info(message, {}, verbosity);
   }
 
   void Logger::warn(const std::string& message) {
@@ -33,8 +37,14 @@ namespace Radiant {
     Logger::fatal(message, {});
   }
 
+  void Logger::info(const std::string& message, std::vector<LogPrefix> prefixes, unsigned short verbosity) {
+    if (verbosity <= Logger::verbosity) {
+      std::cout << LogPrefix{"INFO", MessageStyle::GREEN}.format() << Logger::formatAll(prefixes) << message << "\n";
+    }
+  }
+
   void Logger::info(const std::string& message, std::vector<LogPrefix> prefixes) {
-    std::cout << LogPrefix{"INFO", MessageStyle::GREEN}.format() << Logger::formatAll(prefixes) << message << "\n";
+    Logger::info(message, prefixes, 0);
   }
 
   void Logger::warn(const std::string& message, std::vector<LogPrefix> prefixes) {
@@ -76,7 +86,11 @@ namespace Radiant {
     return Logger::allowExceptions;
   }
 
-  void Logger::setVerbosity() {
+  void Logger::setVerbosity(unsigned short verbosity) {
+    Logger::verbosity = verbosity;
+  }
 
+  unsigned short Logger::getVerbosity() {
+    return Logger::verbosity;
   }
 }
