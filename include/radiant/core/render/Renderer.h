@@ -5,8 +5,10 @@
 #include "radiant/core/render/Window.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanInstance.h"
+#include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
 #include "radiant/core/render/vulkan/VulkanSurface.h"
+#include "radiant/core/render/vulkan/VulkanCommandPool.h"
 
 namespace Radiant {
   class Renderer {
@@ -20,6 +22,9 @@ namespace Radiant {
       std::unique_ptr<VulkanSurface> surface;
       std::unique_ptr<VulkanPhysicalDevice> physicalDevice;
       std::unique_ptr<VulkanDevice> device;
+
+      std::unique_ptr<VulkanMemoryAllocator> memoryAllocator;
+      std::unique_ptr<VulkanCommandPool> commandPool;
 
       void initVulkan(Window& window, bool debug);
       std::vector<const char*> getInstanceExtensions(Window& window, bool debug);

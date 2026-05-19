@@ -1,7 +1,4 @@
 #include "radiant/core/render/Renderer.h"
-#include "radiant/core/render/vulkan/VulkanInstance.h"
-#include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
-#include <memory>
 
 namespace Radiant {
   Renderer::Renderer(Window& window, bool debug) {
@@ -36,6 +33,9 @@ namespace Radiant {
 
     std::vector<const char*> enabledDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
     this->device = std::make_unique<VulkanDevice>(*this->physicalDevice, *this->surface, enabledDeviceExtensions); 
+
+    this->memoryAllocator = std::make_unique<VulkanMemoryAllocator>(*instance, *physicalDevice, *device);
+    this->commandPool = std::make_unique<VulkanCommandPool>(*device, device->getGraphicsQueueFamily());
   }
 
   bool Renderer::getPhysicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {

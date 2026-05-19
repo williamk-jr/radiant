@@ -27,12 +27,26 @@ namespace Radiant {
       }
     }
 
+    this->graphicsQueueFamily = graphicsQueueFamily;
+    this->presentQueueFamily = presentQueueFamily;
     this->createDevice(physicalDevice, {graphicsQueueFamily, presentQueueFamily}, extensions);
     //vkGetDeviceQueue(this->device, graphicsQueueFamily, &this->graphicsQueue);
   }
 
   VulkanDevice::~VulkanDevice() {
     vkDestroyDevice(this->device, nullptr);
+  }
+
+  VkDevice& VulkanDevice::get() {
+    return this->device;
+  }
+
+  uint32_t VulkanDevice::getGraphicsQueueFamily() {
+    return this->graphicsQueueFamily;
+  }
+
+  uint32_t VulkanDevice::getPresentQueueFamily() {
+    return this->presentQueueFamily;
   }
   
   void VulkanDevice::createDevice(VulkanPhysicalDevice& physicalDevice, std::set<uint32_t> queueFamilyIndicies, std::vector<const char*> extensions) {
