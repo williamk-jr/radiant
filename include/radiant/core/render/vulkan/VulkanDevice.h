@@ -5,6 +5,8 @@
 
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
 #include "radiant/core/render/vulkan/VulkanSurface.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
+
 
 namespace Radiant {
   class VulkanDevice {

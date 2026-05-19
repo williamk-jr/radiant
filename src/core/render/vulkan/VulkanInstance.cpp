@@ -1,4 +1,5 @@
 #include "radiant/core/render/vulkan/VulkanInstance.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 
 namespace Radiant {
   VulkanInstance::VulkanInstance(
@@ -28,18 +29,9 @@ namespace Radiant {
     instanceInfo.pApplicationInfo = &applicationInfo;
     instanceInfo.pNext = &debugMessengerInfo;
 
-    uint32_t layerCount = 0;
-    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-    std::vector<VkLayerProperties> availableLayers(layerCount);
-    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-    for (VkLayerProperties properties : availableLayers) {
-      std::cout << properties.layerName << "\n";
-    }
-
-    VkInstance instance;
-    vkCreateInstance(&instanceInfo, nullptr, &this->instance);
+    Validation::verify(
+      vkCreateInstance(&instanceInfo, nullptr, &this->instance)
+    );
   }
 
   VulkanInstance::~VulkanInstance() {

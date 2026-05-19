@@ -5,6 +5,7 @@
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 #include "radiant/core/render/vulkan/VulkanInstance.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 
 namespace Radiant {
   typedef bool (*VulkanPhysicalDeviceRequirements)(VkPhysicalDevice&);

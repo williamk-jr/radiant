@@ -1,6 +1,7 @@
 #pragma once
 #include "radiant/util/logger/Logger.h"
 #include "radiant/util/logger/MessageStyle.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <vector>
 #include <iostream>
 #include <string>

@@ -12,6 +12,7 @@
 #endif
 
 #include "radiant/core/render/vulkan/VulkanInstance.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 
 namespace Radiant {
   class VulkanSurface {

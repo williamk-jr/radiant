@@ -1,4 +1,5 @@
 #include "radiant/core/render/vulkan/VulkanSurface.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <stdexcept>
 #include <string>
 #include <vulkan/vulkan_core.h>
@@ -6,11 +7,9 @@
 namespace Radiant {
 #ifdef HAS_GLFW
   VulkanSurface::VulkanSurface(VulkanInstance& instance, GLFWwindow* window) : instance(instance) {
-    // TODO implement surface.
-    VkResult result = glfwCreateWindowSurface(instance.get(), window, nullptr, &this->surface); 
-    if (result != VK_SUCCESS) {
-      throw std::runtime_error("Failed to create surface: " + std::to_string(result));
-    }
+    Validation::verify(
+      glfwCreateWindowSurface(instance.get(), window, nullptr, &this->surface)
+    );
   }
 #endif 
 

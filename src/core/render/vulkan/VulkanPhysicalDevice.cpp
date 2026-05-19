@@ -16,7 +16,7 @@ namespace Radiant {
       }
     }
 
-    std::runtime_error("Unable to find a device that meets the provided requirements.");
+    Logger::fatal("Unable to find a device that meets the provided requirements.");
   }
 
   VulkanPhysicalDevice::~VulkanPhysicalDevice() {
@@ -27,7 +27,6 @@ namespace Radiant {
     return this->physicalDevice;
   }
 
-  // TODO figure out scoping of this method
   void VulkanPhysicalDevice::getProperties(VkPhysicalDeviceProperties2* properties) {
     vkGetPhysicalDeviceProperties2(this->physicalDevice, properties);
   }
@@ -45,13 +44,12 @@ namespace Radiant {
     std::vector<VkQueueFamilyProperties2> queueFamilies, 
     VulkanQueueFamilyRequirements queueFamilyRequirements
   ) { 
-
     for (int i = 0; i < queueFamilies.size(); i++) {
       if (queueFamilyRequirements(queueFamilies[i])) {
         return i;
       }
     }
+    Logger::fatal("Failed to find queue family.");
     return -1;
-
   }
 }

@@ -31,6 +31,7 @@ add_executable(Radiant
   src/core/render/vulkan/VulkanPhysicalDevice.cpp
   src/core/render/vulkan/VulkanDevice.cpp
   src/core/render/vulkan/VulkanSurface.cpp
+  src/core/render/vulkan/VulkanUtil.cpp
 
   src/core/render/Renderer.cpp
   src/core/render/Window.cpp

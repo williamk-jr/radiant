@@ -1,4 +1,5 @@
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -15,7 +16,11 @@ namespace Radiant {
         graphicsQueueFamily = i;
 
         VkBool32 surfaceSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice.get(), i, surface.get(), &surfaceSupport);
+
+        Validation::verify(
+          vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice.get(), i, surface.get(), &surfaceSupport)
+        );
+
         if (surfaceSupport) {
           presentQueueFamily = i;
         }
@@ -25,7 +30,6 @@ namespace Radiant {
     this->createDevice(physicalDevice, {graphicsQueueFamily, presentQueueFamily}, extensions);
     //vkGetDeviceQueue(this->device, graphicsQueueFamily, &this->graphicsQueue);
   }
-
 
   VulkanDevice::~VulkanDevice() {
     vkDestroyDevice(this->device, nullptr);
@@ -50,6 +54,8 @@ namespace Radiant {
     deviceInfo.enabledExtensionCount = extensions.size();
     deviceInfo.ppEnabledExtensionNames = extensions.data();
 
-    vkCreateDevice(physicalDevice.get(), &deviceInfo, nullptr, &this->device);
+    Validation::verify(
+      vkCreateDevice(physicalDevice.get(), &deviceInfo, nullptr, &this->device)
+    );
   }
 }
