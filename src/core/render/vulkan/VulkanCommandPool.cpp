@@ -7,6 +7,34 @@ namespace Radiant {
     
   }
 
+  VkCommandBuffer& VulkanCommandBuffer::get() {
+    return this->commandBuffer;
+  }
+
+  void VulkanCommandBuffer::begin(VkCommandBufferUsageFlags flags) {
+    //VkCommandBufferInheritanceInfo commandBufferInheritanceInfo{};
+
+    VkCommandBufferBeginInfo commandBufferBeginInfo{};
+    commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    commandBufferBeginInfo.flags = flags;
+    commandBufferBeginInfo.pInheritanceInfo = nullptr; // TODO research secondary vs. primary command buffers.
+    
+    Validation::verify(
+      vkBeginCommandBuffer(this->commandBuffer, &commandBufferBeginInfo)
+    );
+  }
+  
+  void VulkanCommandBuffer::end() {
+    Validation::verify(
+      vkEndCommandBuffer(this->commandBuffer)
+    );
+  }
+
+  void VulkanCommandBuffer::reset(bool recycleResources) {
+    vkResetCommandBuffer(this->commandBuffer, recycleResources ? VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT : 0);
+  }
+  
+
 
   VulkanCommandPool::VulkanCommandPool(VulkanDevice& device, uint32_t queueFamily) : device(device) {
     VkCommandPoolCreateInfo commandPoolInfo{};
@@ -50,5 +78,15 @@ namespace Radiant {
     }
 
     return wrappedCommandBuffers;
+  }
+
+  void VulkanCommandPool::freeCommandBuffers(std::vector<VulkanCommandBuffer> commandBuffers) {
+    VkCommandBuffer* rawCommandBuffers = new VkCommandBuffer[commandBuffers.size()];
+
+    for (int i = 0; i < commandBuffers.size(); i++) {
+      rawCommandBuffers[i] = commandBuffers[i].get();
+    }
+
+    vkFreeCommandBuffers(this->device.get(), this->commandPool, commandBuffers.size(), rawCommandBuffers);
   }
 }

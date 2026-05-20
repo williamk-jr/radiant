@@ -9,6 +9,11 @@ namespace Radiant {
   class VulkanCommandBuffer {
     public:
       VulkanCommandBuffer(VkCommandBuffer commandBuffer);
+      VkCommandBuffer& get();
+
+      void begin(VkCommandBufferUsageFlags flags);
+      void end();
+      void reset(bool recycleResources);
 
     private:
       friend class VulkanCommandPool;
@@ -23,6 +28,7 @@ namespace Radiant {
       
       void reset(bool recycleResources);
       std::vector<VulkanCommandBuffer> allocateCommandBuffers(int count, VkCommandBufferLevel level);
+      void freeCommandBuffers(std::vector<VulkanCommandBuffer> commandBuffers);
     private:
       VkCommandPool commandPool;
       VulkanDevice& device;
