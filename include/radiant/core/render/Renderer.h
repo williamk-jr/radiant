@@ -25,6 +25,7 @@ namespace Radiant {
 
       std::unique_ptr<VulkanMemoryAllocator> memoryAllocator;
       std::unique_ptr<VulkanCommandPool> commandPool;
+      std::vector<VulkanCommandBuffer> commandBuffers;
 
       void initVulkan(Window& window, bool debug);
       std::vector<const char*> getInstanceExtensions(Window& window, bool debug);

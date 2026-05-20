@@ -36,6 +36,8 @@ namespace Radiant {
 
     this->memoryAllocator = std::make_unique<VulkanMemoryAllocator>(*instance, *physicalDevice, *device);
     this->commandPool = std::make_unique<VulkanCommandPool>(*device, device->getGraphicsQueueFamily());
+
+    this->commandBuffers = this->commandPool->allocateCommandBuffers(1, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
   }
 
   bool Renderer::getPhysicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
