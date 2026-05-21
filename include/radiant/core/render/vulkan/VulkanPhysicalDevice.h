@@ -5,11 +5,11 @@
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 #include "radiant/core/render/vulkan/VulkanInstance.h"
+#include "radiant/core/render/vulkan/VulkanSurface.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 
 namespace Radiant {
   typedef bool (*VulkanPhysicalDeviceRequirements)(VkPhysicalDevice&);
-  typedef bool (*VulkanQueueFamilyRequirements)(VkQueueFamilyProperties2&);
 
   class VulkanPhysicalDevice {
     public:
@@ -19,8 +19,8 @@ namespace Radiant {
       VkPhysicalDevice& get();
       void getProperties(VkPhysicalDeviceProperties2* properties);
       std::vector<VkQueueFamilyProperties2> getQueueFamilyProperties();
+      bool queueFamilySupportsSurfaceKHR(VulkanSurface& surface, uint32_t queueFamily);
       
-      uint32_t getQueueFamily(std::vector<VkQueueFamilyProperties2> queueFamilies, VulkanQueueFamilyRequirements queueFamilyRequirements);
     private:
       VkPhysicalDevice physicalDevice;
   };

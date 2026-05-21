@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <set>
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
@@ -20,8 +21,6 @@ namespace Radiant {
 
     private:
       VkDevice device;
-      VkQueue graphicsQueue;
-      VkQueue presentQueue;
 
       uint32_t graphicsQueueFamily;
       uint32_t presentQueueFamily;

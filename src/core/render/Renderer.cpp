@@ -1,4 +1,6 @@
 #include "radiant/core/render/Renderer.h"
+#include "radiant/core/render/vulkan/VulkanDevice.h"
+#include <memory>
 
 namespace Radiant {
   Renderer::Renderer(Window& window, bool debug) {
@@ -33,10 +35,11 @@ namespace Radiant {
 
     std::vector<const char*> enabledDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
     this->device = std::make_unique<VulkanDevice>(*this->physicalDevice, *this->surface, enabledDeviceExtensions); 
+    this->graphicsQueue = std::make_unique<VulkanQueue>(*this->device, this->device->getGraphicsQueueFamily(), 0);
+    this->presentQueue = std::make_unique<VulkanQueue>(*this->device, this->device->getPresentQueueFamily(), 0);
 
     this->memoryAllocator = std::make_unique<VulkanMemoryAllocator>(*instance, *physicalDevice, *device);
     this->commandPool = std::make_unique<VulkanCommandPool>(*device, device->getGraphicsQueueFamily());
-
     this->commandBuffers = this->commandPool->allocateCommandBuffers(1, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
   }
 

@@ -39,17 +39,12 @@ namespace Radiant {
     vkGetPhysicalDeviceQueueFamilyProperties2(this->physicalDevice, &queuePropertyCount, queueFamilyProperties.data());
     return queueFamilyProperties;
   }
-
-  uint32_t VulkanPhysicalDevice::getQueueFamily(
-    std::vector<VkQueueFamilyProperties2> queueFamilies, 
-    VulkanQueueFamilyRequirements queueFamilyRequirements
-  ) { 
-    for (int i = 0; i < queueFamilies.size(); i++) {
-      if (queueFamilyRequirements(queueFamilies[i])) {
-        return i;
-      }
-    }
-    Logger::fatal("Failed to find queue family.");
-    return -1;
+  
+  bool VulkanPhysicalDevice::queueFamilySupportsSurfaceKHR(VulkanSurface& surface, uint32_t queueFamily) {
+    VkBool32 supportsSurface = false;
+    Validation::verify(
+      vkGetPhysicalDeviceSurfaceSupportKHR(this->physicalDevice, queueFamily, surface.get(), &supportsSurface)
+    );
+    return supportsSurface;
   }
 }

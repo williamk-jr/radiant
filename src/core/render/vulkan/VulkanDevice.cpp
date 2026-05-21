@@ -1,36 +1,32 @@
 #include "radiant/core/render/vulkan/VulkanDevice.h"
-#include "radiant/core/render/vulkan/VulkanUtil.h"
-#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
   VulkanDevice::VulkanDevice(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface, std::vector<const char*> extensions) {
     std::vector<VkQueueFamilyProperties2> queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
-    std::set<uint32_t> queueFamilyIndicies;
 
-    uint32_t graphicsQueueFamily;
-    uint32_t presentQueueFamily;
+    uint32_t graphicsQueueFamily = -1;
+    uint32_t presentQueueFamily = -1;
+    // TODO Generalize queue creation.
 
     for (int i = 0; i < queueFamilyProperties.size(); i++) {
       VkQueueFamilyProperties& properties = queueFamilyProperties[i].queueFamilyProperties;
       if (properties.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
         graphicsQueueFamily = i;
+      }
 
-        VkBool32 surfaceSupport = false;
+      if (physicalDevice.queueFamilySupportsSurfaceKHR(surface, i)) {
+        presentQueueFamily = i;
+      }
 
-        Validation::verify(
-          vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice.get(), i, surface.get(), &surfaceSupport)
-        );
-
-        if (surfaceSupport) {
-          presentQueueFamily = i;
-        }
+      if (graphicsQueueFamily > -1 && presentQueueFamily > -1) {
+        break;
       }
     }
 
     this->graphicsQueueFamily = graphicsQueueFamily;
     this->presentQueueFamily = presentQueueFamily;
     this->createDevice(physicalDevice, {graphicsQueueFamily, presentQueueFamily}, extensions);
-    //vkGetDeviceQueue(this->device, graphicsQueueFamily, &this->graphicsQueue);
+
   }
 
   VulkanDevice::~VulkanDevice() {
@@ -48,7 +44,7 @@ namespace Radiant {
   uint32_t VulkanDevice::getPresentQueueFamily() {
     return this->presentQueueFamily;
   }
-  
+
   void VulkanDevice::createDevice(VulkanPhysicalDevice& physicalDevice, std::set<uint32_t> queueFamilyIndicies, std::vector<const char*> extensions) {
     float priority = 1.0;
     std::vector<VkDeviceQueueCreateInfo> deviceQueueInfos;
