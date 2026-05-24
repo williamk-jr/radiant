@@ -22,7 +22,7 @@ namespace Radiant {
 #endif
       ~VulkanSurface();
 
-      VkSurfaceKHR& get();
+      VkSurfaceKHR get();
     private:
       VkSurfaceKHR surface;
       VulkanInstance& instance;

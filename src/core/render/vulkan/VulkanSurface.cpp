@@ -20,7 +20,7 @@ namespace Radiant {
     vkDestroySurfaceKHR(this->instance.get(), this->surface, nullptr);
   }
   
-  VkSurfaceKHR& VulkanSurface::get() {
+  VkSurfaceKHR VulkanSurface::get() {
     return this->surface;
   }
 }

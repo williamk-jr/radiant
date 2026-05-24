@@ -17,7 +17,7 @@ namespace Radiant {
       );
       ~VulkanInstance();
       
-      VkInstance& get();
+      VkInstance get();
       
     private:
       VkInstance instance;

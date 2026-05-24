@@ -1,7 +1,7 @@
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 
 namespace Radiant {
-  VulkanDevice::VulkanDevice(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface, std::vector<const char*> extensions) {
+  VulkanDevice::VulkanDevice(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface, std::vector<const char*>& extensions) {
     std::vector<VkQueueFamilyProperties2> queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
 
     uint32_t graphicsQueueFamily = -1;
@@ -25,7 +25,9 @@ namespace Radiant {
 
     this->graphicsQueueFamily = graphicsQueueFamily;
     this->presentQueueFamily = presentQueueFamily;
-    this->createDevice(physicalDevice, {graphicsQueueFamily, presentQueueFamily}, extensions);
+
+    std::set<uint32_t> queueFamilies{graphicsQueueFamily, presentQueueFamily};
+    this->createDevice(physicalDevice, queueFamilies, extensions);
 
   }
 
@@ -33,7 +35,7 @@ namespace Radiant {
     vkDestroyDevice(this->device, nullptr);
   }
 
-  VkDevice& VulkanDevice::get() {
+  VkDevice VulkanDevice::get() {
     return this->device;
   }
 
@@ -45,7 +47,7 @@ namespace Radiant {
     return this->presentQueueFamily;
   }
 
-  void VulkanDevice::createDevice(VulkanPhysicalDevice& physicalDevice, std::set<uint32_t> queueFamilyIndicies, std::vector<const char*> extensions) {
+  void VulkanDevice::createDevice(VulkanPhysicalDevice& physicalDevice, std::set<uint32_t>& queueFamilyIndicies, std::vector<const char*> extensions) {
     float priority = 1.0;
     std::vector<VkDeviceQueueCreateInfo> deviceQueueInfos;
     for (uint32_t queueFamilyIndex : queueFamilyIndicies) {

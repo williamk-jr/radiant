@@ -23,7 +23,7 @@ namespace Radiant {
     
   }
 
-  VkPhysicalDevice& VulkanPhysicalDevice::get() {
+  VkPhysicalDevice VulkanPhysicalDevice::get() {
     return this->physicalDevice;
   }
 

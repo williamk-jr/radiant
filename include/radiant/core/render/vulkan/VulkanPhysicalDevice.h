@@ -16,7 +16,7 @@ namespace Radiant {
       VulkanPhysicalDevice(VulkanInstance& instance, VulkanPhysicalDeviceRequirements physicalDeviceRequirements);
       ~VulkanPhysicalDevice();
 
-      VkPhysicalDevice& get();
+      VkPhysicalDevice get();
       void getProperties(VkPhysicalDeviceProperties2* properties);
       std::vector<VkQueueFamilyProperties2> getQueueFamilyProperties();
       bool queueFamilySupportsSurfaceKHR(VulkanSurface& surface, uint32_t queueFamily);

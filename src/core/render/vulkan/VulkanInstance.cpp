@@ -38,7 +38,7 @@ namespace Radiant {
     vkDestroyInstance(this->instance, nullptr);
   }
 
-  VkInstance& VulkanInstance::get() {
+  VkInstance VulkanInstance::get() {
     return this->instance;
   }
 }

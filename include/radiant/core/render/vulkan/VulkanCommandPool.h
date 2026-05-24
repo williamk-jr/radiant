@@ -9,7 +9,7 @@ namespace Radiant {
   class VulkanCommandBuffer {
     public:
       VulkanCommandBuffer(VkCommandBuffer commandBuffer);
-      VkCommandBuffer& get();
+      VkCommandBuffer get();
 
       void begin(VkCommandBufferUsageFlags flags);
       void end();
