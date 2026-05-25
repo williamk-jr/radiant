@@ -19,6 +19,7 @@ namespace Radiant {
       VkPhysicalDevice get();
       void getProperties(VkPhysicalDeviceProperties2* properties);
       std::vector<VkQueueFamilyProperties2> getQueueFamilyProperties();
+      std::vector<VkSurfaceFormat2KHR> getSurfaceFormats(VulkanSurface& surface);
       bool queueFamilySupportsSurfaceKHR(VulkanSurface& surface, uint32_t queueFamily);
       
     private:

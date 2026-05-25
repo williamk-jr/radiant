@@ -40,6 +40,18 @@ namespace Radiant {
     return queueFamilyProperties;
   }
   
+  std::vector<VkSurfaceFormat2KHR> VulkanPhysicalDevice::getSurfaceFormats(VulkanSurface& surface) {
+    VkPhysicalDeviceSurfaceInfo2KHR surfaceInfo{};
+    surfaceInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR;
+    surfaceInfo.surface = surface.get();
+
+    uint32_t surfaceFormatCount = 0;
+    vkGetPhysicalDeviceSurfaceFormats2KHR(this->physicalDevice, &surfaceInfo, &surfaceFormatCount, nullptr);
+    std::vector<VkSurfaceFormat2KHR> surfaceFormats(surfaceFormatCount, {VK_STRUCTURE_TYPE_SURFACE_FORMAT_2_KHR});
+    vkGetPhysicalDeviceSurfaceFormats2KHR(this->physicalDevice, &surfaceInfo, &surfaceFormatCount, surfaceFormats.data());
+    return surfaceFormats;
+  }
+  
   bool VulkanPhysicalDevice::queueFamilySupportsSurfaceKHR(VulkanSurface& surface, uint32_t queueFamily) {
     VkBool32 supportsSurface = false;
     Validation::verify(

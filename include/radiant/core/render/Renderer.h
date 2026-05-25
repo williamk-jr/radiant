@@ -9,6 +9,7 @@
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
 #include "radiant/core/render/vulkan/VulkanQueue.h"
 #include "radiant/core/render/vulkan/VulkanSurface.h"
+#include "radiant/core/render/vulkan/VulkanSwapchain.h"
 #include "radiant/core/render/vulkan/VulkanCommandPool.h"
 
 namespace Radiant {
@@ -26,6 +27,8 @@ namespace Radiant {
       std::unique_ptr<VulkanDevice> device;
       std::unique_ptr<VulkanQueue> graphicsQueue;
       std::unique_ptr<VulkanQueue> presentQueue;
+
+      std::unique_ptr<VulkanSwapchain> swapchain;
 
       std::unique_ptr<VulkanMemoryAllocator> memoryAllocator;
       std::unique_ptr<VulkanCommandPool> commandPool;

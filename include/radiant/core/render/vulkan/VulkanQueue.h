@@ -10,10 +10,13 @@ namespace Radiant {
   struct VulkanSemaphoreSubmitInfo {
     VulkanSemaphore& semaphore;
     VkPipelineStageFlags2 flags;
-    uint64_t value;
+    uint64_t value = 0;
 
     VulkanSemaphoreSubmitInfo(VulkanSemaphore& semaphore, VkPipelineStageFlags2 flags, uint64_t value) : 
       semaphore(semaphore), flags(flags), value(value) {}
+
+    VulkanSemaphoreSubmitInfo(VulkanSemaphore& semaphore, VkPipelineStageFlags2 flags) : 
+      semaphore(semaphore), flags(flags) {}
   };
 
   class VulkanQueue {

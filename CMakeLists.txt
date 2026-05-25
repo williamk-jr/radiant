@@ -38,6 +38,7 @@ add_executable(Radiant
   src/core/render/vulkan/VulkanSemaphore.cpp
   src/core/render/vulkan/VulkanBinarySemaphore.cpp
   src/core/render/vulkan/VulkanTimelineSemaphore.cpp
+  src/core/render/vulkan/VulkanSwapchain.cpp
   src/core/render/vulkan/VulkanUtil.cpp
 
   src/core/render/Renderer.cpp

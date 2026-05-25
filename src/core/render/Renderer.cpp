@@ -1,6 +1,7 @@
 #include "radiant/core/render/Renderer.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include <memory>
+#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
   Renderer::Renderer(Window& window, bool debug) {
@@ -13,6 +14,7 @@ namespace Radiant {
   std::vector<const char*> Renderer::getInstanceExtensions(Window& window, bool debug) {
     std::vector<const char*> extensions = window.getSurfaceExtensions();
     extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+    extensions.push_back(VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME);
     if (debug) extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     return extensions;
   }
@@ -37,6 +39,13 @@ namespace Radiant {
     this->device = std::make_unique<VulkanDevice>(*this->physicalDevice, *this->surface, enabledDeviceExtensions); 
     this->graphicsQueue = std::make_unique<VulkanQueue>(*this->device, this->device->getGraphicsQueueFamily(), 0);
     this->presentQueue = std::make_unique<VulkanQueue>(*this->device, this->device->getPresentQueueFamily(), 0);
+    this->swapchain = std::make_unique<VulkanSwapchain>(
+        *this->physicalDevice, 
+        *this->device, 
+        *this->surface, 
+        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+        0
+    );
 
     this->memoryAllocator = std::make_unique<VulkanMemoryAllocator>(*instance, *physicalDevice, *device);
     this->commandPool = std::make_unique<VulkanCommandPool>(*device, device->getGraphicsQueueFamily());
