@@ -7,7 +7,7 @@ namespace Radiant {
     
   }
 
-  VkCommandBuffer& VulkanCommandBuffer::get() {
+  VkCommandBuffer VulkanCommandBuffer::get() {
     return this->commandBuffer;
   }
 

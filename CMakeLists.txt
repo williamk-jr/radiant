@@ -34,6 +34,10 @@ add_executable(Radiant
   src/core/render/vulkan/VulkanCommandPool.cpp
   src/core/render/vulkan/VulkanMemoryAllocator.cpp
   src/core/render/vulkan/VulkanQueue.cpp
+  src/core/render/vulkan/VulkanFence.cpp
+  src/core/render/vulkan/VulkanSemaphore.cpp
+  src/core/render/vulkan/VulkanBinarySemaphore.cpp
+  src/core/render/vulkan/VulkanTimelineSemaphore.cpp
   src/core/render/vulkan/VulkanUtil.cpp
 
   src/core/render/Renderer.cpp

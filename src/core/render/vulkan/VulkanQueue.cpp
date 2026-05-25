@@ -1,4 +1,5 @@
 #include "radiant/core/render/vulkan/VulkanQueue.h"
+#include "radiant/core/render/vulkan/VulkanSemaphore.h"
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -6,7 +7,7 @@ namespace Radiant {
     vkGetDeviceQueue(device.get(), queueFamily, queueIndex, &this->queue);
   }
 
-  void VulkanQueue::submit(std::vector<VulkanCommandBuffer>& commandBuffers) {
+  void VulkanQueue::submit(std::vector<VulkanCommandBuffer>& commandBuffers, std::vector<VulkanSemaphore> waitSemaphores) {
     std::vector<VkCommandBufferSubmitInfo> commandBufferSubmitInfos;
     commandBufferSubmitInfos.reserve(commandBuffers.size());
 
@@ -22,6 +23,8 @@ namespace Radiant {
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO_2;
     submitInfo.commandBufferInfoCount = commandBufferSubmitInfos.size();
     submitInfo.pCommandBufferInfos = commandBufferSubmitInfos.data();
+    submitInfo.pWaitSemaphoreInfos = nullptr;
+    submitInfo.pSignalSemaphoreInfos = nullptr;
 
     vkQueueSubmit2(this->queue, 1, &submitInfo, nullptr);
   }
