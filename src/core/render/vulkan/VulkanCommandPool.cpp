@@ -25,12 +25,42 @@ namespace Radiant {
     );
   }
   
+  void VulkanCommandBuffer::pipelineMemoryBarrier(std::vector<VkMemoryBarrier2>& memoryBarriers, VkDependencyFlags dependencyFlags) {
+    VkDependencyInfo dependencyInfo{};
+    dependencyInfo.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+    dependencyInfo.memoryBarrierCount = memoryBarriers.size();
+    dependencyInfo.pMemoryBarriers = memoryBarriers.data();
+    dependencyInfo.dependencyFlags = dependencyFlags;
+
+    vkCmdPipelineBarrier2(this->commandBuffer, &dependencyInfo);
+  }
+
+  void VulkanCommandBuffer::pipelineImageMemoryBarrier(std::vector<VkImageMemoryBarrier2>& memoryBarriers, VkDependencyFlags dependencyFlags) {
+    VkDependencyInfo dependencyInfo{};
+    dependencyInfo.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+    dependencyInfo.imageMemoryBarrierCount = memoryBarriers.size();
+    dependencyInfo.pImageMemoryBarriers = memoryBarriers.data();
+    dependencyInfo.dependencyFlags = dependencyFlags;
+
+    vkCmdPipelineBarrier2(this->commandBuffer, &dependencyInfo);
+  }
+
+  void VulkanCommandBuffer::pipelineBufferMemoryBarrier(std::vector<VkBufferMemoryBarrier2>& memoryBarriers, VkDependencyFlags dependencyFlags) {
+    VkDependencyInfo dependencyInfo{};
+    dependencyInfo.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+    dependencyInfo.bufferMemoryBarrierCount = memoryBarriers.size();
+    dependencyInfo.pBufferMemoryBarriers = memoryBarriers.data();
+    dependencyInfo.dependencyFlags = dependencyFlags;
+
+    vkCmdPipelineBarrier2(this->commandBuffer, &dependencyInfo);
+  }
+  
   void VulkanCommandBuffer::clearColor(VulkanImage& image, VkClearColorValue& color) {
     VkImageSubresourceRange imageSubresourceRange{};
     imageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     imageSubresourceRange.layerCount = 1;
     imageSubresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
-
+    //vkTransitionImageLayout(VkDevice device, uint32_t transitionCount, const VkHostImageLayoutTransitionInfo *pTransitions)
     vkCmdClearColorImage(this->commandBuffer, image.get(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &color, 1, &imageSubresourceRange);
   }
   

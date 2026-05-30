@@ -30,16 +30,53 @@ namespace Radiant {
     this->commandBuffers[currentFrame].reset(false);
     
     VkClearColorValue color{};
-    color.uint32[0] = 0;
-    color.uint32[1] = 100;
-    color.uint32[2] = 0;
-    color.uint32[3] = 100;
+    color.float32[0] = 0;
+    color.float32[1] = 0.5;
+    color.float32[2] = 0;
+    color.float32[3] = 1;
 
     this->commandBuffers[currentFrame].begin(0);
+
+    // Transition image layout to transfer dst optimal.
+    VkImageSubresourceRange subresourceRange{};
+    subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    subresourceRange.levelCount = 1;
+    subresourceRange.layerCount = 1;
+
+    VkImageMemoryBarrier2 imageMemoryBarrier{};
+    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+    imageMemoryBarrier.srcStageMask = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
+    imageMemoryBarrier.srcAccessMask = 0;
+    imageMemoryBarrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+    imageMemoryBarrier.dstAccessMask = VK_ACCESS_2_MEMORY_READ_BIT | VK_ACCESS_2_MEMORY_WRITE_BIT;
+    imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    imageMemoryBarrier.image = this->swapchain->getImage(imageIndex).get();
+    imageMemoryBarrier.subresourceRange = subresourceRange;
+
+    std::vector<VkImageMemoryBarrier2> imageMemoryBarriers{imageMemoryBarrier};
+    this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(imageMemoryBarriers, 0);
+
+    // Clear Color
     this->commandBuffers[currentFrame].clearColor(
       this->swapchain->getImage(imageIndex),
       color
     );
+
+    // Transition image to presentable layout.
+    VkImageMemoryBarrier2 presentImageMemoryBarrier{};
+    presentImageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+    presentImageMemoryBarrier.srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+    presentImageMemoryBarrier.srcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT;
+    presentImageMemoryBarrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+    presentImageMemoryBarrier.dstAccessMask = 0;
+    presentImageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    presentImageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    presentImageMemoryBarrier.image = this->swapchain->getImage(imageIndex).get();
+    presentImageMemoryBarrier.subresourceRange = subresourceRange;
+
+    std::vector<VkImageMemoryBarrier2> presentImageMemoryBarriers{presentImageMemoryBarrier};
+    this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(presentImageMemoryBarriers, 0);
     this->commandBuffers[currentFrame].end();
 
     VulkanSemaphoreSubmitInfo imageReadySemaphoreSubmitInfo{};

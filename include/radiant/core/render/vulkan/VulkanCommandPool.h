@@ -13,6 +13,9 @@ namespace Radiant {
       VkCommandBuffer get();
 
       void begin(VkCommandBufferUsageFlags flags);
+      void pipelineMemoryBarrier(std::vector<VkMemoryBarrier2>& memoryBarriers, VkDependencyFlags dependencyFlags);
+      void pipelineImageMemoryBarrier(std::vector<VkImageMemoryBarrier2>& memoryBarriers, VkDependencyFlags dependencyFlags);
+      void pipelineBufferMemoryBarrier(std::vector<VkBufferMemoryBarrier2>& memoryBarriers, VkDependencyFlags dependencyFlags);
       void clearColor(VulkanImage& image, VkClearColorValue& color);
       //void beginRendering();
 
