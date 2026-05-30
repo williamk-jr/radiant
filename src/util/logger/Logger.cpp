@@ -15,6 +15,7 @@ namespace Radiant {
 
   bool Logger::allowExceptions = false;
   bool Logger::allowColor = false;
+
   unsigned short Logger::verbosity = 0;
 
   void Logger::info(const std::string& message) {
@@ -52,14 +53,14 @@ namespace Radiant {
   }
 
   void Logger::error(const std::string& message, std::vector<LogPrefix> prefixes) {
-    std::cerr << LogPrefix{"ERROR", MessageStyle::RED}.format() << Logger::formatAll(prefixes) << message << "\n";
+    std::cout << LogPrefix{"ERROR", MessageStyle::RED}.format() << Logger::formatAll(prefixes) << message << "\n";
   }
 
   void Logger::fatal(const std::string& message, std::vector<LogPrefix> prefixes) {
     if (Logger::allowExceptions) {
       throw std::runtime_error(LogPrefix{"FATAL", MessageStyle::RED}.format() + Logger::formatAll(prefixes) + message + "\n");
     }
-    std::cerr << LogPrefix{"FATAL", MessageStyle::RED}.format() << Logger::formatAll(prefixes) << message << "\n";
+    std::cout << LogPrefix{"FATAL", MessageStyle::RED}.format() << Logger::formatAll(prefixes) << message << "\n";
   }
 
   std::string Logger::formatAll(std::vector<LogPrefix> prefixes) {
@@ -79,11 +80,11 @@ namespace Radiant {
   }
   
   bool Logger::canThrowExceptions() {
-    return Logger::allowColor;
+    return Logger::allowExceptions;
   }
   
   bool Logger::canShowColor() {
-    return Logger::allowExceptions;
+    return Logger::allowColor;
   }
 
   void Logger::setVerbosity(unsigned short verbosity) {

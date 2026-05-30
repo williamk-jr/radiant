@@ -39,6 +39,7 @@ add_executable(Radiant
   src/core/render/vulkan/VulkanBinarySemaphore.cpp
   src/core/render/vulkan/VulkanTimelineSemaphore.cpp
   src/core/render/vulkan/VulkanSwapchain.cpp
+  src/core/render/vulkan/VulkanImage.cpp
   src/core/render/vulkan/VulkanUtil.cpp
 
   src/core/render/Renderer.cpp
@@ -55,4 +56,7 @@ target_include_directories(Radiant
   PRIVATE ${Vulkan_INCLUDE_DIRS}  
 )
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()
 

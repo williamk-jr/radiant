@@ -18,6 +18,8 @@ namespace Radiant {
       VkDevice get();
       uint32_t getGraphicsQueueFamily();
       uint32_t getPresentQueueFamily();
+      
+      void waitIdle();
 
     private:
       VkDevice device;

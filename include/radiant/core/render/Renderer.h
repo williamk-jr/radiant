@@ -3,7 +3,9 @@
 #include <vector>
 
 #include "radiant/core/render/Window.h"
+#include "radiant/core/render/vulkan/VulkanBinarySemaphore.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include "radiant/core/render/vulkan/VulkanFence.h"
 #include "radiant/core/render/vulkan/VulkanInstance.h"
 #include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
@@ -11,11 +13,15 @@
 #include "radiant/core/render/vulkan/VulkanSurface.h"
 #include "radiant/core/render/vulkan/VulkanSwapchain.h"
 #include "radiant/core/render/vulkan/VulkanCommandPool.h"
+#include "radiant/core/render/vulkan/VulkanImage.h"
 
 namespace Radiant {
   class Renderer {
     public:
       Renderer(Window& window, bool debug);
+      void waitIdle();
+
+      void renderLoop();
     private:
       std::vector<const char*> instanceExtensions;
       std::vector<const char*> instanceLayers;
@@ -25,14 +31,19 @@ namespace Radiant {
       std::unique_ptr<VulkanPhysicalDevice> physicalDevice;
 
       std::unique_ptr<VulkanDevice> device;
+      std::unique_ptr<VulkanMemoryAllocator> memoryAllocator;
       std::unique_ptr<VulkanQueue> graphicsQueue;
       std::unique_ptr<VulkanQueue> presentQueue;
 
       std::unique_ptr<VulkanSwapchain> swapchain;
 
-      std::unique_ptr<VulkanMemoryAllocator> memoryAllocator;
       std::unique_ptr<VulkanCommandPool> commandPool;
       std::vector<VulkanCommandBuffer> commandBuffers;
+      
+      std::vector<VulkanFence> fences;
+      std::vector<VulkanBinarySemaphore> imageReadySemaphores;
+      std::vector<VulkanBinarySemaphore> frameFinishedSemaphores;
+      int currentFrame = 0;
 
       void initVulkan(Window& window, bool debug);
       std::vector<const char*> getInstanceExtensions(Window& window, bool debug);

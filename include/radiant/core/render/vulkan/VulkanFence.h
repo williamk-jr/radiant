@@ -9,6 +9,8 @@ namespace Radiant {
       ~VulkanFence();
 
       VkFence get();
+      void reset();
+      void wait(uint32_t timeout);
       bool isSignaled();
       static void waitForFences(VulkanDevice& device, std::vector<VulkanFence>& fences, bool waitAll, uint64_t timeout);
     private:

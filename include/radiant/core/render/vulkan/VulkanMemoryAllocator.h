@@ -10,6 +10,8 @@ namespace Radiant {
   class VulkanMemoryAllocator {
     public:
       VulkanMemoryAllocator(VulkanInstance& instance, VulkanPhysicalDevice& physicalDevice, VulkanDevice& device);
+      ~VulkanMemoryAllocator();
+      VmaAllocator& get();
 
     private:
       VmaAllocator memoryAllocator;

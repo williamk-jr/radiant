@@ -1,5 +1,6 @@
 #pragma once
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include "radiant/core/render/vulkan/VulkanImage.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <vulkan/vulkan_core.h>
 
@@ -12,6 +13,10 @@ namespace Radiant {
       VkCommandBuffer get();
 
       void begin(VkCommandBufferUsageFlags flags);
+      void clearColor(VulkanImage& image, VkClearColorValue& color);
+      //void beginRendering();
+
+
       void end();
       void reset(bool recycleResources);
 

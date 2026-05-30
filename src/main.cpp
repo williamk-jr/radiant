@@ -22,7 +22,7 @@ bool physicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
 
 int main() {
   Radiant::Logger::shouldAllowColor(true);
-  Radiant::Logger::shouldAllowExceptions(true);
+  Radiant::Logger::shouldAllowExceptions(false);
   Radiant::Logger::setVerbosity(1);
 
   const std::string applicationName = "Test";
@@ -31,7 +31,10 @@ int main() {
 
   while (!window.shouldClose()) {
     window.pollEvents(); 
+    renderer.renderLoop();
   }
+
+  renderer.waitIdle();
 
   // Create Instance
   //std::vector<const char*> enabledExtensionNames = {VK_KHR_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_EXTENSION_NAME};

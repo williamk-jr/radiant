@@ -1,4 +1,8 @@
 #include "radiant/core/render/vulkan/VulkanSwapchain.h"
+#include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
+#include "radiant/core/render/vulkan/VulkanSemaphore.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
+#include <cstdint>
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -29,12 +33,67 @@ namespace Radiant {
     swapchainInfo.preTransform = surfaceCapabilities.surfaceCapabilities.currentTransform;
     swapchainInfo.clipped = VK_TRUE;
 
-    vkCreateSwapchainKHR(device.get(), &swapchainInfo, nullptr, &this->swapchain);
+    uint32_t queueFamilies[] = {device.getGraphicsQueueFamily(), device.getPresentQueueFamily()};
+    if (device.getGraphicsQueueFamily() != device.getPresentQueueFamily()) {
+      swapchainInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+      swapchainInfo.queueFamilyIndexCount = 2;
+      swapchainInfo.pQueueFamilyIndices = queueFamilies;
+    } else {
+      swapchainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+      swapchainInfo.queueFamilyIndexCount = 0;
+      swapchainInfo.pQueueFamilyIndices = nullptr;
+    }
+
+    Validation::verify(
+      vkCreateSwapchainKHR(device.get(), &swapchainInfo, nullptr, &this->swapchain)
+    );
+    
+    uint32_t swapchainImageCount = 0;
+    vkGetSwapchainImagesKHR(device.get(), this->swapchain, &swapchainImageCount, nullptr);
+    std::vector<VkImage> rawImages(swapchainImageCount);
+    this->images.reserve(swapchainImageCount);
+    vkGetSwapchainImagesKHR(device.get(), this->swapchain, &swapchainImageCount, rawImages.data());
+
+    for (VkImage rawImage : rawImages) {
+      this->images.emplace_back(rawImage);
+    }
   }
+
   VulkanSwapchain::~VulkanSwapchain() {
     vkDestroySwapchainKHR(this->device.get(), this->swapchain, nullptr); 
   }
   
+  VkExtent2D VulkanSwapchain::getExtent(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface) {
+    VkPhysicalDeviceSurfaceInfo2KHR surfaceInfo{};
+    surfaceInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR;
+    surfaceInfo.surface = surface.get();
+
+    VkSurfaceCapabilities2KHR surfaceCapabilities{};
+    surfaceCapabilities.sType = VK_STRUCTURE_TYPE_SURFACE_CAPABILITIES_2_KHR;
+
+    vkGetPhysicalDeviceSurfaceCapabilities2KHR(physicalDevice.get(), &surfaceInfo, &surfaceCapabilities);
+    return surfaceCapabilities.surfaceCapabilities.currentExtent;
+  }
+
+
+  VkSwapchainKHR VulkanSwapchain::get() {
+    return this->swapchain;
+  }
+
+  VulkanImage& VulkanSwapchain::getImage(uint32_t index) {
+    return this->images[index];
+  }
+
+  uint32_t VulkanSwapchain::getImageCount() {
+    return this->images.size();
+  }
+
+  uint32_t VulkanSwapchain::acquireNextImage(VulkanSemaphore* semaphore, uint64_t timeout) {
+    uint32_t imageIndex;
+    vkAcquireNextImageKHR(this->device.get(), this->swapchain, timeout, semaphore->get(), nullptr, &imageIndex);
+    return imageIndex;
+  }
+
   VkSurfaceFormat2KHR VulkanSwapchain::findSurfaceFormat(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface) {
     std::vector<VkSurfaceFormat2KHR> surfaceFormats = physicalDevice.getSurfaceFormats(surface);
 

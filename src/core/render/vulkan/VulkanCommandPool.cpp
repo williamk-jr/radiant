@@ -1,5 +1,6 @@
 
 #include "radiant/core/render/vulkan/VulkanCommandPool.h"
+#include "radiant/core/render/vulkan/VulkanImage.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <vulkan/vulkan_core.h>
 namespace Radiant {
@@ -23,6 +24,38 @@ namespace Radiant {
       vkBeginCommandBuffer(this->commandBuffer, &commandBufferBeginInfo)
     );
   }
+  
+  void VulkanCommandBuffer::clearColor(VulkanImage& image, VkClearColorValue& color) {
+    VkImageSubresourceRange imageSubresourceRange{};
+    imageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageSubresourceRange.layerCount = 1;
+    imageSubresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
+
+    vkCmdClearColorImage(this->commandBuffer, image.get(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &color, 1, &imageSubresourceRange);
+  }
+  
+  //void VulkanCommandBuffer::beginRendering(VkRenderingFlags renderingFlags) {
+  //  VkImageView imageView;
+  //  VkImageViewCreateInfo imageViewInfo{};
+  //  imageViewInfo.image = nullptr;
+  //  vkCmdClearColorImage(VkCommandBuffer commandBuffer, VkImage image, VkImageLayout imageLayout, const VkClearColorValue *pColor, uint32_t rangeCount, const VkImageSubresourceRange *pRanges)
+
+  //  vkCreateImageView(VkDevice device, const VkImageViewCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkImageView *pView)
+  //  
+  //  VkRenderingAttachmentInfo renderingAttachmentInfo{};
+  //  renderingAttachmentInfo.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+  //  renderingAttachmentInfo.imageView = VK_IMAGE_VIEW_TYPE_2D;
+  //  renderingAttachmentInfo.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+  //  renderingAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+  //  renderingAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+  //  VkRenderingInfo renderingInfo{};
+  //  renderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+  //  renderingInfo.flags = renderingFlags;
+  //  renderingInfo.layerCount = 1;
+
+  //  vkCmdBeginRendering(this->commandBuffer, &renderingInfo);
+  //}
   
   void VulkanCommandBuffer::end() {
     Validation::verify(
