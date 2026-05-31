@@ -11,6 +11,11 @@ namespace Radiant {
       vkCreateSemaphore(device.get(), &semaphoreInfo, nullptr, &this->semaphore)
     );
   }
+
+  VulkanSemaphore::VulkanSemaphore(VulkanSemaphore&& other) noexcept :
+    semaphore(other.semaphore), device(other.device) {
+    other.semaphore = nullptr;
+  }
   
   VulkanSemaphore::~VulkanSemaphore() {
     vkDestroySemaphore(this->device.get(), this->semaphore, nullptr);
@@ -19,5 +24,4 @@ namespace Radiant {
   VkSemaphore VulkanSemaphore::get() const {
     return this->semaphore;
   }
-  
 }

@@ -15,6 +15,11 @@ namespace Radiant {
         const std::vector<const char*>& extensionNames,
         const std::vector<const char*>& layerNames
       );
+      VulkanInstance(const VulkanInstance&) = delete;
+      VulkanInstance& operator=(const VulkanInstance&) = delete;
+
+      VulkanInstance(VulkanInstance&&) noexcept;
+      VulkanInstance& operator=(VulkanInstance&&) noexcept = default;
       ~VulkanInstance();
       
       VkInstance get();

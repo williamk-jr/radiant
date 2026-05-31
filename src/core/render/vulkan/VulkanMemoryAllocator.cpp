@@ -19,6 +19,11 @@ namespace Radiant {
       vmaCreateAllocator(&allocatorInfo, &this->memoryAllocator)
     );
   }
+
+  VulkanMemoryAllocator::VulkanMemoryAllocator(VulkanMemoryAllocator&& other) noexcept :
+    memoryAllocator(other.memoryAllocator) {
+    other.memoryAllocator = nullptr;
+  }
   
   VulkanMemoryAllocator::~VulkanMemoryAllocator() {
     vmaDestroyAllocator(this->memoryAllocator);

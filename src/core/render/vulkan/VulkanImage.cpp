@@ -31,6 +31,12 @@ namespace Radiant {
     this->image = image;
   }
 
+  VulkanImage::VulkanImage(VulkanImage&& other) noexcept :
+    image(other.image), imageMemory(other.imageMemory), allocator(other.allocator) {
+    other.image = nullptr;
+    other.imageMemory = nullptr;
+  }
+
   VulkanImage::~VulkanImage() {
     //vkDestroyImage(this->device.get(), this->image, nullptr);
     if (allocator != nullptr) {

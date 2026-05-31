@@ -10,6 +10,11 @@ namespace Radiant {
   class VulkanCommandBuffer {
     public:
       VulkanCommandBuffer(VkCommandBuffer commandBuffer);
+      VulkanCommandBuffer(const VulkanCommandBuffer&) = delete;
+      VulkanCommandBuffer& operator=(const VulkanCommandBuffer&) = delete;
+
+      VulkanCommandBuffer(VulkanCommandBuffer&&) noexcept;
+      VulkanCommandBuffer& operator=(VulkanCommandBuffer&&) noexcept = default;
       VkCommandBuffer get();
 
       void begin(VkCommandBufferUsageFlags flags);
@@ -32,6 +37,11 @@ namespace Radiant {
   class VulkanCommandPool {
     public:
       VulkanCommandPool(VulkanDevice& device, uint32_t queueFamily);
+      VulkanCommandPool(const VulkanCommandPool&) = delete;
+      VulkanCommandPool& operator=(const VulkanCommandPool&) = delete;
+
+      VulkanCommandPool(VulkanCommandPool&&) noexcept;
+      VulkanCommandPool& operator=(VulkanCommandPool&&) noexcept = default;
       ~VulkanCommandPool();
       
       void reset(bool recycleResources);

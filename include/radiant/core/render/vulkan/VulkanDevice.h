@@ -13,6 +13,11 @@ namespace Radiant {
   class VulkanDevice {
     public:
       VulkanDevice(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface, std::vector<const char*>& extensions);
+      VulkanDevice(const VulkanDevice&) = delete;
+      VulkanDevice& operator=(const VulkanDevice&) = delete;
+
+      VulkanDevice(VulkanDevice&&) noexcept;
+      VulkanDevice& operator=(VulkanDevice&&) noexcept = default;
       ~VulkanDevice();
 
       VkDevice get();

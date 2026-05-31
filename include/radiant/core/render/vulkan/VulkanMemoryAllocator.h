@@ -10,6 +10,11 @@ namespace Radiant {
   class VulkanMemoryAllocator {
     public:
       VulkanMemoryAllocator(VulkanInstance& instance, VulkanPhysicalDevice& physicalDevice, VulkanDevice& device);
+      VulkanMemoryAllocator(const VulkanMemoryAllocator&) = delete;
+      VulkanMemoryAllocator& operator=(const VulkanMemoryAllocator&) = delete;
+
+      VulkanMemoryAllocator(VulkanMemoryAllocator&&) noexcept;
+      VulkanMemoryAllocator& operator=(VulkanMemoryAllocator&&) noexcept = default;
       ~VulkanMemoryAllocator();
       VmaAllocator& get();
 

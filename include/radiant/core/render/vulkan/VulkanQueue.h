@@ -23,13 +23,18 @@ namespace Radiant {
   class VulkanQueue {
     public:
       VulkanQueue(VulkanDevice& device, uint32_t queueFamily, uint32_t queueIndex); 
+      VulkanQueue(const VulkanQueue&) = delete;
+      VulkanQueue& operator=(const VulkanQueue&) = delete;
 
-      void submit(std::vector<VulkanCommandBuffer>& commandBuffers, std::vector<VulkanSemaphoreSubmitInfo>* waitSemaphores, std::vector<VulkanSemaphoreSubmitInfo>* signalSemaphores, VulkanFence& fence);
+      VulkanQueue(VulkanQueue&&) noexcept;
+      VulkanQueue& operator=(VulkanQueue&&) noexcept = default;
+
+      void submit(std::vector<VulkanCommandBuffer*>& commandBuffers, std::vector<VulkanSemaphoreSubmitInfo>* waitSemaphores, std::vector<VulkanSemaphoreSubmitInfo>* signalSemaphores, VulkanFence& fence);
       void submit(VulkanCommandBuffer& commandBuffer, std::vector<VulkanSemaphoreSubmitInfo>* waitSemaphores, std::vector<VulkanSemaphoreSubmitInfo>* signalSemaphores, VulkanFence& fence);
       void submit(VulkanCommandBuffer& commandBuffer, VulkanSemaphoreSubmitInfo* waitSemaphore, VulkanSemaphoreSubmitInfo* signalSemaphore, VulkanFence& fence);
       
-      void present(VulkanSwapchain& swapchain, std::vector<uint32_t> imageIndicies, std::vector<VkSemaphore>& waitSemaphores);
-      void present(VulkanSwapchain& swapchain, std::vector<uint32_t> imageIndicies, VkSemaphore& waitSemaphores);
+      void present(VulkanSwapchain& swapchain, std::vector<uint32_t> imageIndicies, std::vector<VulkanSemaphore*>& waitSemaphores);
+      void present(VulkanSwapchain& swapchain, std::vector<uint32_t> imageIndicies, VulkanSemaphore& waitSemaphores);
     private:
       VkQueue queue;
   };

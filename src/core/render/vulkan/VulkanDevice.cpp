@@ -31,6 +31,11 @@ namespace Radiant {
 
   }
 
+  VulkanDevice::VulkanDevice(VulkanDevice&& other) noexcept :
+    device(other.device) {
+    other.device = nullptr;
+  }
+
   VulkanDevice::~VulkanDevice() {
     vkDestroyDevice(this->device, nullptr);
   }

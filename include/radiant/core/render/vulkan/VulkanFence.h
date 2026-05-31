@@ -6,6 +6,11 @@ namespace Radiant {
   class VulkanFence {
     public:
       VulkanFence(VulkanDevice& device, VkFenceCreateFlags flags);
+      VulkanFence(const VulkanFence&) = delete;
+      VulkanFence& operator=(const VulkanFence&) = delete;
+
+      VulkanFence(VulkanFence&&) noexcept;
+      VulkanFence& operator=(VulkanFence&&) noexcept = default;
       ~VulkanFence();
 
       VkFence get();

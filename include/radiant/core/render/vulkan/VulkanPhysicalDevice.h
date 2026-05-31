@@ -14,6 +14,11 @@ namespace Radiant {
   class VulkanPhysicalDevice {
     public:
       VulkanPhysicalDevice(VulkanInstance& instance, VulkanPhysicalDeviceRequirements physicalDeviceRequirements);
+      VulkanPhysicalDevice(const VulkanPhysicalDevice&) = delete;
+      VulkanPhysicalDevice& operator=(const VulkanPhysicalDevice&) = delete;
+
+      VulkanPhysicalDevice(VulkanPhysicalDevice&&) noexcept;
+      VulkanPhysicalDevice& operator=(VulkanPhysicalDevice&&) noexcept = default;
       ~VulkanPhysicalDevice();
 
       VkPhysicalDevice get();

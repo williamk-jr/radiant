@@ -34,6 +34,11 @@ namespace Radiant {
     );
   }
 
+  VulkanInstance::VulkanInstance(VulkanInstance&& other) noexcept :
+    instance(other.instance) {
+    other.instance = nullptr;
+  }
+
   VulkanInstance::~VulkanInstance() {
     vkDestroyInstance(this->instance, nullptr);
   }

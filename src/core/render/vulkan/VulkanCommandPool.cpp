@@ -8,6 +8,11 @@ namespace Radiant {
     
   }
 
+  VulkanCommandBuffer::VulkanCommandBuffer(VulkanCommandBuffer&& other) noexcept :
+    commandBuffer(other.commandBuffer) {
+    other.commandBuffer = nullptr;
+  }
+
   VkCommandBuffer VulkanCommandBuffer::get() {
     return this->commandBuffer;
   }
@@ -108,6 +113,11 @@ namespace Radiant {
     Validation::verify(
       vkCreateCommandPool(device.get(), &commandPoolInfo, nullptr, &this->commandPool)
     ); 
+  }
+
+  VulkanCommandPool::VulkanCommandPool(VulkanCommandPool&& other) noexcept :
+    commandPool(other.commandPool), device(other.device) {
+    other.commandPool = nullptr;
   }
   
   VulkanCommandPool::~VulkanCommandPool() {

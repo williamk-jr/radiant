@@ -1,4 +1,5 @@
 #include "radiant/core/render/vulkan/VulkanBinarySemaphore.h"
+#include "radiant/core/render/vulkan/VulkanSemaphore.h"
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -9,4 +10,8 @@ namespace Radiant {
         VK_SEMAPHORE_TYPE_BINARY,
         0
     }, flags) {}
+
+  VulkanBinarySemaphore::VulkanBinarySemaphore(VulkanBinarySemaphore&& other) noexcept : 
+    VulkanSemaphore(std::move(other)) {
+  }
 }

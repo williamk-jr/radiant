@@ -10,6 +10,11 @@ namespace Radiant {
   class VulkanSwapchain {
     public:
       VulkanSwapchain(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkSwapchainCreateFlagsKHR swapchainFlags);
+      VulkanSwapchain(const VulkanSwapchain&) = delete;
+      VulkanSwapchain& operator=(const VulkanSwapchain&) = delete;
+
+      VulkanSwapchain(VulkanSwapchain&&) noexcept;
+      VulkanSwapchain& operator=(VulkanSwapchain&&) noexcept = default;
       ~VulkanSwapchain();
 
       VkSwapchainKHR get();

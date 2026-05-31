@@ -13,6 +13,10 @@ namespace Radiant {
         initialValue
     }, flags) {}
     
+  VulkanTimelineSemaphore::VulkanTimelineSemaphore(VulkanTimelineSemaphore&& other) noexcept :
+    VulkanSemaphore(std::move(other)) {
+  }
+
   uint64_t VulkanTimelineSemaphore::getCounterValue() {
     uint64_t value = 0;
     vkGetSemaphoreCounterValue(this->device.get(), this->get(), &value);

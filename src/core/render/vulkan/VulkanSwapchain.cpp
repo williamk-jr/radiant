@@ -59,6 +59,11 @@ namespace Radiant {
     }
   }
 
+  VulkanSwapchain::VulkanSwapchain(VulkanSwapchain&& other) noexcept :
+    swapchain(other.swapchain), device(other.device) {
+    other.swapchain = nullptr;
+  }
+
   VulkanSwapchain::~VulkanSwapchain() {
     vkDestroySwapchainKHR(this->device.get(), this->swapchain, nullptr); 
   }

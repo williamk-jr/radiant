@@ -7,6 +7,12 @@
 namespace Radiant {
   class VulkanSemaphore {
     public:
+      VulkanSemaphore(const VulkanSemaphore&) = delete;
+      VulkanSemaphore& operator=(const VulkanSemaphore&) = delete;
+
+      VulkanSemaphore(VulkanSemaphore&&) noexcept;
+      VulkanSemaphore& operator=(VulkanSemaphore&&) noexcept = default;
+
       ~VulkanSemaphore();
       
       VkSemaphore get() const;

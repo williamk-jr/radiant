@@ -21,6 +21,8 @@ namespace Radiant {
       Renderer(Window& window, bool debug);
       void waitIdle();
 
+      uint32_t beginFrame();
+      void endFrame();
       void renderLoop();
     private:
       std::vector<const char*> instanceExtensions;
@@ -44,6 +46,7 @@ namespace Radiant {
       std::vector<VulkanBinarySemaphore> imageReadySemaphores;
       std::vector<VulkanBinarySemaphore> frameFinishedSemaphores;
       int currentFrame = 0;
+      bool isRendering = false;
 
       void initVulkan(Window& window, bool debug);
       std::vector<const char*> getInstanceExtensions(Window& window, bool debug);

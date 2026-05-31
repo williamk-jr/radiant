@@ -19,6 +19,11 @@ namespace Radiant {
     Logger::fatal("Unable to find a device that meets the provided requirements.");
   }
 
+  VulkanPhysicalDevice::VulkanPhysicalDevice(VulkanPhysicalDevice&& other) noexcept :
+    physicalDevice(other.physicalDevice) {
+    other.physicalDevice = nullptr;
+  }
+
   VulkanPhysicalDevice::~VulkanPhysicalDevice() {
     
   }

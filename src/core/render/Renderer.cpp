@@ -19,23 +19,40 @@ namespace Radiant {
   void Renderer::waitIdle() {
     this->device->waitIdle();
   } 
-  
-  void Renderer::renderLoop() {
-    // TODO layout transitions for images
+
+  uint32_t Renderer::beginFrame() {
+    this->isRendering = true;
     this->fences[currentFrame].wait(UINT32_MAX);
 
     uint32_t imageIndex = this->swapchain->acquireNextImage(&this->imageReadySemaphores[currentFrame], UINT64_MAX);
-    //Logger::info(std::to_string(imageIndex));
     this->fences[currentFrame].reset();
     this->commandBuffers[currentFrame].reset(false);
+
+    this->commandBuffers[currentFrame].begin(0);
+    return imageIndex;
+  }
+
+  void Renderer::endFrame() {
+
+    this->isRendering = false;
+  }
+  
+  void Renderer::renderLoop() {
+    this->fences[currentFrame].wait(UINT32_MAX);
+
+    uint32_t imageIndex = this->swapchain->acquireNextImage(&this->imageReadySemaphores[currentFrame], UINT64_MAX);
+    VulkanImage& currentImage = this->swapchain->getImage(imageIndex);
+
+    this->fences[currentFrame].reset();
+    this->commandBuffers[currentFrame].reset(false);
+
+    this->commandBuffers[currentFrame].begin(0);
     
     VkClearColorValue color{};
     color.float32[0] = 0;
     color.float32[1] = 0.5;
     color.float32[2] = 0;
     color.float32[3] = 1;
-
-    this->commandBuffers[currentFrame].begin(0);
 
     // Transition image layout to transfer dst optimal.
     VkImageSubresourceRange subresourceRange{};
@@ -51,17 +68,14 @@ namespace Radiant {
     imageMemoryBarrier.dstAccessMask = VK_ACCESS_2_MEMORY_READ_BIT | VK_ACCESS_2_MEMORY_WRITE_BIT;
     imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    imageMemoryBarrier.image = this->swapchain->getImage(imageIndex).get();
+    imageMemoryBarrier.image = currentImage.get();
     imageMemoryBarrier.subresourceRange = subresourceRange;
 
     std::vector<VkImageMemoryBarrier2> imageMemoryBarriers{imageMemoryBarrier};
     this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(imageMemoryBarriers, 0);
 
     // Clear Color
-    this->commandBuffers[currentFrame].clearColor(
-      this->swapchain->getImage(imageIndex),
-      color
-    );
+    this->commandBuffers[currentFrame].clearColor(currentImage, color);
 
     // Transition image to presentable layout.
     VkImageMemoryBarrier2 presentImageMemoryBarrier{};
@@ -72,7 +86,7 @@ namespace Radiant {
     presentImageMemoryBarrier.dstAccessMask = 0;
     presentImageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
     presentImageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-    presentImageMemoryBarrier.image = this->swapchain->getImage(imageIndex).get();
+    presentImageMemoryBarrier.image = currentImage.get();
     presentImageMemoryBarrier.subresourceRange = subresourceRange;
 
     std::vector<VkImageMemoryBarrier2> presentImageMemoryBarriers{presentImageMemoryBarrier};
@@ -93,9 +107,7 @@ namespace Radiant {
         this->fences[currentFrame]
     );
 
-    std::vector<VkSemaphore> rawSemaphores{this->frameFinishedSemaphores[currentFrame].get()};
-
-    this->presentQueue->present(*this->swapchain, {imageIndex}, rawSemaphores);
+    this->presentQueue->present(*this->swapchain, {imageIndex}, this->frameFinishedSemaphores[currentFrame]);
     this->currentFrame = (currentFrame+1)%swapchain->getImageCount();
   }
 

@@ -15,6 +15,11 @@ namespace Radiant {
     );
   }
 
+  VulkanFence::VulkanFence(VulkanFence&& other) noexcept :
+    fence(other.fence), device(other.device) {
+    other.fence = nullptr;
+  }
+
   VulkanFence::~VulkanFence() {
     vkDestroyFence(this->device.get(), this->fence, nullptr);
   }
