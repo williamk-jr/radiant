@@ -16,27 +16,11 @@ namespace Radiant {
 
     this->initVulkan(window, debug);
   }
+
   void Renderer::waitIdle() {
     this->device->waitIdle();
   } 
 
-  uint32_t Renderer::beginFrame() {
-    this->isRendering = true;
-    this->fences[currentFrame].wait(UINT32_MAX);
-
-    uint32_t imageIndex = this->swapchain->acquireNextImage(&this->imageReadySemaphores[currentFrame], UINT64_MAX);
-    this->fences[currentFrame].reset();
-    this->commandBuffers[currentFrame].reset(false);
-
-    this->commandBuffers[currentFrame].begin(0);
-    return imageIndex;
-  }
-
-  void Renderer::endFrame() {
-
-    this->isRendering = false;
-  }
-  
   void Renderer::renderLoop() {
     this->fences[currentFrame].wait(UINT32_MAX);
 
@@ -130,11 +114,6 @@ namespace Radiant {
     this->surface = std::make_unique<VulkanSurface>(*this->instance, window.getHandle());
     this->physicalDevice = std::make_unique<VulkanPhysicalDevice>(*this->instance, getPhysicalDeviceRequirements);
 
-    VkPhysicalDeviceProperties2 deviceProperties = {};
-    deviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    physicalDevice->getProperties(&deviceProperties);
-    std::cout << "Selected Device: " << deviceProperties.properties.deviceName << "\n";
-
     std::vector<const char*> enabledDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
     this->device = std::make_unique<VulkanDevice>(*this->physicalDevice, *this->surface, enabledDeviceExtensions); 
     this->memoryAllocator = std::make_unique<VulkanMemoryAllocator>(*instance, *physicalDevice, *device);
@@ -151,7 +130,6 @@ namespace Radiant {
     
     this->commandPool = std::make_unique<VulkanCommandPool>(*device, device->getGraphicsQueueFamily());
     this->commandBuffers = this->commandPool->allocateCommandBuffers(this->swapchain->getImageCount(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-    
 
     uint32_t imageCount = this->swapchain->getImageCount();
     this->fences.reserve(imageCount);

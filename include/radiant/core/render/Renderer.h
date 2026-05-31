@@ -21,8 +21,6 @@ namespace Radiant {
       Renderer(Window& window, bool debug);
       void waitIdle();
 
-      uint32_t beginFrame();
-      void endFrame();
       void renderLoop();
     private:
       std::vector<const char*> instanceExtensions;
