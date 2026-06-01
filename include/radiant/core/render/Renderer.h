@@ -1,11 +1,14 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <vulkan/vulkan_core.h>
 
+#include "radiant/core/render/Color.h"
 #include "radiant/core/render/Window.h"
 #include "radiant/core/render/vulkan/VulkanBinarySemaphore.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanFence.h"
+#include "radiant/core/render/vulkan/VulkanImageView.h"
 #include "radiant/core/render/vulkan/VulkanInstance.h"
 #include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
@@ -16,12 +19,27 @@
 #include "radiant/core/render/vulkan/VulkanImage.h"
 
 namespace Radiant {
+  struct RenderContext {
+    std::unique_ptr<VulkanImageView> imageView;
+    uint32_t imageIndex;
+  };
+
+
   class Renderer {
     public:
       Renderer(Window& window, bool debug);
       void waitIdle();
 
-      void renderLoop();
+      void beginFrame();
+      void beginRendering(Color clearColor);
+      void clear(Color color);
+      void clear(Color color, VkRect2D clearArea);
+      void endRendering();
+      void endFrame();
+
+      void submit();
+      void present();
+      
     private:
       std::vector<const char*> instanceExtensions;
       std::vector<const char*> instanceLayers;
@@ -43,6 +61,8 @@ namespace Radiant {
       std::vector<VulkanFence> fences;
       std::vector<VulkanBinarySemaphore> imageReadySemaphores;
       std::vector<VulkanBinarySemaphore> frameFinishedSemaphores;
+
+      RenderContext context;
       int currentFrame = 0;
       bool isRendering = false;
 

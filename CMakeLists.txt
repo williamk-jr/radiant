@@ -41,8 +41,10 @@ add_executable(Radiant
   src/core/render/vulkan/VulkanTimelineSemaphore.cpp
   src/core/render/vulkan/VulkanSwapchain.cpp
   src/core/render/vulkan/VulkanImage.cpp
+  src/core/render/vulkan/VulkanImageView.cpp
   src/core/render/vulkan/VulkanUtil.cpp
 
+  src/core/render/Color.cpp
   src/core/render/Renderer.cpp
   src/core/render/Window.cpp
 )

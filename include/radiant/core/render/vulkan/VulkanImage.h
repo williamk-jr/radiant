@@ -7,7 +7,7 @@ namespace Radiant {
   class VulkanImage {
     public:
       VulkanImage(VulkanMemoryAllocator& allocator, VkExtent3D extent);
-      VulkanImage(VkImage image);
+      VulkanImage(VkImage image, VkExtent2D extent);
       VulkanImage(const VulkanImage&) = delete;
       VulkanImage& operator=(const VulkanImage&) = delete;
 
@@ -16,10 +16,12 @@ namespace Radiant {
       ~VulkanImage();
       
       VkImage get();
+      VkExtent3D getExtent();
       VkImageMemoryBarrier2 createMemoryBarrier();
 
     private:
       VkImage image;
+      VkExtent3D extent;
       VmaAllocation imageMemory;
       VulkanMemoryAllocator* allocator;
   };

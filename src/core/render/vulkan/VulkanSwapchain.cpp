@@ -55,7 +55,7 @@ namespace Radiant {
     vkGetSwapchainImagesKHR(device.get(), this->swapchain, &swapchainImageCount, rawImages.data());
 
     for (VkImage rawImage : rawImages) {
-      this->images.emplace_back(rawImage);
+      this->images.emplace_back(rawImage, surfaceCapabilities.surfaceCapabilities.currentExtent);
     }
   }
 

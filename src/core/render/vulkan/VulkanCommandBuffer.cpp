@@ -1,4 +1,6 @@
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
+#include "radiant/core/render/vulkan/VulkanSwapchain.h"
+#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
 
@@ -65,6 +67,46 @@ namespace Radiant {
     imageSubresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
     //vkTransitionImageLayout(VkDevice device, uint32_t transitionCount, const VkHostImageLayoutTransitionInfo *pTransitions)
     vkCmdClearColorImage(this->commandBuffer, image.get(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &color, 1, &imageSubresourceRange);
+  }
+  
+  void VulkanCommandBuffer::beginRendering(std::vector<VkRenderingAttachmentInfo>* colorAttachments, VkRenderingAttachmentInfo* depthAttachment, VkRenderingAttachmentInfo* stencilAttachment, VkRect2D renderArea, VkRenderingFlags renderingFlags) {
+    VkRenderingInfo renderingInfo{};
+    renderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+    renderingInfo.flags = renderingFlags;
+    renderingInfo.layerCount = 1;
+    renderingInfo.renderArea = renderArea;
+    renderingInfo.colorAttachmentCount = colorAttachments->size();
+    renderingInfo.pColorAttachments = colorAttachments->data();
+    renderingInfo.pDepthAttachment = depthAttachment;
+    renderingInfo.pStencilAttachment = stencilAttachment;
+
+    vkCmdBeginRendering(this->commandBuffer, &renderingInfo);
+  }
+
+  void VulkanCommandBuffer::clearAttachments(std::vector<VkClearAttachment> clearAttachments, std::vector<VkClearRect> clearAreas) {
+    vkCmdClearAttachments(
+        this->commandBuffer, 
+        clearAttachments.size(), clearAttachments.data(), 
+        clearAreas.size(), clearAreas.data()
+    );
+  }
+  
+  void VulkanCommandBuffer::clearAttachment(VulkanImage& image, VkClearAttachment clearAttachment) {
+    VkExtent3D imageExtent = image.getExtent();
+    VkRect2D imageSize{};
+    imageSize.extent.width = imageExtent.width;
+    imageSize.extent.height = imageExtent.height;
+
+    VkClearRect clearArea{};
+    clearArea.rect = imageSize;
+    clearArea.baseArrayLayer = 0;
+    clearArea.layerCount = 1;
+
+    this->clearAttachments({clearAttachment}, {clearArea});
+  }
+
+  void VulkanCommandBuffer::endRendering() {
+    vkCmdEndRendering(this->commandBuffer);
   }
   
   //void VulkanCommandBuffer::beginRendering(VkRenderingFlags renderingFlags) {

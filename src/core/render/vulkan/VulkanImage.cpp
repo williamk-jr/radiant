@@ -4,7 +4,7 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-  VulkanImage::VulkanImage(VulkanMemoryAllocator& allocator, VkExtent3D extent) : allocator(&allocator) {
+  VulkanImage::VulkanImage(VulkanMemoryAllocator& allocator, VkExtent3D extent) : allocator(&allocator), extent(extent) {
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -27,12 +27,13 @@ namespace Radiant {
     );
   }
   
-  VulkanImage::VulkanImage(VkImage image) : allocator(nullptr) {
+  VulkanImage::VulkanImage(VkImage image, VkExtent2D extent) : allocator(nullptr) {
+    this->extent = {extent.width, extent.height, 1};
     this->image = image;
   }
 
   VulkanImage::VulkanImage(VulkanImage&& other) noexcept :
-    image(other.image), imageMemory(other.imageMemory), allocator(other.allocator) {
+      image(other.image), extent(other.extent), imageMemory(other.imageMemory), allocator(other.allocator) {
     other.image = nullptr;
     other.imageMemory = nullptr;
   }
@@ -46,5 +47,9 @@ namespace Radiant {
 
   VkImage VulkanImage::get() {
     return this->image;
+  }
+  
+  VkExtent3D VulkanImage::getExtent() {
+    return this->extent;
   }
 }

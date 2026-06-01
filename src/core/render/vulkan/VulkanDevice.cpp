@@ -1,4 +1,5 @@
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
   VulkanDevice::VulkanDevice(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface, std::vector<const char*>& extensions) {
@@ -71,8 +72,11 @@ namespace Radiant {
     VkPhysicalDeviceVulkan13Features vulkan13Features{};
     vulkan13Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
     vulkan13Features.synchronization2 = VK_TRUE;
+    vulkan13Features.dynamicRendering = VK_TRUE;
     vulkan13Features.pNext = nullptr;
     
+
+
     VkDeviceCreateInfo deviceInfo{};
     deviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     deviceInfo.queueCreateInfoCount = deviceQueueInfos.size();

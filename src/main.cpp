@@ -28,10 +28,21 @@ int main() {
   const std::string applicationName = "Test";
   Radiant::Window window(applicationName, 500, 500);
   Radiant::Renderer renderer(window, true);
+  Radiant::Color color{0,1,0,1};
 
   while (!window.shouldClose()) {
     window.pollEvents(); 
-    renderer.renderLoop();
+    renderer.beginFrame();
+    renderer.beginRendering(color);
+
+    renderer.clear({1, 0, 0, 1}, {{0,0}, {200, 200}});
+
+    renderer.endRendering();
+    renderer.endFrame();
+
+    renderer.submit();
+    renderer.present();
+    //renderer.renderLoop();
   }
 
   renderer.waitIdle();

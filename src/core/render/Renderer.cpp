@@ -3,10 +3,12 @@
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanFence.h"
 #include "radiant/core/render/vulkan/VulkanImage.h"
+#include "radiant/core/render/vulkan/VulkanImageView.h"
 #include "radiant/core/render/vulkan/VulkanQueue.h"
 #include "radiant/util/logger/Logger.h"
 #include <memory>
 #include <string>
+#include <utility>
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -21,29 +23,32 @@ namespace Radiant {
     this->device->waitIdle();
   } 
 
-  void Renderer::renderLoop() {
+  void Renderer::beginFrame() {
     this->fences[currentFrame].wait(UINT32_MAX);
 
     uint32_t imageIndex = this->swapchain->acquireNextImage(&this->imageReadySemaphores[currentFrame], UINT64_MAX);
     VulkanImage& currentImage = this->swapchain->getImage(imageIndex);
 
-    this->fences[currentFrame].reset();
-    this->commandBuffers[currentFrame].reset(false);
-
-    this->commandBuffers[currentFrame].begin(0);
-    
-    VkClearColorValue color{};
-    color.float32[0] = 0;
-    color.float32[1] = 0.5;
-    color.float32[2] = 0;
-    color.float32[3] = 1;
-
-    // Transition image layout to transfer dst optimal.
     VkImageSubresourceRange subresourceRange{};
     subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     subresourceRange.levelCount = 1;
     subresourceRange.layerCount = 1;
 
+    VkComponentMapping componentMapping{};
+    componentMapping.r = VK_COMPONENT_SWIZZLE_R;
+    componentMapping.g = VK_COMPONENT_SWIZZLE_G;
+    componentMapping.b = VK_COMPONENT_SWIZZLE_B;
+    componentMapping.a = VK_COMPONENT_SWIZZLE_A;
+
+    this->context.imageView = std::make_unique<VulkanImageView>(*this->device, currentImage, componentMapping, subresourceRange, 0);
+    this->context.imageIndex = imageIndex;
+
+    this->fences[currentFrame].reset();
+    this->commandBuffers[currentFrame].reset(false);
+
+    this->commandBuffers[currentFrame].begin(0);
+
+    // Transition image layout to transfer dst optimal.
     VkImageMemoryBarrier2 imageMemoryBarrier{};
     imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
     imageMemoryBarrier.srcStageMask = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
@@ -51,32 +56,83 @@ namespace Radiant {
     imageMemoryBarrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
     imageMemoryBarrier.dstAccessMask = VK_ACCESS_2_MEMORY_READ_BIT | VK_ACCESS_2_MEMORY_WRITE_BIT;
     imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
     imageMemoryBarrier.image = currentImage.get();
     imageMemoryBarrier.subresourceRange = subresourceRange;
 
     std::vector<VkImageMemoryBarrier2> imageMemoryBarriers{imageMemoryBarrier};
     this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(imageMemoryBarriers, 0);
+  }
 
-    // Clear Color
-    this->commandBuffers[currentFrame].clearColor(currentImage, color);
+  void Renderer::beginRendering(Color clearColor) {
+    float* rawColor = clearColor.raw();
 
-    // Transition image to presentable layout.
+    std::vector<VkRenderingAttachmentInfo> colorAttachment(1);
+    colorAttachment[0].sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+    colorAttachment[0].imageLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
+    colorAttachment[0].imageView = this->context.imageView->get(); 
+    colorAttachment[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    colorAttachment[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    colorAttachment[0].clearValue = {{rawColor[0], rawColor[1], rawColor[2], rawColor[3]}};
+
+    VulkanImage& currentImage = this->swapchain->getImage(this->context.imageIndex);
+    VkExtent3D imageExtent = currentImage.getExtent(); // TODO remove getExtent, as changing swapchain extent will cause image extent to be out of date.
+
+    VkRect2D renderArea{};
+    renderArea.extent = {imageExtent.width, imageExtent.height};
+
+    this->commandBuffers[currentFrame].beginRendering(&colorAttachment, nullptr, nullptr, renderArea, 0);
+  }
+
+  void Renderer::clear(Color color) {
+    VulkanImage& currentImage = this->swapchain->getImage(this->context.imageIndex);
+    VkExtent3D imageExtent = currentImage.getExtent();
+    this->clear(color, {{0,0},{imageExtent.width, imageExtent.height}});
+  }
+
+  void Renderer::clear(Color color, VkRect2D clearArea) {
+    float* rawColor = color.raw();
+
+    VkClearAttachment clearAttachment{};
+    clearAttachment.clearValue = {{rawColor[0], rawColor[1], rawColor[2], rawColor[3]}};
+    clearAttachment.colorAttachment = 0;
+    clearAttachment.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+
+    VkClearRect clearRect{};
+    clearRect.rect = clearArea;
+    clearRect.baseArrayLayer = 0;
+    clearRect.layerCount = 1;
+  
+    this->commandBuffers[currentFrame].clearAttachments({clearAttachment}, {clearRect});
+  }
+
+  void Renderer::endRendering() {
+    this->commandBuffers[currentFrame].endRendering();
+  }
+
+  void Renderer::endFrame() {
+    VkImageSubresourceRange subresourceRange{};
+    subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    subresourceRange.levelCount = 1;
+    subresourceRange.layerCount = 1;
+
     VkImageMemoryBarrier2 presentImageMemoryBarrier{};
     presentImageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
     presentImageMemoryBarrier.srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
     presentImageMemoryBarrier.srcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT;
     presentImageMemoryBarrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
     presentImageMemoryBarrier.dstAccessMask = 0;
-    presentImageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    presentImageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
     presentImageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-    presentImageMemoryBarrier.image = currentImage.get();
+    presentImageMemoryBarrier.image = this->swapchain->getImage(this->context.imageIndex).get();
     presentImageMemoryBarrier.subresourceRange = subresourceRange;
 
     std::vector<VkImageMemoryBarrier2> presentImageMemoryBarriers{presentImageMemoryBarrier};
     this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(presentImageMemoryBarriers, 0);
     this->commandBuffers[currentFrame].end();
+  }
 
+  void Renderer::submit() {
     VulkanSemaphoreSubmitInfo imageReadySemaphoreSubmitInfo{};
     imageReadySemaphoreSubmitInfo.semaphore = &this->imageReadySemaphores[currentFrame];
     imageReadySemaphoreSubmitInfo.flags = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
@@ -84,14 +140,17 @@ namespace Radiant {
     VulkanSemaphoreSubmitInfo frameFinishedSemaphoreSubmitInfo{};
     frameFinishedSemaphoreSubmitInfo.semaphore = &this->frameFinishedSemaphores[currentFrame];
     
+
     this->graphicsQueue->submit(
         this->commandBuffers[currentFrame], 
         &imageReadySemaphoreSubmitInfo, 
         &frameFinishedSemaphoreSubmitInfo, 
         this->fences[currentFrame]
     );
+  }
 
-    this->presentQueue->present(*this->swapchain, {imageIndex}, this->frameFinishedSemaphores[currentFrame]);
+  void Renderer::present() {
+    this->presentQueue->present(*this->swapchain, {this->context.imageIndex}, this->frameFinishedSemaphores[currentFrame]);
     this->currentFrame = (currentFrame+1)%swapchain->getImageCount();
   }
 
@@ -141,7 +200,6 @@ namespace Radiant {
       this->imageReadySemaphores.emplace_back(*this->device, 0);
       this->frameFinishedSemaphores.emplace_back(*this->device, 0);
     }
-    Logger::info(std::to_string(this->frameFinishedSemaphores.size()));
   }
 
   bool Renderer::getPhysicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {

@@ -23,7 +23,18 @@ namespace Radiant {
       void pipelineImageMemoryBarrier(std::vector<VkImageMemoryBarrier2>& memoryBarriers, VkDependencyFlags dependencyFlags);
       void pipelineBufferMemoryBarrier(std::vector<VkBufferMemoryBarrier2>& memoryBarriers, VkDependencyFlags dependencyFlags);
       void clearColor(VulkanImage& image, VkClearColorValue& color);
-      //void beginRendering();
+      
+      void beginRendering(
+          std::vector<VkRenderingAttachmentInfo>* colorAttachments, 
+          VkRenderingAttachmentInfo* depthAttachment, 
+          VkRenderingAttachmentInfo* stencilAttachment, 
+          VkRect2D renderArea, VkRenderingFlags renderingFlags
+      );
+
+      void clearAttachments(std::vector<VkClearAttachment> clearAttachments, std::vector<VkClearRect> clearAreas);
+      void clearAttachment(VulkanImage& image, VkClearAttachment clearAttachment);
+
+      void endRendering();
 
 
       void end();
