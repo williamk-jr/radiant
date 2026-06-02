@@ -28,24 +28,15 @@ namespace Radiant {
 
     uint32_t imageIndex = this->swapchain->acquireNextImage(&this->imageReadySemaphores[currentFrame], UINT64_MAX);
     VulkanImage& currentImage = this->swapchain->getImage(imageIndex);
+    VulkanImageView& currentImageView = this->swapchain->getImageView(imageIndex);
 
     VkImageSubresourceRange subresourceRange{};
     subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     subresourceRange.levelCount = 1;
     subresourceRange.layerCount = 1;
 
-    VkComponentMapping componentMapping{};
-    componentMapping.r = VK_COMPONENT_SWIZZLE_R;
-    componentMapping.g = VK_COMPONENT_SWIZZLE_G;
-    componentMapping.b = VK_COMPONENT_SWIZZLE_B;
-    componentMapping.a = VK_COMPONENT_SWIZZLE_A;
-
-    this->context.imageView = std::make_unique<VulkanImageView>(*this->device, currentImage, componentMapping, subresourceRange, 0);
-    this->context.imageIndex = imageIndex;
-
     this->fences[currentFrame].reset();
     this->commandBuffers[currentFrame].reset(false);
-
     this->commandBuffers[currentFrame].begin(0);
 
     // Transition image layout to transfer dst optimal.
@@ -62,6 +53,11 @@ namespace Radiant {
 
     std::vector<VkImageMemoryBarrier2> imageMemoryBarriers{imageMemoryBarrier};
     this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(imageMemoryBarriers, 0);
+
+    this->context = std::make_unique<RenderContext>(
+      currentImageView,
+      imageIndex
+    );
   }
 
   void Renderer::beginRendering(Color clearColor) {
@@ -70,12 +66,12 @@ namespace Radiant {
     std::vector<VkRenderingAttachmentInfo> colorAttachment(1);
     colorAttachment[0].sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
     colorAttachment[0].imageLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
-    colorAttachment[0].imageView = this->context.imageView->get(); 
+    colorAttachment[0].imageView = this->context->imageView.get(); 
     colorAttachment[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     colorAttachment[0].clearValue = {{rawColor[0], rawColor[1], rawColor[2], rawColor[3]}};
 
-    VulkanImage& currentImage = this->swapchain->getImage(this->context.imageIndex);
+    VulkanImage& currentImage = this->swapchain->getImage(this->context->imageIndex);
     VkExtent3D imageExtent = currentImage.getExtent(); // TODO remove getExtent, as changing swapchain extent will cause image extent to be out of date.
 
     VkRect2D renderArea{};
@@ -85,7 +81,7 @@ namespace Radiant {
   }
 
   void Renderer::clear(Color color) {
-    VulkanImage& currentImage = this->swapchain->getImage(this->context.imageIndex);
+    VulkanImage& currentImage = this->swapchain->getImage(this->context->imageIndex);
     VkExtent3D imageExtent = currentImage.getExtent();
     this->clear(color, {{0,0},{imageExtent.width, imageExtent.height}});
   }
@@ -124,7 +120,7 @@ namespace Radiant {
     presentImageMemoryBarrier.dstAccessMask = 0;
     presentImageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
     presentImageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-    presentImageMemoryBarrier.image = this->swapchain->getImage(this->context.imageIndex).get();
+    presentImageMemoryBarrier.image = this->swapchain->getImage(this->context->imageIndex).get();
     presentImageMemoryBarrier.subresourceRange = subresourceRange;
 
     std::vector<VkImageMemoryBarrier2> presentImageMemoryBarriers{presentImageMemoryBarrier};
@@ -150,7 +146,7 @@ namespace Radiant {
   }
 
   void Renderer::present() {
-    this->presentQueue->present(*this->swapchain, {this->context.imageIndex}, this->frameFinishedSemaphores[currentFrame]);
+    this->presentQueue->present(*this->swapchain, {this->context->imageIndex}, this->frameFinishedSemaphores[currentFrame]);
     this->currentFrame = (currentFrame+1)%swapchain->getImageCount();
   }
 

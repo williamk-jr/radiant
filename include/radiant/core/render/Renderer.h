@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <memory>
 #include <vector>
 #include <vulkan/vulkan_core.h>
@@ -20,8 +21,11 @@
 
 namespace Radiant {
   struct RenderContext {
-    std::unique_ptr<VulkanImageView> imageView;
+    VulkanImageView& imageView;
     uint32_t imageIndex;
+
+    RenderContext(VulkanImageView& imageView, uint32_t imageIndex) :
+      imageView(imageView), imageIndex(imageIndex) {}
   };
 
 
@@ -62,7 +66,7 @@ namespace Radiant {
       std::vector<VulkanBinarySemaphore> imageReadySemaphores;
       std::vector<VulkanBinarySemaphore> frameFinishedSemaphores;
 
-      RenderContext context;
+      std::unique_ptr<RenderContext> context;
       int currentFrame = 0;
       bool isRendering = false;
 

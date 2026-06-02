@@ -1,6 +1,7 @@
 #pragma once
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanImage.h"
+#include "radiant/core/render/vulkan/VulkanImageView.h"
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
 #include "radiant/core/render/vulkan/VulkanSemaphore.h"
 #include "radiant/core/render/vulkan/VulkanSurface.h"
@@ -22,10 +23,14 @@ namespace Radiant {
       VkExtent2D getExtent(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface);
       uint32_t acquireNextImage(VulkanSemaphore* semaphore, uint64_t timeout);
       VulkanImage& getImage(uint32_t index);
+      VulkanImageView& getImageView(uint32_t index);
       uint32_t getImageCount();
+
+      void resize();
     private:
       VkSwapchainKHR swapchain;
       std::vector<VulkanImage> images;
+      std::vector<VulkanImageView> imageViews;
       VulkanDevice& device;
       
       VkSurfaceFormat2KHR findSurfaceFormat(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface);

@@ -3,6 +3,7 @@
 #include "radiant/core/render/vulkan/VulkanSemaphore.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <cstdint>
+#include <string>
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -50,12 +51,27 @@ namespace Radiant {
     
     uint32_t swapchainImageCount = 0;
     vkGetSwapchainImagesKHR(device.get(), this->swapchain, &swapchainImageCount, nullptr);
-    std::vector<VkImage> rawImages(swapchainImageCount);
+
+    std::vector<VkImage> rawImages;
+    rawImages.reserve(swapchainImageCount);
     this->images.reserve(swapchainImageCount);
+    this->imageViews.reserve(swapchainImageCount);
     vkGetSwapchainImagesKHR(device.get(), this->swapchain, &swapchainImageCount, rawImages.data());
 
-    for (VkImage rawImage : rawImages) {
-      this->images.emplace_back(rawImage, surfaceCapabilities.surfaceCapabilities.currentExtent);
+    VkImageSubresourceRange subresourceRange{};
+    subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    subresourceRange.levelCount = 1;
+    subresourceRange.layerCount = 1;
+
+    VkComponentMapping componentMapping{};
+    componentMapping.r = VK_COMPONENT_SWIZZLE_R;
+    componentMapping.g = VK_COMPONENT_SWIZZLE_G;
+    componentMapping.b = VK_COMPONENT_SWIZZLE_B;
+    componentMapping.a = VK_COMPONENT_SWIZZLE_A;
+
+    for (int i = 0; i < swapchainImageCount; i++) {
+      this->images.emplace_back(rawImages[i], surfaceCapabilities.surfaceCapabilities.currentExtent);
+      this->imageViews.emplace_back(device, this->images[i], componentMapping, subresourceRange, 0);
     }
   }
 
@@ -89,14 +105,26 @@ namespace Radiant {
     return this->images[index];
   }
 
+  VulkanImageView& VulkanSwapchain::getImageView(uint32_t index) {
+    return this->imageViews[index];
+  }
+
   uint32_t VulkanSwapchain::getImageCount() {
     return this->images.size();
   }
 
   uint32_t VulkanSwapchain::acquireNextImage(VulkanSemaphore* semaphore, uint64_t timeout) {
     uint32_t imageIndex;
-    vkAcquireNextImageKHR(this->device.get(), this->swapchain, timeout, semaphore->get(), nullptr, &imageIndex);
+    VkResult result = vkAcquireNextImageKHR(this->device.get(), this->swapchain, timeout, semaphore->get(), nullptr, &imageIndex);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+      this->resize();
+    }
     return imageIndex;
+  }
+
+  void VulkanSwapchain::resize() {
+    this->device.waitIdle();
+
   }
 
   VkSurfaceFormat2KHR VulkanSwapchain::findSurfaceFormat(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface) {
