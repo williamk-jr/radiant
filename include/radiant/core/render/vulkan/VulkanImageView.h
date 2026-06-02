@@ -19,6 +19,6 @@ namespace Radiant {
 
     private:
       VkImageView imageView;
-      VulkanDevice& device;
+      VkDevice device;
   };
 }

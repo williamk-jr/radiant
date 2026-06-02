@@ -2,10 +2,9 @@
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <cstdint>
-#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-  VulkanFence::VulkanFence(VulkanDevice& device, VkFenceCreateFlags flags) : device(device) {
+  VulkanFence::VulkanFence(VulkanDevice& device, VkFenceCreateFlags flags) : device(device.get()) {
     VkFenceCreateInfo fenceInfo{};
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceInfo.flags = flags;
@@ -21,7 +20,7 @@ namespace Radiant {
   }
 
   VulkanFence::~VulkanFence() {
-    vkDestroyFence(this->device.get(), this->fence, nullptr);
+    vkDestroyFence(this->device, this->fence, nullptr);
   }
   
   VkFence VulkanFence::get() {
@@ -29,15 +28,15 @@ namespace Radiant {
   }
   
   void VulkanFence::reset() {
-    vkResetFences(this->device.get(), 1, &this->fence);
+    vkResetFences(this->device, 1, &this->fence);
   }
 
   void VulkanFence::wait(uint32_t timeout) {
-    vkWaitForFences(this->device.get(), 1, &this->fence, VK_TRUE, timeout);
+    vkWaitForFences(this->device, 1, &this->fence, VK_TRUE, timeout);
   }
   
   bool VulkanFence::isSignaled() {
-    return vkGetFenceStatus(this->device.get(), this->fence) == VK_SUCCESS;
+    return vkGetFenceStatus(this->device, this->fence) == VK_SUCCESS;
   }
   
 

@@ -1,15 +1,4 @@
 #include "radiant/core/render/Renderer.h"
-#include "radiant/core/render/vulkan/VulkanCommandPool.h"
-#include "radiant/core/render/vulkan/VulkanDevice.h"
-#include "radiant/core/render/vulkan/VulkanFence.h"
-#include "radiant/core/render/vulkan/VulkanImage.h"
-#include "radiant/core/render/vulkan/VulkanImageView.h"
-#include "radiant/core/render/vulkan/VulkanQueue.h"
-#include "radiant/util/logger/Logger.h"
-#include <memory>
-#include <string>
-#include <utility>
-#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
   Renderer::Renderer(Window& window, bool debug) {

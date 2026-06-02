@@ -1,5 +1,4 @@
 #include "radiant/core/render/Window.h"
-#include <GLFW/glfw3.h>
 
 namespace Radiant {
   Window::Window(const std::string& title, int width, int height) : title(title) {

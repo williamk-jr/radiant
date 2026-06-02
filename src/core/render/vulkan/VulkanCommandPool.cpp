@@ -2,7 +2,7 @@
 #include "radiant/core/render/vulkan/VulkanCommandPool.h"
 
 namespace Radiant {
-  VulkanCommandPool::VulkanCommandPool(VulkanDevice& device, uint32_t queueFamily) : device(device) {
+  VulkanCommandPool::VulkanCommandPool(VulkanDevice& device, uint32_t queueFamily) : device(device.get()) {
     VkCommandPoolCreateInfo commandPoolInfo{};
     commandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     commandPoolInfo.queueFamilyIndex = queueFamily;
@@ -19,12 +19,12 @@ namespace Radiant {
   }
   
   VulkanCommandPool::~VulkanCommandPool() {
-    vkDestroyCommandPool(this->device.get(), this->commandPool, nullptr);
+    vkDestroyCommandPool(this->device, this->commandPool, nullptr);
   }
 
   void VulkanCommandPool::reset(bool recycleResources) {
     Validation::verify(
-      vkResetCommandPool(this->device.get(), this->commandPool, recycleResources ? VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT : 0)
+      vkResetCommandPool(this->device, this->commandPool, recycleResources ? VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT : 0)
     );
   }
   
@@ -38,7 +38,7 @@ namespace Radiant {
     commandBufferAllocateInfo.level = level;
 
     Validation::verify(
-      vkAllocateCommandBuffers(this->device.get(), &commandBufferAllocateInfo, commandBuffers.data())
+      vkAllocateCommandBuffers(this->device, &commandBufferAllocateInfo, commandBuffers.data())
     );
 
     std::vector<VulkanCommandBuffer> wrappedCommandBuffers;
@@ -58,6 +58,6 @@ namespace Radiant {
       rawCommandBuffers[i] = commandBuffers[i].get();
     }
 
-    vkFreeCommandBuffers(this->device.get(), this->commandPool, commandBuffers.size(), rawCommandBuffers);
+    vkFreeCommandBuffers(this->device, this->commandPool, commandBuffers.size(), rawCommandBuffers);
   }
 }

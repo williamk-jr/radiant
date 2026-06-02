@@ -20,7 +20,7 @@ namespace Radiant {
     protected:
       VulkanSemaphore(VulkanDevice& device, VkSemaphoreTypeCreateInfo type, VkSemaphoreCreateFlags flags);
 
-      VulkanDevice& device;
+      VkDevice device;
     private:
       VkSemaphore semaphore;
   };

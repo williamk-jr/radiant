@@ -1,13 +1,7 @@
 #include "radiant/core/render/vulkan/VulkanSwapchain.h"
-#include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
-#include "radiant/core/render/vulkan/VulkanSemaphore.h"
-#include "radiant/core/render/vulkan/VulkanUtil.h"
-#include <cstdint>
-#include <string>
-#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-  VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkSwapchainCreateFlagsKHR swapchainFlags) : device(device) {
+  VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkSwapchainCreateFlagsKHR swapchainFlags) : device(device.get()) {
     VkPhysicalDeviceSurfaceInfo2KHR surfaceInfo{};
     surfaceInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR;
     surfaceInfo.surface = surface.get();
@@ -81,7 +75,7 @@ namespace Radiant {
   }
 
   VulkanSwapchain::~VulkanSwapchain() {
-    vkDestroySwapchainKHR(this->device.get(), this->swapchain, nullptr); 
+    vkDestroySwapchainKHR(this->device, this->swapchain, nullptr); 
   }
   
   VkExtent2D VulkanSwapchain::getExtent(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface) {
@@ -115,7 +109,7 @@ namespace Radiant {
 
   uint32_t VulkanSwapchain::acquireNextImage(VulkanSemaphore* semaphore, uint64_t timeout) {
     uint32_t imageIndex;
-    VkResult result = vkAcquireNextImageKHR(this->device.get(), this->swapchain, timeout, semaphore->get(), nullptr, &imageIndex);
+    VkResult result = vkAcquireNextImageKHR(this->device, this->swapchain, timeout, semaphore->get(), nullptr, &imageIndex);
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
       this->resize();
     }
@@ -123,7 +117,7 @@ namespace Radiant {
   }
 
   void VulkanSwapchain::resize() {
-    this->device.waitIdle();
+    //this->device.waitIdle();
 
   }
 

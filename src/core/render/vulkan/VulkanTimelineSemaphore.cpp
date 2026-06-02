@@ -1,8 +1,5 @@
 
 #include "radiant/core/render/vulkan/VulkanTimelineSemaphore.h"
-#include "radiant/core/render/vulkan/VulkanUtil.h"
-#include <cstdint>
-#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
   VulkanTimelineSemaphore::VulkanTimelineSemaphore(VulkanDevice& device, VkSemaphoreCreateFlags flags, uint64_t initialValue) :
@@ -19,7 +16,7 @@ namespace Radiant {
 
   uint64_t VulkanTimelineSemaphore::getCounterValue() {
     uint64_t value = 0;
-    vkGetSemaphoreCounterValue(this->device.get(), this->get(), &value);
+    vkGetSemaphoreCounterValue(this->device, this->get(), &value);
     return value;
   }
   
@@ -30,7 +27,7 @@ namespace Radiant {
     signalInfo.value = value;
 
     Validation::verify(
-      vkSignalSemaphore(this->device.get(), &signalInfo)
+      vkSignalSemaphore(this->device, &signalInfo)
     );
   }
 

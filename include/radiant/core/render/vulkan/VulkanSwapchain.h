@@ -31,7 +31,7 @@ namespace Radiant {
       VkSwapchainKHR swapchain;
       std::vector<VulkanImage> images;
       std::vector<VulkanImageView> imageViews;
-      VulkanDevice& device;
+      VkDevice device;
       
       VkSurfaceFormat2KHR findSurfaceFormat(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface);
   };

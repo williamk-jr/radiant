@@ -1,6 +1,4 @@
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
-#include "radiant/core/render/vulkan/VulkanSwapchain.h"
-#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
 

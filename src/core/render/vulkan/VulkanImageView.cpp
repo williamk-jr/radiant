@@ -1,9 +1,7 @@
 #include "radiant/core/render/vulkan/VulkanImageView.h"
-#include "radiant/core/render/vulkan/VulkanImage.h"
-#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-    VulkanImageView::VulkanImageView(VulkanDevice& device, VulkanImage& image, VkComponentMapping componentMapping, VkImageSubresourceRange subresourceRange, VkImageViewCreateFlags flags) : device(device) {
+    VulkanImageView::VulkanImageView(VulkanDevice& device, VulkanImage& image, VkComponentMapping componentMapping, VkImageSubresourceRange subresourceRange, VkImageViewCreateFlags flags) : device(device.get()) {
     VkImageViewCreateInfo imageViewInfo{};
     imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     imageViewInfo.image = image.get();
@@ -21,7 +19,7 @@ namespace Radiant {
   }
   
   VulkanImageView::~VulkanImageView() {
-    vkDestroyImageView(this->device.get(), this->imageView, nullptr);
+    vkDestroyImageView(this->device, this->imageView, nullptr);
   }
   
   VkImageView VulkanImageView::get() {

@@ -1,8 +1,7 @@
 #include "radiant/core/render/vulkan/VulkanSemaphore.h"
-#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-  VulkanSemaphore::VulkanSemaphore(VulkanDevice& device, VkSemaphoreTypeCreateInfo type, VkSemaphoreCreateFlags flags) : device(device) {
+  VulkanSemaphore::VulkanSemaphore(VulkanDevice& device, VkSemaphoreTypeCreateInfo type, VkSemaphoreCreateFlags flags) : device(device.get()) {
     VkSemaphoreCreateInfo semaphoreInfo{};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     semaphoreInfo.flags = flags;
@@ -15,10 +14,11 @@ namespace Radiant {
   VulkanSemaphore::VulkanSemaphore(VulkanSemaphore&& other) noexcept :
     semaphore(other.semaphore), device(other.device) {
     other.semaphore = nullptr;
+    other.device = nullptr;
   }
   
   VulkanSemaphore::~VulkanSemaphore() {
-    vkDestroySemaphore(this->device.get(), this->semaphore, nullptr);
+    vkDestroySemaphore(this->device, this->semaphore, nullptr);
   }
 
   VkSemaphore VulkanSemaphore::get() const {

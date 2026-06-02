@@ -21,6 +21,6 @@ namespace Radiant {
       void freeCommandBuffers(std::vector<VulkanCommandBuffer> commandBuffers);
     private:
       VkCommandPool commandPool;
-      VulkanDevice& device;
+      VkDevice device;
   };
 }

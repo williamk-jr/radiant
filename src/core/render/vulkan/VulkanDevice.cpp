@@ -1,5 +1,4 @@
 #include "radiant/core/render/vulkan/VulkanDevice.h"
-#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
   VulkanDevice::VulkanDevice(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface, std::vector<const char*>& extensions) {

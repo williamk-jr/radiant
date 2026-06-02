@@ -1,12 +1,8 @@
 #include "radiant/core/render/vulkan/VulkanSurface.h"
-#include "radiant/core/render/vulkan/VulkanUtil.h"
-#include <stdexcept>
-#include <string>
-#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
 #ifdef HAS_GLFW
-  VulkanSurface::VulkanSurface(VulkanInstance& instance, GLFWwindow* window) : instance(instance) {
+  VulkanSurface::VulkanSurface(VulkanInstance& instance, GLFWwindow* window) : instance(instance.get()) {
     Validation::verify(
       glfwCreateWindowSurface(instance.get(), window, nullptr, &this->surface)
     );
@@ -23,7 +19,7 @@ namespace Radiant {
   }
 
   VulkanSurface::~VulkanSurface() {
-    vkDestroySurfaceKHR(this->instance.get(), this->surface, nullptr);
+    vkDestroySurfaceKHR(this->instance, this->surface, nullptr);
   }
   
   VkSurfaceKHR VulkanSurface::get() {

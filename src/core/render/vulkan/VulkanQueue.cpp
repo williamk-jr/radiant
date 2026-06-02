@@ -1,11 +1,4 @@
 #include "radiant/core/render/vulkan/VulkanQueue.h"
-#include "radiant/core/render/vulkan/VulkanCommandPool.h"
-#include "radiant/core/render/vulkan/VulkanFence.h"
-#include "radiant/core/render/vulkan/VulkanSemaphore.h"
-#include <memory>
-#include <string>
-#include <vector>
-#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
   VulkanQueue::VulkanQueue(VulkanDevice& device, uint32_t queueFamily, uint32_t queueIndex) {

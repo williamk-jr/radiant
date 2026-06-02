@@ -30,6 +30,6 @@ namespace Radiant {
       VkSurfaceKHR get();
     private:
       VkSurfaceKHR surface;
-      VulkanInstance& instance;
+      VkInstance instance;
   };
 }

@@ -20,6 +20,6 @@ namespace Radiant {
       static void waitForFences(VulkanDevice& device, std::vector<VulkanFence>& fences, bool waitAll, uint64_t timeout);
     private:
       VkFence fence;
-      VulkanDevice& device;
+      VkDevice device;
   };
 }

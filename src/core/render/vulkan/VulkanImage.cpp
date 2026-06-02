@@ -1,7 +1,4 @@
 #include "radiant/core/render/vulkan/VulkanImage.h"
-#include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
-#include "radiant/core/render/vulkan/VulkanUtil.h"
-#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
   VulkanImage::VulkanImage(VulkanMemoryAllocator& allocator, VkExtent3D extent) : allocator(&allocator), extent(extent) {
