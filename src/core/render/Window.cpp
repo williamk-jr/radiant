@@ -28,6 +28,26 @@ namespace Radiant {
     return extensionsVector;
 #endif
   }
+  
+  Rect2D Window::getWindowSize() {
+#ifdef HAS_GLFW
+    int width = 0;
+    int height = 0;
+
+    glfwGetWindowSize(this->window, &width, &height);
+    return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
+#endif
+  }
+
+  Rect2D Window::getFrameBufferSize() {
+#ifdef HAS_GLFW
+    int width = 0;
+    int height = 0;
+
+    glfwGetFramebufferSize(this->window, &width, &height);
+    return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
+#endif
+  }
 
 
   bool Window::shouldClose() {

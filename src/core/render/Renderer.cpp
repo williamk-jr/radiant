@@ -1,4 +1,5 @@
 #include "radiant/core/render/Renderer.h"
+#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
   Renderer::Renderer(Window& window, bool debug) {
@@ -15,9 +16,20 @@ namespace Radiant {
   void Renderer::beginFrame() {
     this->fences[currentFrame].wait(UINT32_MAX);
 
-    uint32_t imageIndex = this->swapchain->acquireNextImage(&this->imageReadySemaphores[currentFrame], UINT64_MAX);
-    VulkanImage& currentImage = this->swapchain->getImage(imageIndex);
-    VulkanImageView& currentImageView = this->swapchain->getImageView(imageIndex);
+    VulkanResult<uint32_t> imageIndex = this->swapchain->acquireNextImage(&this->imageReadySemaphores[currentFrame], UINT64_MAX);
+    if (imageIndex.result == VK_ERROR_OUT_OF_DATE_KHR) {
+      //Logger::info("Swapchain out of date.");
+      this->swapchain->recreate(
+          *this->physicalDevice, 
+          *this->device, 
+          *this->surface, 
+          VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+          0
+      );
+    }
+
+    VulkanImage& currentImage = this->swapchain->getImage(imageIndex.value);
+    VulkanImageView& currentImageView = this->swapchain->getImageView(imageIndex.value);
 
     VkImageSubresourceRange subresourceRange{};
     subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -45,7 +57,7 @@ namespace Radiant {
 
     this->context = std::make_unique<RenderContext>(
       currentImageView,
-      imageIndex
+      imageIndex.value
     );
   }
 
@@ -67,6 +79,14 @@ namespace Radiant {
     renderArea.extent = {imageExtent.width, imageExtent.height};
 
     this->commandBuffers[currentFrame].beginRendering(&colorAttachment, nullptr, nullptr, renderArea, 0);
+  }
+
+  void Renderer::setViewport(float width, float height, float minDepth, float maxDepth) {
+    this->commandBuffers[currentFrame].setViewport(width, height, minDepth, maxDepth);
+  }
+
+  void Renderer::setScissor(uint32_t width, uint32_t height) {
+    this->commandBuffers[currentFrame].setScissor(width, height);
   }
 
   void Renderer::clear(Color color) {

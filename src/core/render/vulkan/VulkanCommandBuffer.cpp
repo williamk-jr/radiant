@@ -1,4 +1,5 @@
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
+#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
 
@@ -79,6 +80,28 @@ namespace Radiant {
     renderingInfo.pStencilAttachment = stencilAttachment;
 
     vkCmdBeginRendering(this->commandBuffer, &renderingInfo);
+  }
+
+  void VulkanCommandBuffer::setViewport(float width, float height, float minDepth, float maxDepth) {
+    VkViewport viewport{};
+    viewport.width = width;
+    viewport.height = height;
+    viewport.minDepth = minDepth;
+    viewport.maxDepth = maxDepth;
+    viewport.x = 0;
+    viewport.y = 0;
+
+    vkCmdSetViewport(this->commandBuffer, 0, 1, &viewport);
+  }
+
+  void VulkanCommandBuffer::setScissor(uint32_t width, uint32_t height) {
+    VkRect2D scissor{};
+    scissor.extent.width = width;
+    scissor.extent.height = height;
+    scissor.offset.x = 0;
+    scissor.offset.y = 0;
+
+    vkCmdSetScissor(this->commandBuffer, 0, 1, &scissor);
   }
 
   void VulkanCommandBuffer::clearAttachments(std::vector<VkClearAttachment> clearAttachments, std::vector<VkClearRect> clearAreas) {

@@ -1,7 +1,23 @@
 #include "radiant/core/render/vulkan/VulkanSwapchain.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
+#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-  VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkSwapchainCreateFlagsKHR swapchainFlags) : device(device.get()) {
+  VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkSwapchainCreateFlagsKHR swapchainFlags) {
+    this->device = device.get();
+    this->create(physicalDevice, device, surface, imageUsageFlags, swapchainFlags);
+  }
+
+  VulkanSwapchain::VulkanSwapchain(VulkanSwapchain&& other) noexcept :
+    swapchain(other.swapchain), device(other.device) {
+    other.swapchain = nullptr;
+  }
+
+  VulkanSwapchain::~VulkanSwapchain() {
+    this->destroy();
+  }
+  
+  void VulkanSwapchain::create(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkSwapchainCreateFlagsKHR swapchainFlags) {
     VkPhysicalDeviceSurfaceInfo2KHR surfaceInfo{};
     surfaceInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR;
     surfaceInfo.surface = surface.get();
@@ -10,8 +26,13 @@ namespace Radiant {
     surfaceCapabilities.sType = VK_STRUCTURE_TYPE_SURFACE_CAPABILITIES_2_KHR;
 
     vkGetPhysicalDeviceSurfaceCapabilities2KHR(physicalDevice.get(), &surfaceInfo, &surfaceCapabilities);
-
     VkSurfaceFormat2KHR surfaceFormat = this->findSurfaceFormat(physicalDevice, surface);
+
+    //VkExtent2D swapchainExtent{surfaceCapabilities.surfaceCapabilities.currentExtent};
+    //if (swapchainExtent.width = 0xFFFFFFFF) {
+
+    //}
+
 
     VkSwapchainCreateInfoKHR swapchainInfo{};
     swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -68,13 +89,8 @@ namespace Radiant {
       this->imageViews.emplace_back(device, this->images[i], componentMapping, subresourceRange, 0);
     }
   }
-
-  VulkanSwapchain::VulkanSwapchain(VulkanSwapchain&& other) noexcept :
-    swapchain(other.swapchain), device(other.device) {
-    other.swapchain = nullptr;
-  }
-
-  VulkanSwapchain::~VulkanSwapchain() {
+  
+  void VulkanSwapchain::destroy() {
     vkDestroySwapchainKHR(this->device, this->swapchain, nullptr); 
   }
   
@@ -107,18 +123,21 @@ namespace Radiant {
     return this->images.size();
   }
 
-  uint32_t VulkanSwapchain::acquireNextImage(VulkanSemaphore* semaphore, uint64_t timeout) {
+  VulkanResult<uint32_t> VulkanSwapchain::acquireNextImage(VulkanSemaphore* semaphore, uint64_t timeout) {
     uint32_t imageIndex;
     VkResult result = vkAcquireNextImageKHR(this->device, this->swapchain, timeout, semaphore->get(), nullptr, &imageIndex);
-    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-      this->resize();
-    }
-    return imageIndex;
+    //Validation::verify(result);
+    return {result, imageIndex};
   }
 
-  void VulkanSwapchain::resize() {
-    //this->device.waitIdle();
+  void VulkanSwapchain::recreate(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkSwapchainCreateFlagsKHR swapchainFlags) {
+    vkDeviceWaitIdle(this->device);
 
+    this->imageViews.clear();
+    this->images.clear();
+    this->destroy(); 
+    
+    this->create(physicalDevice, device, surface, imageUsageFlags, swapchainFlags);
   }
 
   VkSurfaceFormat2KHR VulkanSwapchain::findSurfaceFormat(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface) {

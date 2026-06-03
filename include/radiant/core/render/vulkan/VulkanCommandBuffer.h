@@ -31,6 +31,8 @@ namespace Radiant {
           VkRect2D renderArea, VkRenderingFlags renderingFlags
       );
 
+      void setViewport(float width, float height, float minDepth, float maxDepth);
+      void setScissor(uint32_t width, uint32_t height);
       void clearAttachments(std::vector<VkClearAttachment> clearAttachments, std::vector<VkClearRect> clearAreas);
       void clearAttachment(VulkanImage& image, VkClearAttachment clearAttachment);
 

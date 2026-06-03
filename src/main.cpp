@@ -1,3 +1,5 @@
+#include "radiant/core/render/Rect2D.h"
+#include <string>
 #define GLFW_INCLUDE_VULKAN
 
 #include <iostream>
@@ -34,6 +36,10 @@ int main() {
     window.pollEvents(); 
     renderer.beginFrame();
     renderer.beginRendering(color);
+
+    Radiant::Rect2D frameBufferSize = window.getFrameBufferSize();
+    renderer.setViewport(frameBufferSize.width, frameBufferSize.height, 0, 1.0);
+    renderer.setScissor(frameBufferSize.width, frameBufferSize.height);
 
     renderer.clear({1, 0, 0, 1}, {{0,0}, {200, 200}});
 

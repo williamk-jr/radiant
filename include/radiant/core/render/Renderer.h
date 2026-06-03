@@ -36,6 +36,8 @@ namespace Radiant {
 
       void beginFrame();
       void beginRendering(Color clearColor);
+      void setViewport(float width, float height, float minDepth, float maxDepth);
+      void setScissor(uint32_t width, uint32_t height);
       void clear(Color color);
       void clear(Color color, VkRect2D clearArea);
       void endRendering();

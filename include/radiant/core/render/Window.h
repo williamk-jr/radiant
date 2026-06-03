@@ -6,6 +6,8 @@
 #include <GLFW/glfw3.h>
 #endif
 
+#include "radiant/core/render/Rect2D.h"
+
 namespace Radiant {
   class Window {
     public:
@@ -14,6 +16,9 @@ namespace Radiant {
 
       const std::string& getTitle();
       std::vector<const char*> getSurfaceExtensions();
+      
+      Rect2D getWindowSize(); 
+      Rect2D getFrameBufferSize();
 
       bool shouldClose();
       void makeContextCurrent();
