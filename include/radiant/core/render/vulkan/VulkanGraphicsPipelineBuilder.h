@@ -31,17 +31,78 @@ namespace Radiant {
     VkStencilOpState back;
   };
 
+  struct VulkanDepthBias {
+    VkBool32 enabled;
+    VkBool32 clampEnabled;
+    float clamp;
+    float constantfactor;
+    float slopefactor;
+  };
+
+  struct VulkanSampleShading {
+    VkBool32 enabled;
+    float min;
+  };
+
   class VulkanGraphicsPipelineBuilder {
     public:
       VulkanGraphicsPipelineBuilder(VulkanDevice& device);
 
-      void withVertexBindingDescription(uint32_t stride, VkVertexInputRate inputRate, std::vector<VulkanVertexAttributeDescription> attributeDescriptions);
-      void withInputAssemblyState(VkPrimitiveTopology topology, VkBool32 primitiveRestartEnable);
-      void withColorBlendState(std::vector<VkPipelineColorBlendAttachmentState> attachmentStates, float blendConstants[4], VkLogicOp logicOperation);
-      void withDepthStencilState(VulkanDepthTest depthTest, VulkanDepthBoundsTest depthBoundsTest, VulkanStencilTest stencilTest); 
+      VulkanGraphicsPipelineBuilder& withVertexBindingDescription(
+          uint32_t stride, 
+          VkVertexInputRate inputRate, 
+          std::vector<VulkanVertexAttributeDescription> attributeDescriptions
+      );
+
+      VulkanGraphicsPipelineBuilder& withInputAssemblyState(
+          VkPrimitiveTopology topology, 
+          VkBool32 primitiveRestartEnable
+      );
+
+      VulkanGraphicsPipelineBuilder& withRasterizationState(
+          VkPolygonMode polygonMode, 
+          VkCullModeFlagBits cullMode, 
+          VkFrontFace frontFace, 
+          VulkanDepthBias depthBias, 
+          float lineWidth, 
+          VkBool32 rasterizerDiscardEnable
+      );
+
+      VulkanGraphicsPipelineBuilder& withMultisampleState(
+          VkSampleCountFlagBits rasterizationSampleCount, 
+          VulkanSampleShading sampleShading, 
+          VkBool32 alphaToCoverageEnable, 
+          VkBool32 alphaToOneEnable
+      );
+
+      VulkanGraphicsPipelineBuilder& withDynamicState(
+          std::vector<VkDynamicState> dynamicStates
+      );
+
+      VulkanGraphicsPipelineBuilder& withViewportState(
+          std::vector<VkViewport> viewports, 
+          std::vector<VkRect2D> scissors
+      );
+
+      VulkanGraphicsPipelineBuilder& withColorBlendState(
+          std::vector<VkPipelineColorBlendAttachmentState> attachmentStates, 
+          float blendConstants[4], 
+          VkLogicOp logicOperation
+      );
+
+      VulkanGraphicsPipelineBuilder& withDepthStencilState(
+          VulkanDepthTest depthTest, 
+          VulkanDepthBoundsTest depthBoundsTest, 
+          VulkanStencilTest stencilTest
+      ); 
     
-      void withShaderSlang(std::string stageName, std::filesystem::path shaderPath, VkShaderStageFlagBits stageFlags);
-      void withShaderSpirv(std::filesystem::path shaderPath);
+      VulkanGraphicsPipelineBuilder& withShaderSlang(
+          std::string stageName, 
+          std::filesystem::path shaderPath, 
+          VkShaderStageFlagBits stageFlags
+      );
+
+      //void withShaderSpirv(std::filesystem::path shaderPath);
 
       void build(VulkanDevice& device);
     private:
@@ -54,10 +115,19 @@ namespace Radiant {
       std::vector<VkVertexInputAttributeDescription> vertexAttributeDescriptors;
       std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachmentStates;
       std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
+      std::vector<VkDynamicState> dynamicStates;
+      std::vector<VkViewport> viewports;
+      std::vector<VkRect2D> scissors;
 
+      VkPipelineVertexInputStateCreateInfo vertextInputStateInfo{};
       VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo{};
+      VkPipelineRasterizationStateCreateInfo rasterizationStateInfo{};
       VkPipelineColorBlendStateCreateInfo colorBlendStateInfo{};
       VkPipelineDepthStencilStateCreateInfo depthStencilInfo{};
+      VkPipelineMultisampleStateCreateInfo multisampleStateInfo{};
+      VkPipelineDynamicStateCreateInfo dynamicStateInfo{};
+      VkPipelineViewportStateCreateInfo viewportStateInfo{};
+
   };
 }
 

@@ -1,5 +1,4 @@
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
-#include <charconv>
 #include <slang/slang-com-ptr.h>
 #include <slang/slang.h>
 #include <vulkan/vulkan_core.h>
@@ -11,7 +10,7 @@ namespace Radiant {
     this->device = device.get();
   }
   
-  void VulkanGraphicsPipelineBuilder::withVertexBindingDescription(uint32_t stride, VkVertexInputRate inputRate, std::vector<VulkanVertexAttributeDescription> attributeDescriptions) {
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withVertexBindingDescription(uint32_t stride, VkVertexInputRate inputRate, std::vector<VulkanVertexAttributeDescription> attributeDescriptions) {
     VkVertexInputBindingDescription bindingDescription{};
     bindingDescription.binding = this->vertexBindingDescriptors.size();
     bindingDescription.inputRate = inputRate;
@@ -27,16 +26,69 @@ namespace Radiant {
       attributeDescription.offset = attributeDescriptions[i].offset;
       this->vertexAttributeDescriptors.push_back(attributeDescription);
     }
+    return *this;
   }
 
-  void VulkanGraphicsPipelineBuilder::withInputAssemblyState(VkPrimitiveTopology topology, VkBool32 primitiveRestartEnable) {
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withInputAssemblyState(VkPrimitiveTopology topology, VkBool32 primitiveRestartEnable) {
     this->inputAssemblyStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     this->inputAssemblyStateInfo.primitiveRestartEnable = primitiveRestartEnable;
     this->inputAssemblyStateInfo.topology = topology;
     this->inputAssemblyStateInfo.flags = 0;
+    return *this;
+  }
+
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withRasterizationState(VkPolygonMode polygonMode, VkCullModeFlagBits cullMode, VkFrontFace frontFace, VulkanDepthBias depthBias, float lineWidth, VkBool32 rasterizerDiscardEnable) {
+    this->rasterizationStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    this->rasterizationStateInfo.cullMode = cullMode;
+    this->rasterizationStateInfo.polygonMode = polygonMode;
+    this->rasterizationStateInfo.lineWidth = lineWidth;
+    this->rasterizationStateInfo.frontFace = frontFace;
+    this->rasterizationStateInfo.depthBiasEnable = depthBias.enabled;
+    this->rasterizationStateInfo.depthClampEnable = depthBias.clampEnabled;
+    this->rasterizationStateInfo.depthBiasClamp = depthBias.clamp;
+    this->rasterizationStateInfo.depthBiasConstantFactor = depthBias.constantfactor;
+    this->rasterizationStateInfo.depthBiasSlopeFactor = depthBias.slopefactor;
+    this->rasterizationStateInfo.rasterizerDiscardEnable = rasterizerDiscardEnable;
+    this->rasterizationStateInfo.flags = 0;
+    return *this;
   }
   
-  void VulkanGraphicsPipelineBuilder::withColorBlendState(std::vector<VkPipelineColorBlendAttachmentState> attachmentStates, float* blendConstants, VkLogicOp logicOperation) {
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withMultisampleState(VkSampleCountFlagBits rasterizationSampleCount, VulkanSampleShading sampleShading, VkBool32 alphaToCoverageEnable, VkBool32 alphaToOneEnable) {
+    this->multisampleStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    this->multisampleStateInfo.rasterizationSamples = rasterizationSampleCount;
+    this->multisampleStateInfo.pSampleMask = nullptr; // TODO implement sample masks
+    this->multisampleStateInfo.sampleShadingEnable = sampleShading.enabled;
+    this->multisampleStateInfo.minSampleShading = sampleShading.min;
+    this->multisampleStateInfo.alphaToCoverageEnable = alphaToCoverageEnable;
+    this->multisampleStateInfo.alphaToOneEnable = alphaToOneEnable;
+    this->multisampleStateInfo.flags = 0;
+    return *this;
+  }
+
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withDynamicState(std::vector<VkDynamicState> dynamicStates) {
+    this->dynamicStates = dynamicStates;
+
+    this->dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    this->dynamicStateInfo.dynamicStateCount = this->dynamicStates.size();
+    this->dynamicStateInfo.pDynamicStates = this->dynamicStates.data();
+    this->dynamicStateInfo.flags = 0;
+    return *this;
+  }
+  
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withViewportState(std::vector<VkViewport> viewports, std::vector<VkRect2D> scissors) {
+    this->viewports = viewports;
+    this->scissors = scissors;
+
+    this->viewportStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    this->viewportStateInfo.viewportCount = this->viewports.size();
+    this->viewportStateInfo.pViewports = this->viewports.data();
+    this->viewportStateInfo.scissorCount = this->scissors.size();
+    this->viewportStateInfo.pScissors = this->scissors.data();
+    this->viewportStateInfo.flags = 0;
+    return *this;
+  }
+  
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withColorBlendState(std::vector<VkPipelineColorBlendAttachmentState> attachmentStates, float* blendConstants, VkLogicOp logicOperation) {
     this->colorBlendAttachmentStates = attachmentStates;
 
     this->colorBlendStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -48,9 +100,10 @@ namespace Radiant {
     this->colorBlendStateInfo.blendConstants[3] = blendConstants[3];
     this->colorBlendStateInfo.logicOp = logicOperation;
     this->colorBlendStateInfo.flags = 0;
+    return *this;
   }
   
-  void VulkanGraphicsPipelineBuilder::withDepthStencilState(VulkanDepthTest depthTest, VulkanDepthBoundsTest depthBoundsTest, VulkanStencilTest stencilTest) {
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withDepthStencilState(VulkanDepthTest depthTest, VulkanDepthBoundsTest depthBoundsTest, VulkanStencilTest stencilTest) {
     this->depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     this->depthStencilInfo.depthTestEnable = depthTest.enabled;
     this->depthStencilInfo.depthWriteEnable = depthTest.depthWriteEnabled;
@@ -61,9 +114,10 @@ namespace Radiant {
     this->depthStencilInfo.front = stencilTest.front;
     this->depthStencilInfo.back = stencilTest.back;
     this->depthStencilInfo.flags = 0;
+    return *this;
   }
 
-  void VulkanGraphicsPipelineBuilder::withShaderSlang(std::string stageName, std::filesystem::path shaderPath, VkShaderStageFlagBits stageFlags) {
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withShaderSlang(std::string stageName, std::filesystem::path shaderPath, VkShaderStageFlagBits stageFlags) {
     if (this->slangGlobalSession.readRef() == nullptr) {
       slang::createGlobalSession(slangGlobalSession.writeRef());
 
@@ -110,25 +164,29 @@ namespace Radiant {
     shaderStageInfo.flags = 0;
 
     this->shaderStages.push_back(shaderStageInfo);
-
+    
+    return *this;
   }
 
   void VulkanGraphicsPipelineBuilder::build(VulkanDevice& device) {
     this->createInfo.stageCount = this->shaderStages.size();
     this->createInfo.pStages = this->shaderStages.data();
 
-    VkPipelineVertexInputStateCreateInfo vertextInputStateInfo{};
-    vertextInputStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertextInputStateInfo.vertexBindingDescriptionCount = this->vertexBindingDescriptors.size();
-    vertextInputStateInfo.pVertexBindingDescriptions = this->vertexBindingDescriptors.data();
-    vertextInputStateInfo.vertexAttributeDescriptionCount = this->vertexAttributeDescriptors.size();
-    vertextInputStateInfo.pVertexAttributeDescriptions = this->vertexAttributeDescriptors.data();
-    vertextInputStateInfo.flags = 0;
+    this->vertextInputStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    this->vertextInputStateInfo.vertexBindingDescriptionCount = this->vertexBindingDescriptors.size();
+    this->vertextInputStateInfo.pVertexBindingDescriptions = this->vertexBindingDescriptors.data();
+    this->vertextInputStateInfo.vertexAttributeDescriptionCount = this->vertexAttributeDescriptors.size();
+    this->vertextInputStateInfo.pVertexAttributeDescriptions = this->vertexAttributeDescriptors.data();
+    this->vertextInputStateInfo.flags = 0;
 
-    this->createInfo.pVertexInputState = &vertextInputStateInfo;
+    this->createInfo.pVertexInputState = &this->vertextInputStateInfo;
     this->createInfo.pInputAssemblyState = &this->inputAssemblyStateInfo;
+    this->createInfo.pRasterizationState = &this->rasterizationStateInfo;
     this->createInfo.pColorBlendState = &this->colorBlendStateInfo;
     this->createInfo.pDepthStencilState = &this->depthStencilInfo;
+    this->createInfo.pMultisampleState = &this->multisampleStateInfo;
+    this->createInfo.pDynamicState = &this->dynamicStateInfo;
+    this->createInfo.pViewportState = &this->viewportStateInfo;
 
     VkPipeline graphicsPipeline;
     vkCreateGraphicsPipelines(
