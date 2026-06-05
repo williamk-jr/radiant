@@ -9,10 +9,12 @@
 #include "radiant/core/render/vulkan/VulkanBinarySemaphore.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanFence.h"
+#include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
 #include "radiant/core/render/vulkan/VulkanImageView.h"
 #include "radiant/core/render/vulkan/VulkanInstance.h"
 #include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
+#include "radiant/core/render/vulkan/VulkanPipeline.h"
 #include "radiant/core/render/vulkan/VulkanQueue.h"
 #include "radiant/core/render/vulkan/VulkanSurface.h"
 #include "radiant/core/render/vulkan/VulkanSwapchain.h"
@@ -68,6 +70,7 @@ namespace Radiant {
       std::vector<VulkanBinarySemaphore> imageReadySemaphores;
       std::vector<VulkanBinarySemaphore> frameFinishedSemaphores;
 
+      std::unique_ptr<VulkanPipeline> graphicsPipeline;
       std::unique_ptr<RenderContext> context;
       int currentFrame = 0;
       bool isRendering = false;

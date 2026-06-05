@@ -1,6 +1,7 @@
 #pragma once
 
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include "radiant/core/render/vulkan/VulkanPipeline.h"
 #include <filesystem>
 #include <vector>
 #include <vulkan/vulkan_core.h>
@@ -84,6 +85,11 @@ namespace Radiant {
           std::vector<VkRect2D> scissors
       );
 
+      VulkanGraphicsPipelineBuilder& withViewportState(
+          uint32_t viewportCount, 
+          uint32_t scissorCount
+      );
+
       VulkanGraphicsPipelineBuilder& withColorBlendState(
           std::vector<VkPipelineColorBlendAttachmentState> attachmentStates, 
           float blendConstants[4], 
@@ -104,7 +110,7 @@ namespace Radiant {
 
       //void withShaderSpirv(std::filesystem::path shaderPath);
 
-      void build(VulkanDevice& device);
+      VulkanPipeline build();
     private:
       Slang::ComPtr<slang::IGlobalSession> slangGlobalSession;
       Slang::ComPtr<slang::ISession> slangSession;

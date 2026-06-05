@@ -1,4 +1,6 @@
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
+#include "radiant/util/logger/Logger.h"
+#include <filesystem>
 #include <slang/slang-com-ptr.h>
 #include <slang/slang.h>
 #include <vulkan/vulkan_core.h>
@@ -87,6 +89,14 @@ namespace Radiant {
     this->viewportStateInfo.flags = 0;
     return *this;
   }
+
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withViewportState(uint32_t viewportCount, uint32_t scissorCount) {
+    this->viewportStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    this->viewportStateInfo.viewportCount = viewportCount;
+    this->viewportStateInfo.scissorCount = scissorCount;
+    this->viewportStateInfo.flags = 0;
+    return *this;
+  }
   
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withColorBlendState(std::vector<VkPipelineColorBlendAttachmentState> attachmentStates, float* blendConstants, VkLogicOp logicOperation) {
     this->colorBlendAttachmentStates = attachmentStates;
@@ -118,6 +128,10 @@ namespace Radiant {
   }
 
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withShaderSlang(std::string stageName, std::filesystem::path shaderPath, VkShaderStageFlagBits stageFlags) {
+    if (!std::filesystem::exists(shaderPath)) {
+      Logger::error("Could not find shader file: " + std::filesystem::absolute(shaderPath).string());
+    }
+
     if (this->slangGlobalSession.readRef() == nullptr) {
       slang::createGlobalSession(slangGlobalSession.writeRef());
 
@@ -168,7 +182,7 @@ namespace Radiant {
     return *this;
   }
 
-  void VulkanGraphicsPipelineBuilder::build(VulkanDevice& device) {
+  VulkanPipeline VulkanGraphicsPipelineBuilder::build() {
     this->createInfo.stageCount = this->shaderStages.size();
     this->createInfo.pStages = this->shaderStages.data();
 
@@ -190,11 +204,12 @@ namespace Radiant {
 
     VkPipeline graphicsPipeline;
     vkCreateGraphicsPipelines(
-        device.get(),
+        this->device,
         nullptr, 
         1, &this->createInfo, 
         nullptr, 
         &graphicsPipeline
     );
+    return {this->device, graphicsPipeline};
   }
 }

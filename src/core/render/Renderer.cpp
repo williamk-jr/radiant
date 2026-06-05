@@ -1,4 +1,8 @@
 #include "radiant/core/render/Renderer.h"
+#include "radiant/core/render/Vertex.h"
+#include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
+#include <cstddef>
+#include <memory>
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -205,6 +209,29 @@ namespace Radiant {
       this->imageReadySemaphores.emplace_back(*this->device, 0);
       this->frameFinishedSemaphores.emplace_back(*this->device, 0);
     }
+
+    this->graphicsPipeline = std::make_unique<VulkanPipeline>(VulkanGraphicsPipelineBuilder(*this->device)
+      .withVertexBindingDescription(sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX, {
+        {VK_FORMAT_R32G32B32_SFLOAT, 0},
+        {VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal)},
+        {VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)},
+      })
+      .withInputAssemblyState(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE)
+      .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_VERTEX_BIT)
+      .withMultisampleState(VK_SAMPLE_COUNT_1_BIT, {VK_FALSE, 0.0}, VK_FALSE, VK_FALSE)
+      .withRasterizationState(
+          VK_POLYGON_MODE_FILL, 
+          VK_CULL_MODE_NONE, 
+          VK_FRONT_FACE_COUNTER_CLOCKWISE, 
+          {VK_FALSE}, 
+          0.1, 
+          VK_FALSE
+      )
+      .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_FRAGMENT_BIT)
+      .withColorBlendState({}, nullptr, VK_LOGIC_OP_COPY)
+      .withDynamicState({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
+      .withViewportState(1, 1)
+      .build()); 
   }
 
   bool Renderer::getPhysicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {

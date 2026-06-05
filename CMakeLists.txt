@@ -7,12 +7,15 @@ project(Radiant VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "") # Required by clangd
+#list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/lib/glm")
 
 # Find the GLM package
 find_package(Vulkan REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(slang REQUIRED)
+find_package(glm REQUIRED)
 
+#message(STATUS "Slang path: ${SLANG_EXECUTABL}")
 if (glfw3_FOUND)
   add_definitions(-DHAS_GLFW)
 elseif (SDL3_FOUND)
@@ -43,6 +46,7 @@ add_executable(Radiant
   src/core/render/vulkan/VulkanImage.cpp
   src/core/render/vulkan/VulkanImageView.cpp
   src/core/render/vulkan/VulkanGraphicsPipelineBuilder.cpp
+  src/core/render/vulkan/VulkanPipeline.cpp
   src/core/render/vulkan/VulkanUtil.cpp
 
   src/core/render/Color.cpp
@@ -52,12 +56,15 @@ add_executable(Radiant
 
 target_link_libraries(Radiant 
   PRIVATE Vulkan::Vulkan
+  PRIVATE slang::slang
+  PRIVATE glm::glm
   PRIVATE glfw
 )
 
 target_include_directories(Radiant 
   PUBLIC ${CMAKE_SOURCE_DIR}/include
   PRIVATE ${Vulkan_INCLUDE_DIRS}  
+  #PRIVATE ${SLANG_INCLUDE_DIRS}  
 )
 
 if(NOT CMAKE_BUILD_TYPE)
