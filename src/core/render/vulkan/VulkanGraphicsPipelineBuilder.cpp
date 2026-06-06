@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <slang/slang-com-ptr.h>
 #include <slang/slang.h>
+#include <string>
 #include <vulkan/vulkan_core.h>
 #include <array>
 
@@ -12,12 +13,26 @@ namespace Radiant {
     this->device = device.get();
   }
   
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withLayout(std::vector<VulkanDescriptorSetLayout> descriptorSetLayouts) {
+    for (VulkanDescriptorSetLayout& descriptorSetLayout : descriptorSetLayouts) {
+      this->descriptorSetLayouts.push_back(descriptorSetLayout.get());
+    }
+    
+    VkPipelineLayoutCreateInfo pipelineLayoutinfo{};
+    pipelineLayoutinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutinfo.setLayoutCount = this->descriptorSetLayouts.size();
+    pipelineLayoutinfo.pSetLayouts = this->descriptorSetLayouts.data();
+    pipelineLayoutinfo.flags = 0;
+
+    vkCreatePipelineLayout(this->device, &pipelineLayoutinfo, nullptr, &this->layout);
+    return *this;
+  }
+
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withVertexBindingDescription(uint32_t stride, VkVertexInputRate inputRate, std::vector<VulkanVertexAttributeDescription> attributeDescriptions) {
     VkVertexInputBindingDescription bindingDescription{};
     bindingDescription.binding = this->vertexBindingDescriptors.size();
     bindingDescription.inputRate = inputRate;
     bindingDescription.stride = stride;
-    this->vertexBindingDescriptors.push_back(bindingDescription);
     
     // All attributes are tied to the above binding description
     for (int i = 0; i < attributeDescriptions.size(); i++) {
@@ -28,6 +43,7 @@ namespace Radiant {
       attributeDescription.offset = attributeDescriptions[i].offset;
       this->vertexAttributeDescriptors.push_back(attributeDescription);
     }
+    this->vertexBindingDescriptors.push_back(bindingDescription); // Don't move before loop. 
     return *this;
   }
 
@@ -104,10 +120,17 @@ namespace Radiant {
     this->colorBlendStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     this->colorBlendStateInfo.attachmentCount = this->colorBlendAttachmentStates.size();
     this->colorBlendStateInfo.pAttachments = this->colorBlendAttachmentStates.data();
-    this->colorBlendStateInfo.blendConstants[0] = blendConstants[0];
-    this->colorBlendStateInfo.blendConstants[1] = blendConstants[1];
-    this->colorBlendStateInfo.blendConstants[2] = blendConstants[2];
-    this->colorBlendStateInfo.blendConstants[3] = blendConstants[3];
+    if (blendConstants != nullptr) {
+      this->colorBlendStateInfo.blendConstants[0] = blendConstants[0];
+      this->colorBlendStateInfo.blendConstants[1] = blendConstants[1];
+      this->colorBlendStateInfo.blendConstants[2] = blendConstants[2];
+      this->colorBlendStateInfo.blendConstants[3] = blendConstants[3];
+    } else {
+      this->colorBlendStateInfo.blendConstants[0] = 0;
+      this->colorBlendStateInfo.blendConstants[1] = 0;
+      this->colorBlendStateInfo.blendConstants[2] = 0;
+      this->colorBlendStateInfo.blendConstants[3] = 0;
+    }
     this->colorBlendStateInfo.logicOp = logicOperation;
     this->colorBlendStateInfo.flags = 0;
     return *this;
@@ -132,7 +155,8 @@ namespace Radiant {
       Logger::error("Could not find shader file: " + std::filesystem::absolute(shaderPath).string());
     }
 
-    if (this->slangGlobalSession.readRef() == nullptr) {
+    if (this->slangGlobalSession.get() == nullptr) {
+      //Logger::info("Creating slang session.");
       slang::createGlobalSession(slangGlobalSession.writeRef());
 
       slang::TargetDesc slangTargetDesc{};
@@ -155,8 +179,9 @@ namespace Radiant {
       slangGlobalSession->createSession(slangSessionDesc, this->slangSession.writeRef());
     }
     
+    const char* cShaderPath = shaderPath.c_str();
     Slang::ComPtr<slang::IModule> slangModule{
-      slangSession->loadModuleFromSource("test", shaderPath.c_str(), nullptr)
+      slangSession->loadModuleFromSource("test", cShaderPath, nullptr, nullptr)
     };
 
     Slang::ComPtr<slang::IBlob> spirv;
@@ -169,16 +194,17 @@ namespace Radiant {
     
     VkShaderModule shaderModule;
     vkCreateShaderModule(this->device, &shaderModuleInfo, nullptr, &shaderModule);
+    this->shaderModules.push_back(shaderModule);
 
+    const char* cStageName = stageName.c_str();
     VkPipelineShaderStageCreateInfo shaderStageInfo{};
     shaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shaderStageInfo.pName = stageName.c_str();
+    shaderStageInfo.pName = cStageName;
     shaderStageInfo.module = shaderModule;
     shaderStageInfo.stage = stageFlags;
     shaderStageInfo.flags = 0;
 
     this->shaderStages.push_back(shaderStageInfo);
-    
     return *this;
   }
 
@@ -193,6 +219,7 @@ namespace Radiant {
     this->vertextInputStateInfo.pVertexAttributeDescriptions = this->vertexAttributeDescriptors.data();
     this->vertextInputStateInfo.flags = 0;
 
+    this->createInfo.layout = this->layout;
     this->createInfo.pVertexInputState = &this->vertextInputStateInfo;
     this->createInfo.pInputAssemblyState = &this->inputAssemblyStateInfo;
     this->createInfo.pRasterizationState = &this->rasterizationStateInfo;
@@ -210,6 +237,7 @@ namespace Radiant {
         nullptr, 
         &graphicsPipeline
     );
-    return {this->device, graphicsPipeline};
+
+    return {this->device, graphicsPipeline, this->layout, this->shaderModules};
   }
 }

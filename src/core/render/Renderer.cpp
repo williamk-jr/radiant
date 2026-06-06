@@ -211,6 +211,7 @@ namespace Radiant {
     }
 
     this->graphicsPipeline = std::make_unique<VulkanPipeline>(VulkanGraphicsPipelineBuilder(*this->device)
+      .withLayout({})
       .withVertexBindingDescription(sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX, {
         {VK_FORMAT_R32G32B32_SFLOAT, 0},
         {VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal)},
@@ -224,7 +225,7 @@ namespace Radiant {
           VK_CULL_MODE_NONE, 
           VK_FRONT_FACE_COUNTER_CLOCKWISE, 
           {VK_FALSE}, 
-          0.1, 
+          1.0, 
           VK_FALSE
       )
       .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_FRAGMENT_BIT)

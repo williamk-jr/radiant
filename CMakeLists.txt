@@ -47,6 +47,7 @@ add_executable(Radiant
   src/core/render/vulkan/VulkanImageView.cpp
   src/core/render/vulkan/VulkanGraphicsPipelineBuilder.cpp
   src/core/render/vulkan/VulkanPipeline.cpp
+  src/core/render/vulkan/VulkanDescriptorSetLayout.cpp
   src/core/render/vulkan/VulkanUtil.cpp
 
   src/core/render/Color.cpp

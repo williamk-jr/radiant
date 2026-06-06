@@ -1,5 +1,6 @@
 #pragma once
 
+#include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanPipeline.h"
 #include <filesystem>
@@ -48,6 +49,10 @@ namespace Radiant {
   class VulkanGraphicsPipelineBuilder {
     public:
       VulkanGraphicsPipelineBuilder(VulkanDevice& device);
+
+      VulkanGraphicsPipelineBuilder& withLayout(
+          std::vector<VulkanDescriptorSetLayout> descriptorSetLayouts
+      );
 
       VulkanGraphicsPipelineBuilder& withVertexBindingDescription(
           uint32_t stride, 
@@ -117,14 +122,17 @@ namespace Radiant {
       VkGraphicsPipelineCreateInfo createInfo{};
       VkDevice device;
 
+      std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
       std::vector<VkVertexInputBindingDescription> vertexBindingDescriptors;
       std::vector<VkVertexInputAttributeDescription> vertexAttributeDescriptors;
       std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachmentStates;
+      std::vector<VkShaderModule> shaderModules;
       std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
       std::vector<VkDynamicState> dynamicStates;
       std::vector<VkViewport> viewports;
       std::vector<VkRect2D> scissors;
 
+      VkPipelineLayout layout;
       VkPipelineVertexInputStateCreateInfo vertextInputStateInfo{};
       VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo{};
       VkPipelineRasterizationStateCreateInfo rasterizationStateInfo{};
