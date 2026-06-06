@@ -1,4 +1,5 @@
 #include "radiant/core/render/Renderer.h"
+#include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/Vertex.h"
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
 #include <cstddef>
@@ -9,6 +10,7 @@ namespace Radiant {
   Renderer::Renderer(Window& window, bool debug) {
     this->instanceExtensions = this->getInstanceExtensions(window, debug); 
     this->instanceLayers = this->getInstanceLayers(debug);
+    this->frameBufferSize = window.getFrameBufferSize();
 
     this->initVulkan(window, debug);
   }
@@ -17,20 +19,20 @@ namespace Radiant {
     this->device->waitIdle();
   } 
 
-  void Renderer::beginFrame() {
+  void Renderer::beginFrame(Window& window) {
     this->fences[currentFrame].wait(UINT32_MAX);
+    this->fences[currentFrame].reset();
 
     VulkanResult<uint32_t> imageIndex = this->swapchain->acquireNextImage(&this->imageReadySemaphores[currentFrame], UINT64_MAX);
-    if (imageIndex.result == VK_ERROR_OUT_OF_DATE_KHR) {
-      //Logger::info("Swapchain out of date.");
-      this->swapchain->recreate(
-          *this->physicalDevice, 
-          *this->device, 
-          *this->surface, 
-          VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-          0
-      );
+
+    Rect2D newFrameBufferSize = window.getFrameBufferSize();
+    if (
+        (imageIndex.result == VK_ERROR_OUT_OF_DATE_KHR || imageIndex.result == VK_SUBOPTIMAL_KHR) && 
+        (newFrameBufferSize.width != this->frameBufferSize.width) || (newFrameBufferSize.height != this->frameBufferSize.height)
+    ) {
+      this->updateSwapchain = true;
     }
+
 
     VulkanImage& currentImage = this->swapchain->getImage(imageIndex.value);
     VulkanImageView& currentImageView = this->swapchain->getImageView(imageIndex.value);
@@ -40,7 +42,6 @@ namespace Radiant {
     subresourceRange.levelCount = 1;
     subresourceRange.layerCount = 1;
 
-    this->fences[currentFrame].reset();
     this->commandBuffers[currentFrame].reset(false);
     this->commandBuffers[currentFrame].begin(0);
 
@@ -61,11 +62,16 @@ namespace Radiant {
 
     this->context = std::make_unique<RenderContext>(
       currentImageView,
-      imageIndex.value
+      imageIndex.value,
+      true
     );
   }
 
   void Renderer::beginRendering(Color clearColor) {
+    if (!this->context->rendering) {
+      return;
+    }
+
     float* rawColor = clearColor.raw();
 
     std::vector<VkRenderingAttachmentInfo> colorAttachment(1);
@@ -76,30 +82,41 @@ namespace Radiant {
     colorAttachment[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     colorAttachment[0].clearValue = {{rawColor[0], rawColor[1], rawColor[2], rawColor[3]}};
 
-    VulkanImage& currentImage = this->swapchain->getImage(this->context->imageIndex);
-    VkExtent3D imageExtent = currentImage.getExtent(); // TODO remove getExtent, as changing swapchain extent will cause image extent to be out of date.
-
     VkRect2D renderArea{};
-    renderArea.extent = {imageExtent.width, imageExtent.height};
+    renderArea.extent = {this->frameBufferSize.width, this->frameBufferSize.height};
 
     this->commandBuffers[currentFrame].beginRendering(&colorAttachment, nullptr, nullptr, renderArea, 0);
+    this->commandBuffers[currentFrame].bindPipeline(*this->graphicsPipeline);
   }
 
   void Renderer::setViewport(float width, float height, float minDepth, float maxDepth) {
+    if (!this->context->rendering) {
+      return;
+    }
     this->commandBuffers[currentFrame].setViewport(width, height, minDepth, maxDepth);
   }
 
   void Renderer::setScissor(uint32_t width, uint32_t height) {
+    if (!this->context->rendering) {
+      return;
+    }
     this->commandBuffers[currentFrame].setScissor(width, height);
   }
 
   void Renderer::clear(Color color) {
-    VulkanImage& currentImage = this->swapchain->getImage(this->context->imageIndex);
-    VkExtent3D imageExtent = currentImage.getExtent();
-    this->clear(color, {{0,0},{imageExtent.width, imageExtent.height}});
+    if (!this->context->rendering) {
+      return;
+    }
+    //VulkanImage& currentImage = this->swapchain->getImage(this->context->imageIndex);
+    //VkExtent3D imageExtent = currentImage.getExtent();
+    VkExtent2D swapchainExtent = {this->frameBufferSize.width, this->frameBufferSize.height};
+    this->clear(color, {{0,0},swapchainExtent});
   }
 
   void Renderer::clear(Color color, VkRect2D clearArea) {
+    if (!this->context->rendering) {
+      return;
+    }
     float* rawColor = color.raw();
 
     VkClearAttachment clearAttachment{};
@@ -116,10 +133,16 @@ namespace Radiant {
   }
 
   void Renderer::endRendering() {
+    if (!this->context->rendering) {
+      return;
+    }
     this->commandBuffers[currentFrame].endRendering();
   }
 
   void Renderer::endFrame() {
+    if (!this->context->rendering) {
+      return;
+    }
     VkImageSubresourceRange subresourceRange{};
     subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     subresourceRange.levelCount = 1;
@@ -139,6 +162,7 @@ namespace Radiant {
     std::vector<VkImageMemoryBarrier2> presentImageMemoryBarriers{presentImageMemoryBarrier};
     this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(presentImageMemoryBarriers, 0);
     this->commandBuffers[currentFrame].end();
+    this->context->rendering = false;
   }
 
   void Renderer::submit() {
@@ -158,9 +182,23 @@ namespace Radiant {
     );
   }
 
-  void Renderer::present() {
+  void Renderer::present(Window& window) {
     this->presentQueue->present(*this->swapchain, {this->context->imageIndex}, this->frameFinishedSemaphores[currentFrame]);
     this->currentFrame = (currentFrame+1)%swapchain->getImageCount();
+
+    if (this->updateSwapchain) {
+      this->frameBufferSize = window.getFrameBufferSize();
+
+      this->updateSwapchain = false;
+      this->swapchain->recreate(
+          *this->physicalDevice,
+          *this->device, 
+          *this->surface, 
+          VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+          0
+      );
+      return;
+    }
   }
 
   std::vector<const char*> Renderer::getInstanceExtensions(Window& window, bool debug) {

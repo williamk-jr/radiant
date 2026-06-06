@@ -238,6 +238,6 @@ namespace Radiant {
         &graphicsPipeline
     );
 
-    return {this->device, graphicsPipeline, this->layout, this->shaderModules};
+    return {this->device, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline, this->layout, this->shaderModules};
   }
 }

@@ -33,8 +33,7 @@ int main() {
   Radiant::Color color{0,1,0,1};
 
   while (!window.shouldClose()) {
-    window.pollEvents(); 
-    renderer.beginFrame();
+    renderer.beginFrame(window);
     renderer.beginRendering(color);
 
     Radiant::Rect2D frameBufferSize = window.getFrameBufferSize();
@@ -47,7 +46,9 @@ int main() {
     renderer.endFrame();
 
     renderer.submit();
-    renderer.present();
+    renderer.present(window);
+
+    window.pollEvents(); 
     //renderer.renderLoop();
   }
 

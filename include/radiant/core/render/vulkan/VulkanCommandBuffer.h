@@ -2,6 +2,7 @@
 #pragma once
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanImage.h"
+#include "radiant/core/render/vulkan/VulkanPipeline.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <vulkan/vulkan_core.h>
 
@@ -30,7 +31,7 @@ namespace Radiant {
           VkRenderingAttachmentInfo* stencilAttachment, 
           VkRect2D renderArea, VkRenderingFlags renderingFlags
       );
-
+      void bindPipeline(VulkanPipeline& pipeline);
       void setViewport(float width, float height, float minDepth, float maxDepth);
       void setScissor(uint32_t width, uint32_t height);
       void clearAttachments(std::vector<VkClearAttachment> clearAttachments, std::vector<VkClearRect> clearAreas);

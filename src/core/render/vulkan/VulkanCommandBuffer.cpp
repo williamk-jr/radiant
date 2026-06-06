@@ -82,6 +82,10 @@ namespace Radiant {
     vkCmdBeginRendering(this->commandBuffer, &renderingInfo);
   }
 
+  void VulkanCommandBuffer::bindPipeline(VulkanPipeline& pipeline) {
+    vkCmdBindPipeline(this->commandBuffer, pipeline.getBindPoint(), pipeline.get());
+  }
+
   void VulkanCommandBuffer::setViewport(float width, float height, float minDepth, float maxDepth) {
     VkViewport viewport{};
     viewport.width = width;
@@ -113,17 +117,18 @@ namespace Radiant {
   }
   
   void VulkanCommandBuffer::clearAttachment(VulkanImage& image, VkClearAttachment clearAttachment) {
-    VkExtent3D imageExtent = image.getExtent();
-    VkRect2D imageSize{};
-    imageSize.extent.width = imageExtent.width;
-    imageSize.extent.height = imageExtent.height;
+    Logger::info("Clear attachment is empty.");
+    //VkExtent3D imageExtent = image.getExtent();
+    //VkRect2D imageSize{};
+    //imageSize.extent.width = imageExtent.width;
+    //imageSize.extent.height = imageExtent.height;
 
-    VkClearRect clearArea{};
-    clearArea.rect = imageSize;
-    clearArea.baseArrayLayer = 0;
-    clearArea.layerCount = 1;
+    //VkClearRect clearArea{};
+    //clearArea.rect = imageSize;
+    //clearArea.baseArrayLayer = 0;
+    //clearArea.layerCount = 1;
 
-    this->clearAttachments({clearAttachment}, {clearArea});
+    //this->clearAttachments({clearAttachment}, {clearArea});
   }
 
   void VulkanCommandBuffer::endRendering() {

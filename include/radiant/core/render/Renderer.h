@@ -5,6 +5,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "radiant/core/render/Color.h"
+#include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/Window.h"
 #include "radiant/core/render/vulkan/VulkanBinarySemaphore.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
@@ -25,9 +26,10 @@ namespace Radiant {
   struct RenderContext {
     VulkanImageView& imageView;
     uint32_t imageIndex;
+    bool rendering = false;
 
-    RenderContext(VulkanImageView& imageView, uint32_t imageIndex) :
-      imageView(imageView), imageIndex(imageIndex) {}
+    RenderContext(VulkanImageView& imageView, uint32_t imageIndex, bool rendering) :
+      imageView(imageView), imageIndex(imageIndex), rendering(rendering) {}
   };
 
 
@@ -36,7 +38,7 @@ namespace Radiant {
       Renderer(Window& window, bool debug);
       void waitIdle();
 
-      void beginFrame();
+      void beginFrame(Window& window);
       void beginRendering(Color clearColor);
       void setViewport(float width, float height, float minDepth, float maxDepth);
       void setScissor(uint32_t width, uint32_t height);
@@ -46,7 +48,7 @@ namespace Radiant {
       void endFrame();
 
       void submit();
-      void present();
+      void present(Window& window);
       
     private:
       std::vector<const char*> instanceExtensions;
@@ -73,8 +75,9 @@ namespace Radiant {
       std::unique_ptr<VulkanPipeline> graphicsPipeline;
       std::unique_ptr<RenderContext> context;
       int currentFrame = 0;
-      bool isRendering = false;
-
+      bool updateSwapchain = false;
+      Rect2D frameBufferSize;
+      
       void initVulkan(Window& window, bool debug);
       std::vector<const char*> getInstanceExtensions(Window& window, bool debug);
       std::vector<const char*> getInstanceLayers(bool debug);

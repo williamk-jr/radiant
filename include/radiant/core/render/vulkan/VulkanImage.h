@@ -16,7 +16,7 @@ namespace Radiant {
       ~VulkanImage();
       
       VkImage get();
-      VkExtent3D getExtent();
+      //VkExtent3D getExtent();
       VkImageMemoryBarrier2 createMemoryBarrier();
 
     private:
