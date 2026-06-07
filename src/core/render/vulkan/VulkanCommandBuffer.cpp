@@ -1,4 +1,5 @@
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
+#include "radiant/core/render/vulkan/VulkanBuffer.h"
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -84,6 +85,10 @@ namespace Radiant {
 
   void VulkanCommandBuffer::bindPipeline(VulkanPipeline& pipeline) {
     vkCmdBindPipeline(this->commandBuffer, pipeline.getBindPoint(), pipeline.get());
+  }
+
+  void VulkanCommandBuffer::bindVertexBuffer(VulkanBuffer& buffer) {
+    vkCmdBindVertexBuffers(this->commandBuffer, 0, 1, buffer.get(), const VkDeviceSize *pOffsets);
   }
 
   void VulkanCommandBuffer::setViewport(float width, float height, float minDepth, float maxDepth) {

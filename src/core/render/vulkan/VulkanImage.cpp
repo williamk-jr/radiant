@@ -1,7 +1,7 @@
 #include "radiant/core/render/vulkan/VulkanImage.h"
 
 namespace Radiant {
-  VulkanImage::VulkanImage(VulkanMemoryAllocator& allocator, VkExtent3D extent) : allocator(&allocator), extent(extent) {
+  VulkanImage::VulkanImage(VulkanMemoryAllocator& allocator, VkExtent3D extent) : memoryAllocator(allocator.get()), extent(extent) {
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -24,21 +24,21 @@ namespace Radiant {
     );
   }
   
-  VulkanImage::VulkanImage(VkImage image, VkExtent2D extent) : allocator(nullptr) {
+  VulkanImage::VulkanImage(VkImage image, VkExtent2D extent) : memoryAllocator(nullptr) {
     this->extent = {extent.width, extent.height, 1};
     this->image = image;
   }
 
   VulkanImage::VulkanImage(VulkanImage&& other) noexcept :
-      image(other.image), extent(other.extent), imageMemory(other.imageMemory), allocator(other.allocator) {
+      image(other.image), extent(other.extent), imageMemory(other.imageMemory), memoryAllocator(other.memoryAllocator) {
     other.image = nullptr;
     other.imageMemory = nullptr;
   }
 
   VulkanImage::~VulkanImage() {
     //vkDestroyImage(this->device.get(), this->image, nullptr);
-    if (allocator != nullptr) {
-      vmaDestroyImage(this->allocator->get(), this->image, this->imageMemory);
+    if (this->memoryAllocator != nullptr) {
+      vmaDestroyImage(this->memoryAllocator, this->image, this->imageMemory);
     }
   }
 
