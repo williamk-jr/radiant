@@ -14,10 +14,16 @@ namespace Radiant {
       VulkanBuffer& operator=(VulkanBuffer&&) noexcept = default;
       ~VulkanBuffer();
 
+      void append(void* data, size_t size);
+
       VkBuffer get();
     private:
       VkBuffer buffer;
       VmaAllocation allocation;
+      VmaAllocationInfo allocationInfo{};
       VmaAllocator memoryAllocator;
+
+      VkDeviceSize size;
+      VkDeviceSize offset;
   };
 }

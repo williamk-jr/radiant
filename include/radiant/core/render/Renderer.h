@@ -5,6 +5,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "radiant/core/render/Color.h"
+#include "radiant/core/render/Quad2D.h"
 #include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/Window.h"
 #include "radiant/core/render/vulkan/VulkanBinarySemaphore.h"
@@ -42,6 +43,8 @@ namespace Radiant {
       void beginRendering(Color clearColor);
       void setViewport(float width, float height, float minDepth, float maxDepth);
       void setScissor(uint32_t width, uint32_t height);
+      void bindVertexBuffer();
+      void bindIndexBuffer();
       void clear(Color color);
       void clear(Color color, VkRect2D clearArea);
       void endRendering();
@@ -73,7 +76,10 @@ namespace Radiant {
       std::vector<VulkanBinarySemaphore> frameFinishedSemaphores;
 
       std::unique_ptr<VulkanPipeline> graphicsPipeline;
+      std::unique_ptr<VulkanBuffer> vertexBuffer;
+      std::unique_ptr<VulkanBuffer> indexBuffer;
       std::unique_ptr<RenderContext> context;
+      Quad2D quad;
       int currentFrame = 0;
       bool updateSwapchain = false;
       Rect2D frameBufferSize;

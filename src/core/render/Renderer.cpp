@@ -103,12 +103,18 @@ namespace Radiant {
     this->commandBuffers[currentFrame].setScissor(width, height);
   }
 
+  void Renderer::bindVertexBuffer() {
+    this->commandBuffers[currentFrame].bindVertexBuffer(*this->vertexBuffer, 0);
+  }
+
+  void Renderer::bindIndexBuffer() {
+    this->commandBuffers[currentFrame].bindIndexBuffer(*this->indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+  }
+
   void Renderer::clear(Color color) {
     if (!this->context->rendering) {
       return;
     }
-    //VulkanImage& currentImage = this->swapchain->getImage(this->context->imageIndex);
-    //VkExtent3D imageExtent = currentImage.getExtent();
     VkExtent2D swapchainExtent = {this->frameBufferSize.width, this->frameBufferSize.height};
     this->clear(color, {{0,0},swapchainExtent});
   }
@@ -270,7 +276,32 @@ namespace Radiant {
       .withColorBlendState({}, nullptr, VK_LOGIC_OP_COPY)
       .withDynamicState({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
       .withViewportState(1, 1)
-      .build()); 
+      .build()
+    );
+
+    VkDeviceSize vertexBufferSize{2048};
+    VkDeviceSize indexBufferSize{2048};
+
+    this->vertexBuffer = std::make_unique<VulkanBuffer>(
+        *this->memoryAllocator,
+        vertexBufferSize,
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+        VK_SHARING_MODE_EXCLUSIVE,
+        std::vector<uint32_t>{}
+    );
+
+    this->indexBuffer = std::make_unique<VulkanBuffer>(
+        *this->memoryAllocator,
+        indexBufferSize,
+        VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+        VK_SHARING_MODE_EXCLUSIVE,
+        std::vector<uint32_t>{}
+    );
+
+    std::vector<Vertex> verticies = quad.getVerticies();
+    std::vector<uint16_t> indicies = quad.getIndicies();
+    this->vertexBuffer->append(verticies.data(), sizeof(Vertex)*verticies.size());
+    this->indexBuffer->append(indicies.data(), sizeof(uint16_t)*indicies.size());
   }
 
   bool Renderer::getPhysicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {

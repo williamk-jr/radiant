@@ -40,7 +40,10 @@ int main() {
     renderer.setViewport(frameBufferSize.width, frameBufferSize.height, 0, 1.0);
     renderer.setScissor(frameBufferSize.width, frameBufferSize.height);
 
-    renderer.clear({1, 0, 0, 1}, {{0,0}, {200, 200}});
+    renderer.bindVertexBuffer();
+    renderer.bindIndexBuffer();
+
+    //renderer.clear({1, 0, 0, 1}, {{0,0}, {200, 200}});
 
     renderer.endRendering();
     renderer.endFrame();
