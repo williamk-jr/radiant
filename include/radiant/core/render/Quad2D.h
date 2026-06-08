@@ -11,15 +11,15 @@ namespace Radiant {
     private:
       std::vector<Vertex> verticies{
         //Position  Normal     UV
-        {{1, 0, 0}, {0, 0, 1}, {1, 0}}, // Top Left
+        {{0, 1, 0}, {0, 0, 1}, {0, 1}}, // Top Left
         {{1, 1, 0}, {0, 0, 1}, {1, 1}}, // Top Right
         {{0, 0, 0}, {0, 0, 1}, {0, 0}}, // Bottom Left
-        {{0, 1, 0}, {0, 0, 1}, {0, 1}}  // Bottom Right
+        {{1, 0, 0}, {0, 0, 1}, {1, 0}}  // Bottom Right
       };
 
       std::vector<uint16_t> indicies{
         0, 2, 3,
-        0, 3, 1
+        0, 1, 3
       };
   };
 }

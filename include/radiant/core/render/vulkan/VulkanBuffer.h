@@ -23,7 +23,7 @@ namespace Radiant {
       VmaAllocationInfo allocationInfo{};
       VmaAllocator memoryAllocator;
 
-      VkDeviceSize size;
-      VkDeviceSize offset;
+      VkDeviceSize size = 0;
+      VkDeviceSize offset = 0;
   };
 }

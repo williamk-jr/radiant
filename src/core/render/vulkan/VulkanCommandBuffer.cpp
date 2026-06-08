@@ -119,6 +119,10 @@ namespace Radiant {
 
     vkCmdSetScissor(this->commandBuffer, 0, 1, &scissor);
   }
+  
+  void VulkanCommandBuffer::drawIndexed(uint32_t indexCount, uint32_t instanceCount) {
+    vkCmdDrawIndexed(this->commandBuffer, indexCount, instanceCount, 0, 0, 0);
+  }
 
   void VulkanCommandBuffer::clearAttachments(std::vector<VkClearAttachment> clearAttachments, std::vector<VkClearRect> clearAreas) {
     vkCmdClearAttachments(

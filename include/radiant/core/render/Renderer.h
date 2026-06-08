@@ -45,6 +45,7 @@ namespace Radiant {
       void setScissor(uint32_t width, uint32_t height);
       void bindVertexBuffer();
       void bindIndexBuffer();
+      void drawIndexed(uint32_t indexCount, uint32_t instanceCount);
       void clear(Color color);
       void clear(Color color, VkRect2D clearArea);
       void endRendering();

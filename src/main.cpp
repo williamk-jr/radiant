@@ -43,6 +43,8 @@ int main() {
     renderer.bindVertexBuffer();
     renderer.bindIndexBuffer();
 
+    renderer.drawIndexed(6, 1);
+
     //renderer.clear({1, 0, 0, 1}, {{0,0}, {200, 200}});
 
     renderer.endRendering();

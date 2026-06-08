@@ -12,21 +12,26 @@ namespace Radiant {
     bufferInfo.pQueueFamilyIndices = queueFamilyIndicies.data();
     bufferInfo.flags = 0;
 
-    VmaAllocationCreateInfo allocationInfo{};
-    allocationInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_ALLOW_TRANSFER_INSTEAD_BIT;
-    allocationInfo.usage = VMA_MEMORY_USAGE_AUTO;
+    VmaAllocationCreateInfo allocationCreateInfo{};
+    allocationCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_HOST_ACCESS_ALLOW_TRANSFER_INSTEAD_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT;
+    allocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO;
 
-    vmaCreateBuffer(memoryAllocator.get(), &bufferInfo, &allocationInfo, &this->buffer, &this->allocation, nullptr); 
+    vmaCreateBuffer(memoryAllocator.get(), &bufferInfo, &allocationCreateInfo, &this->buffer, &this->allocation, &this->allocationInfo); 
   }
   
   VulkanBuffer::VulkanBuffer(VulkanBuffer&& other) noexcept : 
-    buffer(other.buffer), allocation(other.allocation), memoryAllocator(other.memoryAllocator) {
+    buffer(other.buffer), allocation(other.allocation), allocationInfo(other.allocationInfo), memoryAllocator(other.memoryAllocator) {
     other.buffer = nullptr;
     other.allocation = nullptr;
+    other.allocationInfo = {};
   }
 
   VulkanBuffer::~VulkanBuffer() {
     vmaDestroyBuffer(this->memoryAllocator, this->buffer, this->allocation);
+  }
+
+  VkBuffer VulkanBuffer::get() {
+    return this->buffer;
   }
 
   void VulkanBuffer::append(void* data, size_t size) {

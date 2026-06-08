@@ -28,6 +28,15 @@ namespace Radiant {
     return *this;
   }
 
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withRenderingInfo(std::vector<VkFormat> colorAttachmentFormats, VkFormat depthAttachmentFormat, VkFormat stencilAttachmentFormat) {
+    this->renderingInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
+    this->renderingInfo.colorAttachmentCount = colorAttachmentFormats.size();
+    this->renderingInfo.pColorAttachmentFormats = colorAttachmentFormats.data();
+    this->renderingInfo.depthAttachmentFormat = depthAttachmentFormat;
+    this->renderingInfo.stencilAttachmentFormat = stencilAttachmentFormat;
+    return *this;
+  }
+
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withVertexBindingDescription(uint32_t stride, VkVertexInputRate inputRate, std::vector<VulkanVertexAttributeDescription> attributeDescriptions) {
     VkVertexInputBindingDescription bindingDescription{};
     bindingDescription.binding = this->vertexBindingDescriptors.size();
@@ -228,6 +237,8 @@ namespace Radiant {
     this->createInfo.pMultisampleState = &this->multisampleStateInfo;
     this->createInfo.pDynamicState = &this->dynamicStateInfo;
     this->createInfo.pViewportState = &this->viewportStateInfo;
+    this->createInfo.pNext = &this->renderingInfo; 
+
 
     VkPipeline graphicsPipeline;
     vkCreateGraphicsPipelines(

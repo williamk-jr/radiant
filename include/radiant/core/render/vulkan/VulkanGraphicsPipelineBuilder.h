@@ -54,6 +54,12 @@ namespace Radiant {
           std::vector<VulkanDescriptorSetLayout> descriptorSetLayouts
       );
 
+      VulkanGraphicsPipelineBuilder& withRenderingInfo(
+          std::vector<VkFormat> colorAttachmentFormats, 
+          VkFormat depthAttachmentFormat, 
+          VkFormat stencilAttachmentFormat
+      );
+
       VulkanGraphicsPipelineBuilder& withVertexBindingDescription(
           uint32_t stride, 
           VkVertexInputRate inputRate, 
@@ -133,6 +139,7 @@ namespace Radiant {
       std::vector<VkRect2D> scissors;
 
       VkPipelineLayout layout;
+      VkPipelineRenderingCreateInfo renderingInfo{};
       VkPipelineVertexInputStateCreateInfo vertextInputStateInfo{};
       VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo{};
       VkPipelineRasterizationStateCreateInfo rasterizationStateInfo{};

@@ -48,11 +48,13 @@ add_executable(Radiant
   src/core/render/vulkan/VulkanGraphicsPipelineBuilder.cpp
   src/core/render/vulkan/VulkanPipeline.cpp
   src/core/render/vulkan/VulkanDescriptorSetLayout.cpp
+  src/core/render/vulkan/VulkanBuffer.cpp
   src/core/render/vulkan/VulkanUtil.cpp
 
   src/core/render/Color.cpp
   src/core/render/Renderer.cpp
   src/core/render/Window.cpp
+  src/core/render/Quad2D.cpp
 )
 
 target_link_libraries(Radiant 

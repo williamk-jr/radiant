@@ -111,6 +111,10 @@ namespace Radiant {
     this->commandBuffers[currentFrame].bindIndexBuffer(*this->indexBuffer, 0, VK_INDEX_TYPE_UINT16);
   }
 
+  void Renderer::drawIndexed(uint32_t indexCount, uint32_t instanceCount) {
+    this->commandBuffers[currentFrame].drawIndexed(indexCount, instanceCount);
+  }
+
   void Renderer::clear(Color color) {
     if (!this->context->rendering) {
       return;
@@ -254,8 +258,12 @@ namespace Radiant {
       this->frameFinishedSemaphores.emplace_back(*this->device, 0);
     }
 
+    VkPipelineColorBlendAttachmentState attachmentState{};
+    attachmentState.colorWriteMask = 0xF;
+
     this->graphicsPipeline = std::make_unique<VulkanPipeline>(VulkanGraphicsPipelineBuilder(*this->device)
       .withLayout({})
+      .withRenderingInfo({VK_FORMAT_B8G8R8A8_SRGB}, VK_FORMAT_UNDEFINED, VK_FORMAT_UNDEFINED)
       .withVertexBindingDescription(sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX, {
         {VK_FORMAT_R32G32B32_SFLOAT, 0},
         {VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal)},
@@ -273,7 +281,7 @@ namespace Radiant {
           VK_FALSE
       )
       .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_FRAGMENT_BIT)
-      .withColorBlendState({}, nullptr, VK_LOGIC_OP_COPY)
+      .withColorBlendState({attachmentState}, nullptr, VK_LOGIC_OP_COPY)
       .withDynamicState({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
       .withViewportState(1, 1)
       .build()

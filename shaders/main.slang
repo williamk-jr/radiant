@@ -5,17 +5,17 @@ struct VertexInput {
 };
 
 struct VertexOutput {
-  float3 position;
+  float4 position : SV_Position;
   float3 normal;
   float2 uv;
 };
 
 [shader("vertex")]
 VertexOutput main(VertexInput vertex) {
-  return {vertex.position, vertex.normal, vertex.uv};
+  return {float4(vertex.position, 1.0), vertex.normal, vertex.uv};
 }
 
 [shader("fragment")]
 float4 main(VertexOutput vertex) {
-  return {0.0, 0.0, 0.0, 1.0};
+  return float4(vertex.uv.x, vertex.uv.y, 0.0, 1.0);
 }

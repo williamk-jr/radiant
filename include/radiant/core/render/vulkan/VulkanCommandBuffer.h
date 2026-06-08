@@ -35,6 +35,9 @@ namespace Radiant {
       void bindPipeline(VulkanPipeline& pipeline);
       void bindVertexBuffer(VulkanBuffer& buffer, VkDeviceSize offset);
       void bindIndexBuffer(VulkanBuffer& buffer, VkDeviceSize offset, VkIndexType indexType);
+      void drawIndexed(uint32_t indexCount, uint32_t instanceCount);
+
+
       void setViewport(float width, float height, float minDepth, float maxDepth);
       void setScissor(uint32_t width, uint32_t height);
       void clearAttachments(std::vector<VkClearAttachment> clearAttachments, std::vector<VkClearRect> clearAreas);
