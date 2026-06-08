@@ -78,6 +78,7 @@ namespace Radiant {
 
       std::unique_ptr<VulkanPipeline> graphicsPipeline;
       std::unique_ptr<VulkanBuffer> vertexBuffer;
+      std::unique_ptr<VulkanBuffer> instanceBuffer;
       std::unique_ptr<VulkanBuffer> indexBuffer;
       std::unique_ptr<RenderContext> context;
       Quad2D quad;

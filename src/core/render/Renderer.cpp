@@ -1,4 +1,5 @@
 #include "radiant/core/render/Renderer.h"
+#include "radiant/core/render/Instance.h"
 #include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/Vertex.h"
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
@@ -104,7 +105,8 @@ namespace Radiant {
   }
 
   void Renderer::bindVertexBuffer() {
-    this->commandBuffers[currentFrame].bindVertexBuffer(*this->vertexBuffer, 0);
+    this->commandBuffers[currentFrame].bindVertexBuffer(*this->vertexBuffer, 0, 0);
+    this->commandBuffers[currentFrame].bindVertexBuffer(*this->instanceBuffer, 1, 0);
   }
 
   void Renderer::bindIndexBuffer() {
@@ -269,6 +271,11 @@ namespace Radiant {
         {VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal)},
         {VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)},
       })
+      .withVertexBindingDescription(sizeof(Instance), VK_VERTEX_INPUT_RATE_INSTANCE, {
+        {VK_FORMAT_R32G32B32A32_SFLOAT, 0},
+        {VK_FORMAT_R32G32B32_SFLOAT, offsetof(Instance, position)},
+        {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, size)},
+      })
       .withInputAssemblyState(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE)
       .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_VERTEX_BIT)
       .withMultisampleState(VK_SAMPLE_COUNT_1_BIT, {VK_FALSE, 0.0}, VK_FALSE, VK_FALSE)
@@ -298,6 +305,14 @@ namespace Radiant {
         std::vector<uint32_t>{}
     );
 
+    this->instanceBuffer = std::make_unique<VulkanBuffer>(
+        *this->memoryAllocator,
+        vertexBufferSize,
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+        VK_SHARING_MODE_EXCLUSIVE,
+        std::vector<uint32_t>{}
+    );
+
     this->indexBuffer = std::make_unique<VulkanBuffer>(
         *this->memoryAllocator,
         indexBufferSize,
@@ -307,8 +322,12 @@ namespace Radiant {
     );
 
     std::vector<Vertex> verticies = quad.getVerticies();
+    std::vector<Instance> instances = {
+      {{100, 0, 0, 255}, {100, 100, 0}, {200, 200}}
+    };
     std::vector<uint16_t> indicies = quad.getIndicies();
     this->vertexBuffer->append(verticies.data(), sizeof(Vertex)*verticies.size());
+    this->instanceBuffer->append(instances.data(), sizeof(Instance)*instances.size());
     this->indexBuffer->append(indicies.data(), sizeof(uint16_t)*indicies.size());
   }
 

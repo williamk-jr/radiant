@@ -33,7 +33,7 @@ namespace Radiant {
           VkRect2D renderArea, VkRenderingFlags renderingFlags
       );
       void bindPipeline(VulkanPipeline& pipeline);
-      void bindVertexBuffer(VulkanBuffer& buffer, VkDeviceSize offset);
+      void bindVertexBuffer(VulkanBuffer& buffer, uint32_t firstBinding, VkDeviceSize offset);
       void bindIndexBuffer(VulkanBuffer& buffer, VkDeviceSize offset, VkIndexType indexType);
       void drawIndexed(uint32_t indexCount, uint32_t instanceCount);
 

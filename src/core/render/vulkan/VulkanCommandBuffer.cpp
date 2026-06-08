@@ -87,11 +87,12 @@ namespace Radiant {
     vkCmdBindPipeline(this->commandBuffer, pipeline.getBindPoint(), pipeline.get());
   }
 
-  void VulkanCommandBuffer::bindVertexBuffer(VulkanBuffer& buffer, VkDeviceSize offset) {
+  void VulkanCommandBuffer::bindVertexBuffer(VulkanBuffer& buffer, uint32_t firstBinding, VkDeviceSize offset) {
     std::vector<VkBuffer> buffers{buffer.get()};
     std::vector<VkDeviceSize> offsets{offset};
 
-    vkCmdBindVertexBuffers(this->commandBuffer, 0, 1, buffers.data(), offsets.data());
+
+    vkCmdBindVertexBuffers(this->commandBuffer, firstBinding, 1, buffers.data(), offsets.data());
   }
 
   void VulkanCommandBuffer::bindIndexBuffer(VulkanBuffer& buffer, VkDeviceSize offset, VkIndexType indexType) {
