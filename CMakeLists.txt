@@ -30,6 +30,11 @@ add_executable(Radiant
   src/util/string_util.cpp
   src/util/logger/Logger.cpp
 
+  src/core/engine/RadiantEngine.cpp
+  src/core/engine/layout/WidgetManager.cpp
+  src/core/engine/widgets/widget.cpp
+  src/core/engine/widgets/Unit.cpp
+
   src/core/render/vulkan/VulkanInstance.cpp
   src/core/render/vulkan/VulkanPhysicalDevice.cpp
   src/core/render/vulkan/VulkanDevice.cpp
@@ -55,6 +60,9 @@ add_executable(Radiant
   src/core/render/Renderer.cpp
   src/core/render/Window.cpp
   src/core/render/Quad2D.cpp
+  src/core/render/buffers/VertexBuffer.cpp
+  src/core/render/buffers/InstanceBuffer.cpp
+  src/core/render/buffers/IndexBuffer.cpp
 )
 
 target_link_libraries(Radiant 

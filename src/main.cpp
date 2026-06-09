@@ -1,3 +1,5 @@
+#include "radiant/core/engine/RadiantEngine.h"
+#include "radiant/core/engine/widgets/widget.h"
 #include "radiant/core/render/Rect2D.h"
 #include <string>
 #define GLFW_INCLUDE_VULKAN
@@ -28,36 +30,20 @@ int main() {
   Radiant::Logger::setVerbosity(1);
 
   const std::string applicationName = "Test";
-  Radiant::Window window(applicationName, 500, 500);
-  Radiant::Renderer renderer(window, true);
-  Radiant::Color color{0,1,0,1};
+  Radiant::RadiantEngine engine(applicationName, 500, 500);
+  //Radiant::Window window(applicationName, 500, 500);
+  //Radiant::Renderer renderer(window, true);
+  //Radiant::Color color{0,1,0,1};
 
-  while (!window.shouldClose()) {
-    renderer.beginFrame(window);
-    renderer.beginRendering(color);
+  //Radiant::Widget testWidget(
+  //    engine.getRootWidget(),
+  //    {Radiant::UnitType::PIXELS, 200},
+  //    {Radiant::UnitType::PIXELS, 200}
+  //);
 
-    Radiant::Rect2D frameBufferSize = window.getFrameBufferSize();
-    renderer.setViewport(frameBufferSize.width, frameBufferSize.height, 0, 1.0);
-    renderer.setScissor(frameBufferSize.width, frameBufferSize.height);
-
-    renderer.bindVertexBuffer();
-    renderer.bindIndexBuffer();
-
-    renderer.drawIndexed(6, 1);
-
-    //renderer.clear({1, 0, 0, 1}, {{0,0}, {200, 200}});
-
-    renderer.endRendering();
-    renderer.endFrame();
-
-    renderer.submit();
-    renderer.present(window);
-
-    window.pollEvents(); 
-    //renderer.renderLoop();
+  while (engine.isRunning()) {
+    engine.update(); 
   }
-
-  renderer.waitIdle();
 
   // Create Instance
   //std::vector<const char*> enabledExtensionNames = {VK_KHR_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_EXTENSION_NAME};

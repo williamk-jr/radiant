@@ -1,30 +1,41 @@
 #pragma once
+#include <cstdint>
 #include <vector>
+#include "radiant/core/engine/widgets/Unit.h"
 #include "radiant/core/render/renderable.h"
 
 namespace Radiant {
+  enum class PositionType {
+    ABSOLUTE,
+    RELATIVE,
+    FIXED
+  };
+
   class Widget: public Renderable {
     public:
 
-      Widget(Widget& parent, int width, int height);
-      Widget(Widget& parent, int positionX, int positionY, int width, int height);
+      Widget(Widget* parent, Unit width, Unit height);
+      Widget(Widget* parent, uint32_t positionX, uint32_t positionY, Unit width, Unit height);
 
-      int getPositionX();
-      int getPositionY();
+      uint32_t getPositionX();
+      uint32_t getPositionY();
       
-      int getWidth();
-      int getHeight();
+      uint32_t getWidth();
+      uint32_t getHeight();
+
+      void updateLayout();
 
       void render() override;
 
     private:
-      Widget& parent;
-      std::vector<Widget> children;
+      Widget* parent;
+      std::vector<Widget*> children;
+      PositionType positionType = PositionType::RELATIVE;
 
-      int positionX;
-      int positionY;
+      uint32_t positionX;
+      uint32_t positionY;
 
-      int width;
-      int height;
+      Unit width;
+      Unit height;
   };
 }

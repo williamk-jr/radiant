@@ -20,6 +20,18 @@ namespace Radiant {
     this->device->waitIdle();
   } 
 
+  std::unique_ptr<VertexBuffer> Renderer::createVertexBuffer(VkDeviceSize size) {
+    return std::make_unique<VertexBuffer>(*this->memoryAllocator, size);
+  }
+
+  std::unique_ptr<IndexBuffer> Renderer::createIndexBuffer(VkDeviceSize size) {
+    return std::make_unique<IndexBuffer>(*this->memoryAllocator, size);
+  }
+
+  std::unique_ptr<InstanceBuffer> Renderer::createInstanceBuffer(VkDeviceSize size) {
+    return std::make_unique<InstanceBuffer>(*this->memoryAllocator, size);
+  }
+
   void Renderer::beginFrame(Window& window) {
     this->fences[currentFrame].wait(UINT32_MAX);
     this->fences[currentFrame].reset();
@@ -104,13 +116,16 @@ namespace Radiant {
     this->commandBuffers[currentFrame].setScissor(width, height);
   }
 
-  void Renderer::bindVertexBuffer() {
-    this->commandBuffers[currentFrame].bindVertexBuffer(*this->vertexBuffer, 0, 0);
-    this->commandBuffers[currentFrame].bindVertexBuffer(*this->instanceBuffer, 1, 0);
+  void Renderer::bindVertexBuffer(VertexBuffer& vertexBuffer) {
+    this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.get(), 0, 0);
   }
 
-  void Renderer::bindIndexBuffer() {
-    this->commandBuffers[currentFrame].bindIndexBuffer(*this->indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+  void Renderer::bindInstanceBuffer(InstanceBuffer& instanceBuffer) {
+    this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.get(), 1, 0);
+  }
+
+  void Renderer::bindIndexBuffer(IndexBuffer& indexBuffer) {
+    this->commandBuffers[currentFrame].bindIndexBuffer(indexBuffer.get(), 0, VK_INDEX_TYPE_UINT16);
   }
 
   void Renderer::drawIndexed(uint32_t indexCount, uint32_t instanceCount) {
@@ -295,40 +310,41 @@ namespace Radiant {
     );
 
     VkDeviceSize vertexBufferSize{2048};
+    VkDeviceSize instanceBufferSize{2048};
     VkDeviceSize indexBufferSize{2048};
 
-    this->vertexBuffer = std::make_unique<VulkanBuffer>(
-        *this->memoryAllocator,
-        vertexBufferSize,
-        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-        VK_SHARING_MODE_EXCLUSIVE,
-        std::vector<uint32_t>{}
-    );
+    //this->vertexBuffer = std::make_unique<VulkanBuffer>(
+    //    *this->memoryAllocator,
+    //    vertexBufferSize,
+    //    VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+    //    VK_SHARING_MODE_EXCLUSIVE,
+    //    std::vector<uint32_t>{}
+    //);
 
-    this->instanceBuffer = std::make_unique<VulkanBuffer>(
-        *this->memoryAllocator,
-        vertexBufferSize,
-        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-        VK_SHARING_MODE_EXCLUSIVE,
-        std::vector<uint32_t>{}
-    );
+    //this->instanceBuffer = std::make_unique<VulkanBuffer>(
+    //    *this->memoryAllocator,
+    //    instanceBufferSize,
+    //    VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+    //    VK_SHARING_MODE_EXCLUSIVE,
+    //    std::vector<uint32_t>{}
+    //);
 
-    this->indexBuffer = std::make_unique<VulkanBuffer>(
-        *this->memoryAllocator,
-        indexBufferSize,
-        VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-        VK_SHARING_MODE_EXCLUSIVE,
-        std::vector<uint32_t>{}
-    );
+    //this->indexBuffer = std::make_unique<VulkanBuffer>(
+    //    *this->memoryAllocator,
+    //    indexBufferSize,
+    //    VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+    //    VK_SHARING_MODE_EXCLUSIVE,
+    //    std::vector<uint32_t>{}
+    //);
 
-    std::vector<Vertex> verticies = quad.getVerticies();
-    std::vector<Instance> instances = {
-      {{100, 0, 0, 255}, {100, 100, 0}, {200, 200}}
-    };
-    std::vector<uint16_t> indicies = quad.getIndicies();
-    this->vertexBuffer->append(verticies.data(), sizeof(Vertex)*verticies.size());
-    this->instanceBuffer->append(instances.data(), sizeof(Instance)*instances.size());
-    this->indexBuffer->append(indicies.data(), sizeof(uint16_t)*indicies.size());
+    //std::vector<Vertex> verticies = quad.getVerticies();
+    //std::vector<Instance> instances = {
+    //  {{255, 0, 0, 255}, {100, 100, 0}, {200, 200}}
+    //};
+    //std::vector<uint16_t> indicies = quad.getIndicies();
+    //this->vertexBuffer->append(verticies.data(), sizeof(Vertex)*verticies.size());
+    //this->instanceBuffer->append(instances.data(), sizeof(Instance)*instances.size());
+    //this->indexBuffer->append(indicies.data(), sizeof(uint16_t)*indicies.size());
   }
 
   bool Renderer::getPhysicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
