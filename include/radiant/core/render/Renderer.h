@@ -6,7 +6,6 @@
 
 #include "radiant/core/render/Color.h"
 #include "radiant/core/render/buffers/IndexBuffer.h"
-#include "radiant/core/render/Quad2D.h"
 #include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/buffers/InstanceBuffer.h"
 #include "radiant/core/render/buffers/VertexBuffer.h"
@@ -52,7 +51,9 @@ namespace Radiant {
       void setScissor(uint32_t width, uint32_t height);
 
       void bindVertexBuffer(VertexBuffer& vertexBuffer);
+      void bindVertexBuffer(VertexBuffer& vertexBuffer, VkDeviceSize size);
       void bindInstanceBuffer(InstanceBuffer& instanceBuffer);
+      void bindInstanceBuffer(InstanceBuffer& instanceBuffer, VkDeviceSize size);
       void bindIndexBuffer(IndexBuffer& indexBuffer);
 
       void drawIndexed(uint32_t indexCount, uint32_t instanceCount);
@@ -87,11 +88,8 @@ namespace Radiant {
       std::vector<VulkanBinarySemaphore> frameFinishedSemaphores;
 
       std::unique_ptr<VulkanPipeline> graphicsPipeline;
-      //std::unique_ptr<VulkanBuffer> vertexBuffer;
-      //std::unique_ptr<VulkanBuffer> instanceBuffer;
-      //std::unique_ptr<VulkanBuffer> indexBuffer;
       std::unique_ptr<RenderContext> context;
-      Quad2D quad;
+
       int currentFrame = 0;
       bool updateSwapchain = false;
       Rect2D frameBufferSize;

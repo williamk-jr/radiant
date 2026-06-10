@@ -27,6 +27,10 @@ namespace Radiant {
         this->buffer->append(data.data(), sizeof(T)*data.size());
       }
 
+      void resetOffset() {
+        this->buffer->resetOffset();
+      }
+
       void size() {
 
       }

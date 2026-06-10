@@ -19,7 +19,7 @@ struct VertexOutput {
 };
 
 [shader("vertex")]
-VertexOutput main(VertexInput vertex) {
+VertexOutput main(VertexInput vertex, uint instanceId : SV_InstanceID) {
   return {
     float4(vertex.position, 1.0), vertex.normal, vertex.uv,
     vertex.color, vertex.screenPosition, vertex.screenSize

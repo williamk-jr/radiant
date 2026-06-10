@@ -31,15 +31,12 @@ int main() {
 
   const std::string applicationName = "Test";
   Radiant::RadiantEngine engine(applicationName, 500, 500);
-  //Radiant::Window window(applicationName, 500, 500);
-  //Radiant::Renderer renderer(window, true);
-  //Radiant::Color color{0,1,0,1};
 
-  //Radiant::Widget testWidget(
-  //    engine.getRootWidget(),
-  //    {Radiant::UnitType::PIXELS, 200},
-  //    {Radiant::UnitType::PIXELS, 200}
-  //);
+  Radiant::Widget testWidget(
+      engine.getRootWidget(),
+      {Radiant::UnitType::PIXELS, 200},
+      {Radiant::UnitType::PIXELS, 200}
+  );
 
   while (engine.isRunning()) {
     engine.update(); 
@@ -101,14 +98,4 @@ int main() {
   //std::cout << string_util::isNumeric(str2) << "\n";
   //std::cout << string_util::isNumeric(str3) << "\n";
   //std::cout << string_util::isNumeric(str4) << "\n";
-}
-
-VkBool32 debugCallback(
-  VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-  VkDebugUtilsMessageTypeFlagsEXT messageTypes,
-  const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-  void* pUserData
-) {
-  std::cerr << pCallbackData->pMessage << "\n";
-  return VK_FALSE;
 }

@@ -1,8 +1,9 @@
 #include "radiant/core/engine/RadiantEngine.h"
 #include "radiant/core/engine/layout/WidgetManager.h"
-#include "radiant/core/render/Quad2D.h"
+#include "radiant/core/render/models/Quad2D.h"
 #include "radiant/core/render/Window.h"
 #include <memory>
+#include <string>
 
 namespace Radiant {
   RadiantEngine::RadiantEngine(const std::string& title, uint32_t width, uint32_t height) {
@@ -17,14 +18,12 @@ namespace Radiant {
 
     Quad2D quad;
     std::vector<Vertex> verticies = quad.getVerticies();
-    std::vector<Instance> instances = {
-      {{255, 0, 0, 255}, {100, 100, 0}, {200, 200}}
-    };
     std::vector<uint16_t> indicies = quad.getIndicies();
-
+    //std::vector<Instance> instances = {
+    //  {{255, 0, 0, 255}, {100, 100, 0}, {200, 200}}
+    //};
 
     this->vertexBuffer->append(verticies);
-    this->instanceBuffer->append(instances);
     this->indexBuffer->append(indicies);
   }
 
@@ -32,11 +31,22 @@ namespace Radiant {
     renderer->waitIdle();
   }
   
+  std::shared_ptr<Widget> RadiantEngine::getRootWidget() {
+    return this->widgetManager->getRootWidget();
+  }
+  
   bool RadiantEngine::isRunning() {
     return !this->window->shouldClose();
   }
 
   void RadiantEngine::update() {
+    RenderBatch batch = this->widgetManager->createRenderBatch();
+    //Logger::info(std::to_string(batch.instances.size()));
+    if (!batch.instances.empty()) { // If empty, instanceBuffer does not need to be updated
+      this->instanceBuffer->resetOffset();
+      this->instanceBuffer->append(batch.instances);
+    }
+
     Radiant::Color color{0,0,0,1};
     renderer->beginFrame(*window);
     renderer->beginRendering(color);
@@ -46,10 +56,10 @@ namespace Radiant {
     renderer->setScissor(frameBufferSize.width, frameBufferSize.height);
 
     renderer->bindVertexBuffer(*this->vertexBuffer);
-    renderer->bindInstanceBuffer(*this->instanceBuffer);
+    renderer->bindInstanceBuffer(*this->instanceBuffer, sizeof(Instance)*batch.instances.size());
     renderer->bindIndexBuffer(*this->indexBuffer);
 
-    renderer->drawIndexed(6, 1);
+    renderer->drawIndexed(6, batch.instances.size());
 
     renderer->endRendering();
     renderer->endFrame();

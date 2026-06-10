@@ -11,6 +11,7 @@ namespace Radiant {
       RadiantEngine(const std::string& title, uint32_t width, uint32_t height);
       ~RadiantEngine();
 
+      std::shared_ptr<Widget> getRootWidget();
       bool isRunning();
       void update();
     private:

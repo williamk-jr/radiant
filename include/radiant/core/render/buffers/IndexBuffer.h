@@ -1,5 +1,5 @@
 #pragma once
-#include "radiant/core/render/Buffer.h"
+#include "radiant/core/render/buffers/Buffer.h"
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {

@@ -38,4 +38,8 @@ namespace Radiant {
     memcpy(((char*)this->allocationInfo.pMappedData+this->offset), data, size);
     this->offset += size;
   }
+  
+  void VulkanBuffer::resetOffset() {
+    this->offset = 0;
+  }
 }

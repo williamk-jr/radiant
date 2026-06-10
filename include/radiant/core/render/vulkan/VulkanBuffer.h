@@ -15,6 +15,7 @@ namespace Radiant {
       ~VulkanBuffer();
 
       void append(void* data, size_t size);
+      void resetOffset();
 
       VkBuffer get();
     private:

@@ -1,13 +1,19 @@
 #include "radiant/core/engine/widgets/widget.h"
+#include <memory>
 
 namespace Radiant {
-  Widget::Widget(Widget* parent, Unit width, Unit height) :
+  Widget::Widget(std::shared_ptr<Widget> parent, Unit width, Unit height) :
     parent(parent), width(width), height(height) {
+    if (parent != nullptr) {
+      parent->addChild(this);
+    }
   }
 
-  Widget::Widget(Widget* parent, uint32_t positionX, uint32_t positionY, Unit width, Unit height) :
+  Widget::Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, Unit width, Unit height) :
     parent(parent), positionX(positionX), positionY(positionY), width(width), height(height) {
-
+    if (parent != nullptr) {
+      parent->addChild(this);
+    }
   }
 
   uint32_t Widget::getPositionX() {
@@ -27,6 +33,13 @@ namespace Radiant {
     return 0;
   }
 
+  std::vector<Widget*> Widget::getChildren() {
+    return this->children;
+  }
+  
+  void Widget::addChild(Widget* child) {
+    this->children.push_back(child);
+  }
 
   void Widget::render() {
 
@@ -45,10 +58,6 @@ namespace Radiant {
       case PositionType::ABSOLUTE:
 
         break;
-    }
-
-    for (Widget* child : this->children) {
-      child->updateLayout();
     }
   }
 }

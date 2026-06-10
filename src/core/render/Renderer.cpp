@@ -2,6 +2,7 @@
 #include "radiant/core/render/Instance.h"
 #include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/Vertex.h"
+#include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
 #include <cstddef>
 #include <memory>
@@ -116,17 +117,27 @@ namespace Radiant {
     this->commandBuffers[currentFrame].setScissor(width, height);
   }
 
+
   void Renderer::bindVertexBuffer(VertexBuffer& vertexBuffer) {
     this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.get(), 0, 0);
+  }
+
+  void Renderer::bindVertexBuffer(VertexBuffer& vertexBuffer, VkDeviceSize size) {
+    this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.get(), 0, 0, size);
   }
 
   void Renderer::bindInstanceBuffer(InstanceBuffer& instanceBuffer) {
     this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.get(), 1, 0);
   }
 
+  void Renderer::bindInstanceBuffer(InstanceBuffer& instanceBuffer, VkDeviceSize size) {
+    this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.get(), 1, 0, size);
+  }
+
   void Renderer::bindIndexBuffer(IndexBuffer& indexBuffer) {
     this->commandBuffers[currentFrame].bindIndexBuffer(indexBuffer.get(), 0, VK_INDEX_TYPE_UINT16);
   }
+
 
   void Renderer::drawIndexed(uint32_t indexCount, uint32_t instanceCount) {
     this->commandBuffers[currentFrame].drawIndexed(indexCount, instanceCount);
@@ -277,6 +288,11 @@ namespace Radiant {
 
     VkPipelineColorBlendAttachmentState attachmentState{};
     attachmentState.colorWriteMask = 0xF;
+
+
+    //VulkanDescriptorSetLayout descriptorSet(*this->device, {
+    //  VkDescriptorSetLayoutBinding{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_ALL_GRAPHICS, nullptr}
+    //});
 
     this->graphicsPipeline = std::make_unique<VulkanPipeline>(VulkanGraphicsPipelineBuilder(*this->device)
       .withLayout({})
