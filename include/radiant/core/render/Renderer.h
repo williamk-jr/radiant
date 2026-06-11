@@ -11,6 +11,7 @@
 #include "radiant/core/render/buffers/VertexBuffer.h"
 #include "radiant/core/render/Window.h"
 #include "radiant/core/render/vulkan/VulkanBinarySemaphore.h"
+#include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanFence.h"
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
@@ -77,7 +78,6 @@ namespace Radiant {
       std::unique_ptr<VulkanMemoryAllocator> memoryAllocator;
       std::unique_ptr<VulkanQueue> graphicsQueue;
       std::unique_ptr<VulkanQueue> presentQueue;
-
       std::unique_ptr<VulkanSwapchain> swapchain;
 
       std::unique_ptr<VulkanCommandPool> commandPool;
@@ -87,9 +87,12 @@ namespace Radiant {
       std::vector<VulkanBinarySemaphore> imageReadySemaphores;
       std::vector<VulkanBinarySemaphore> frameFinishedSemaphores;
 
+      std::unique_ptr<VulkanDescriptorPool> descriptorPool;
+      std::vector<VulkanDescriptorSetLayout> descriptorSetLayouts;
+      std::vector<VulkanDescriptorSet> descriptorSets;
       std::unique_ptr<VulkanPipeline> graphicsPipeline;
-      std::unique_ptr<RenderContext> context;
 
+      std::unique_ptr<RenderContext> context;
       int currentFrame = 0;
       bool updateSwapchain = false;
       Rect2D frameBufferSize;

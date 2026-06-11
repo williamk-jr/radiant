@@ -13,7 +13,7 @@ namespace Radiant {
     this->device = device.get();
   }
   
-  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withLayout(std::vector<VulkanDescriptorSetLayout> descriptorSetLayouts) {
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withLayout(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts) {
     for (VulkanDescriptorSetLayout& descriptorSetLayout : descriptorSetLayouts) {
       this->descriptorSetLayouts.push_back(descriptorSetLayout.get());
     }

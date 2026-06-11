@@ -53,6 +53,8 @@ add_executable(Radiant
   src/core/render/vulkan/VulkanGraphicsPipelineBuilder.cpp
   src/core/render/vulkan/VulkanPipeline.cpp
   src/core/render/vulkan/VulkanDescriptorSetLayout.cpp
+  src/core/render/vulkan/VulkanDescriptorPool.cpp
+  src/core/render/vulkan/VulkanDescriptorSet.cpp
   src/core/render/vulkan/VulkanBuffer.cpp
   src/core/render/vulkan/VulkanUtil.cpp
 

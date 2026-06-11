@@ -51,7 +51,7 @@ namespace Radiant {
       VulkanGraphicsPipelineBuilder(VulkanDevice& device);
 
       VulkanGraphicsPipelineBuilder& withLayout(
-          std::vector<VulkanDescriptorSetLayout> descriptorSetLayouts
+          std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts
       );
 
       VulkanGraphicsPipelineBuilder& withRenderingInfo(

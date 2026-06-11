@@ -6,6 +6,7 @@
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
 #include <cstddef>
 #include <memory>
+#include <vector>
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -286,16 +287,23 @@ namespace Radiant {
       this->frameFinishedSemaphores.emplace_back(*this->device, 0);
     }
 
+
+    this->descriptorPool = std::make_unique<VulkanDescriptorPool>(*this->device, std::vector<VkDescriptorPoolSize>{
+      {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}
+    }, 10);
+
+    this->descriptorSetLayouts.emplace_back(*this->device, std::vector<VkDescriptorSetLayoutBinding>{
+      VkDescriptorSetLayoutBinding{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_ALL_GRAPHICS, nullptr}
+    });
+
+    this->descriptorSets = this->descriptorPool->allocateDescriptorSets(this->descriptorSetLayouts);
+
+
     VkPipelineColorBlendAttachmentState attachmentState{};
     attachmentState.colorWriteMask = 0xF;
 
-
-    //VulkanDescriptorSetLayout descriptorSet(*this->device, {
-    //  VkDescriptorSetLayoutBinding{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_ALL_GRAPHICS, nullptr}
-    //});
-
     this->graphicsPipeline = std::make_unique<VulkanPipeline>(VulkanGraphicsPipelineBuilder(*this->device)
-      .withLayout({})
+      .withLayout(this->descriptorSetLayouts)
       .withRenderingInfo({VK_FORMAT_B8G8R8A8_SRGB}, VK_FORMAT_UNDEFINED, VK_FORMAT_UNDEFINED)
       .withVertexBindingDescription(sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX, {
         {VK_FORMAT_R32G32B32_SFLOAT, 0},
@@ -324,43 +332,6 @@ namespace Radiant {
       .withViewportState(1, 1)
       .build()
     );
-
-    VkDeviceSize vertexBufferSize{2048};
-    VkDeviceSize instanceBufferSize{2048};
-    VkDeviceSize indexBufferSize{2048};
-
-    //this->vertexBuffer = std::make_unique<VulkanBuffer>(
-    //    *this->memoryAllocator,
-    //    vertexBufferSize,
-    //    VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-    //    VK_SHARING_MODE_EXCLUSIVE,
-    //    std::vector<uint32_t>{}
-    //);
-
-    //this->instanceBuffer = std::make_unique<VulkanBuffer>(
-    //    *this->memoryAllocator,
-    //    instanceBufferSize,
-    //    VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-    //    VK_SHARING_MODE_EXCLUSIVE,
-    //    std::vector<uint32_t>{}
-    //);
-
-    //this->indexBuffer = std::make_unique<VulkanBuffer>(
-    //    *this->memoryAllocator,
-    //    indexBufferSize,
-    //    VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-    //    VK_SHARING_MODE_EXCLUSIVE,
-    //    std::vector<uint32_t>{}
-    //);
-
-    //std::vector<Vertex> verticies = quad.getVerticies();
-    //std::vector<Instance> instances = {
-    //  {{255, 0, 0, 255}, {100, 100, 0}, {200, 200}}
-    //};
-    //std::vector<uint16_t> indicies = quad.getIndicies();
-    //this->vertexBuffer->append(verticies.data(), sizeof(Vertex)*verticies.size());
-    //this->instanceBuffer->append(instances.data(), sizeof(Instance)*instances.size());
-    //this->indexBuffer->append(indicies.data(), sizeof(uint16_t)*indicies.size());
   }
 
   bool Renderer::getPhysicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
