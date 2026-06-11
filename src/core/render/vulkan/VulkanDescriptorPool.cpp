@@ -31,7 +31,11 @@ namespace Radiant {
     return this->descriptorPool;
   }
   
-  std::vector<VulkanDescriptorSet> VulkanDescriptorPool::allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts) {
+  void VulkanDescriptorPool::reset() {
+    vkResetDescriptorPool(this->device, this->descriptorPool, 0);
+  }
+
+  void VulkanDescriptorPool::allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts) {
     std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts;
     rawDescriptorSetLayouts.reserve(descriptorSetLayouts.size());
     for (VulkanDescriptorSetLayout& descriptorSetLayout : descriptorSetLayouts) {
@@ -50,10 +54,13 @@ namespace Radiant {
     vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data());
 
     std::vector<VulkanDescriptorSet> wrappedDescriptorSets;
-    wrappedDescriptorSets.reserve(rawDescriptorSets.size());
+    this->descriptorSets.reserve(rawDescriptorSets.size());
     for (VkDescriptorSet& descriptorSet : rawDescriptorSets) {
-      wrappedDescriptorSets.emplace_back(descriptorSet);
+      this->descriptorSets.emplace_back(descriptorSet);
     }
-    return wrappedDescriptorSets;
+  }
+  
+  VulkanDescriptorSet& VulkanDescriptorPool::getDescriptorSet(uint32_t index) {
+    return this->descriptorSets[index];
   }
 }

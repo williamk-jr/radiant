@@ -87,6 +87,7 @@ namespace Radiant {
       std::vector<VulkanBinarySemaphore> imageReadySemaphores;
       std::vector<VulkanBinarySemaphore> frameFinishedSemaphores;
 
+      std::unique_ptr<VulkanBuffer> descriptorBuffer;
       std::unique_ptr<VulkanDescriptorPool> descriptorPool;
       std::vector<VulkanDescriptorSetLayout> descriptorSetLayouts;
       std::vector<VulkanDescriptorSet> descriptorSets;

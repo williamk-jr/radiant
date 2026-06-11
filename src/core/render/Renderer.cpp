@@ -287,16 +287,21 @@ namespace Radiant {
       this->frameFinishedSemaphores.emplace_back(*this->device, 0);
     }
 
-
-    this->descriptorPool = std::make_unique<VulkanDescriptorPool>(*this->device, std::vector<VkDescriptorPoolSize>{
-      {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}
-    }, 10);
+    this->descriptorBuffer = std::make_unique<VulkanBuffer>(
+        *this->memoryAllocator, 2048, 
+        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 
+        VK_SHARING_MODE_EXCLUSIVE, std::vector<uint32_t>{}
+    );
 
     this->descriptorSetLayouts.emplace_back(*this->device, std::vector<VkDescriptorSetLayoutBinding>{
       VkDescriptorSetLayoutBinding{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_ALL_GRAPHICS, nullptr}
     });
 
-    this->descriptorSets = this->descriptorPool->allocateDescriptorSets(this->descriptorSetLayouts);
+    this->descriptorPool = std::make_unique<VulkanDescriptorPool>(*this->device, std::vector<VkDescriptorPoolSize>{
+      {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}
+    }, 10);
+
+    this->descriptorPool->allocateDescriptorSets(this->descriptorSetLayouts);
 
 
     VkPipelineColorBlendAttachmentState attachmentState{};

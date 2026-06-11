@@ -17,9 +17,14 @@ namespace Radiant {
       ~VulkanDescriptorPool();
 
       VkDescriptorPool get();
-      std::vector<VulkanDescriptorSet> allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts);
+      void reset();
+      void allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts);
+      VulkanDescriptorSet& getDescriptorSet(uint32_t index);
+
     private:
       VkDescriptorPool descriptorPool;
       VkDevice device;
+
+      std::vector<VulkanDescriptorSet> descriptorSets;
   };
 }
