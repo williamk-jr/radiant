@@ -14,6 +14,7 @@ namespace Radiant {
       ~VulkanPipeline();
       
       VkPipeline get();
+      VkPipelineLayout getLayout();
       VkPipelineBindPoint getBindPoint();
     private:
       VkPipeline pipeline;

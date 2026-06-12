@@ -1,5 +1,6 @@
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
 #include "radiant/core/render/vulkan/VulkanBuffer.h"
+#include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -105,6 +106,21 @@ namespace Radiant {
 
   void VulkanCommandBuffer::bindIndexBuffer(VulkanBuffer& buffer, VkDeviceSize offset, VkIndexType indexType) {
     vkCmdBindIndexBuffer(this->commandBuffer, buffer.get(), offset, indexType);
+  }
+
+  void VulkanCommandBuffer::bindDescriptorSets(VulkanPipeline pipeline, uint32_t firstSet, std::vector<VulkanDescriptorSet>& descriptorSets) {
+    std::vector<VkDescriptorSet> rawDescriptorSets;
+    rawDescriptorSets.reserve(descriptorSets.size());
+    for (VulkanDescriptorSet& descriptorSet : descriptorSets) {
+      rawDescriptorSets.emplace_back(descriptorSet.get());
+    }
+
+    vkCmdBindDescriptorSets(
+        this->commandBuffer, 
+        pipeline.getBindPoint(), pipeline.getLayout(), 
+        firstSet, rawDescriptorSets.size(), rawDescriptorSets.data(), 
+        0, nullptr
+    ); 
   }
 
   void VulkanCommandBuffer::setViewport(float width, float height, float minDepth, float maxDepth) {

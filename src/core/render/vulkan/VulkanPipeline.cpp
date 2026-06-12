@@ -26,6 +26,10 @@ namespace Radiant {
     return this->pipeline;
   }
 
+  VkPipelineLayout VulkanPipeline::getLayout() {
+    return this->layout;
+  }
+
   VkPipelineBindPoint VulkanPipeline::getBindPoint() {
     return this->bindPoint;
   }
