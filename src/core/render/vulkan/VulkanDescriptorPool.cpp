@@ -1,6 +1,7 @@
 #include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include <algorithm>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
@@ -60,6 +61,52 @@ namespace Radiant {
     }
   }
   
+  void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites, std::vector<VulkanCopyDescriptorSet> descriptorSetCopies) {
+    std::vector<VkWriteDescriptorSet> rawDescriptorWrites;
+    rawDescriptorWrites.reserve(descriptorSetWrites.size());
+
+    for (VulkanWriteDescriptorSet& descriptorWrite : descriptorSetWrites) {
+      uint32_t descriptorCount = std::max({
+          descriptorWrite.imageInfo.size(), 
+          descriptorWrite.bufferInfo.size(), 
+          descriptorWrite.texelBufferViews.size()
+      });
+
+      rawDescriptorWrites.emplace_back(VkWriteDescriptorSet{
+        VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, nullptr, 
+        this->getDescriptorSet(descriptorWrite.descriptorIndex).get(),
+        descriptorWrite.descriptorBindingIndex, 
+        descriptorWrite.descriptorArrayElement,
+        descriptorCount,
+        descriptorWrite.descriptorType, 
+        descriptorWrite.imageInfo.data(), 
+        descriptorWrite.bufferInfo.data(), 
+        descriptorWrite.texelBufferViews.data()
+      });
+    }
+
+    std::vector<VkCopyDescriptorSet> rawDescriptorCopies;
+    rawDescriptorCopies.reserve(descriptorSetCopies.size());
+
+    for (VulkanCopyDescriptorSet& descriptorCopy : descriptorSetCopies) {
+      rawDescriptorCopies.emplace_back(VkCopyDescriptorSet{
+        VK_STRUCTURE_TYPE_COPY_DESCRIPTOR_SET, nullptr, 
+        this->getDescriptorSet(descriptorCopy.srcDescriptorIndex).get(),
+        descriptorCopy.srcDecriptorBindingIndex,
+        descriptorCopy.srcDescriptorArrayElement,
+        this->getDescriptorSet(descriptorCopy.dstDescriptorIndex).get(),
+        descriptorCopy.dstDecriptorBindingIndex,
+        descriptorCopy.dstDescriptorArrayElement,
+        descriptorCopy.descriptorCount
+      });
+    }
+
+    vkUpdateDescriptorSets(this->device, 
+        rawDescriptorWrites.size(), rawDescriptorWrites.data(), 
+        rawDescriptorCopies.size(), rawDescriptorCopies.data()
+    );
+  }
+
   VulkanDescriptorSet& VulkanDescriptorPool::getDescriptorSet(uint32_t index) {
     return this->descriptorSets[index];
   }
