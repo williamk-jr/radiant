@@ -35,8 +35,8 @@ namespace Radiant {
       std::vector<Widget*> children;
       PositionType positionType = PositionType::RELATIVE;
 
-      uint32_t positionX;
-      uint32_t positionY;
+      uint32_t positionX = 0;
+      uint32_t positionY = 0;
 
       Unit width;
       Unit height;

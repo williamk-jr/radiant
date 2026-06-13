@@ -18,10 +18,24 @@ struct VertexOutput {
   float2 screenSize;
 };
 
+struct ShaderData {
+  uint32_t2 frameBufferSize;
+};
+
+uniform ShaderData shaderData;
+
 [shader("vertex")]
 VertexOutput main(VertexInput vertex, uint instanceId : SV_InstanceID) {
+  float2 normalizedVertexPosition = (vertex.position.xy + 1) / 2;
+
+  float sizeX = 100 * normalizedVertexPosition.x;
+  float sizeY = 100 * normalizedVertexPosition.y;
+  
+  float newX = ( (vertex.screenPosition.x + sizeX) / (float)shaderData.frameBufferSize.x) * 2.0 - 1.0;
+  float newY = ( (vertex.screenPosition.y + sizeY) / (float)shaderData.frameBufferSize.y) * 2.0 - 1.0;
+
   return {
-    float4(vertex.position, 1.0), vertex.normal, vertex.uv,
+    float4(newX, newY, vertex.position.z, 1.0), vertex.normal, vertex.uv,
     vertex.color, vertex.screenPosition, vertex.screenSize
   };
 }

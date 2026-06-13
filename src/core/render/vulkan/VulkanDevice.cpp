@@ -73,11 +73,15 @@ namespace Radiant {
     vulkan11Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
     vulkan11Features.shaderDrawParameters = VK_TRUE;
 
+    VkPhysicalDeviceDescriptorIndexingFeatures descriptorIndexingFeatures{}; 
+    descriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+    descriptorIndexingFeatures.descriptorBindingUniformBufferUpdateAfterBind = VK_TRUE;
+
     VkPhysicalDeviceVulkan13Features vulkan13Features{};
     vulkan13Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
     vulkan13Features.synchronization2 = VK_TRUE;
     vulkan13Features.dynamicRendering = VK_TRUE;
-    vulkan13Features.pNext = &vulkan11Features;
+    vulkan13Features.pNext = &descriptorIndexingFeatures;
     
 
 

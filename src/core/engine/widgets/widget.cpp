@@ -17,11 +17,11 @@ namespace Radiant {
   }
 
   uint32_t Widget::getPositionX() {
-    return 0;
+    return this->positionX;
   }
-  uint32_t Widget::getPositionY() {
 
-    return 0;
+  uint32_t Widget::getPositionY() {
+    return this->positionY;
   }
   
   uint32_t Widget::getWidth() {

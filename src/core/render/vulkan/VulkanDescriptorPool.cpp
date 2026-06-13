@@ -14,7 +14,7 @@ namespace Radiant {
     descriptorPoolInfo.poolSizeCount = poolSizes.size();
     descriptorPoolInfo.pPoolSizes = poolSizes.data();
     descriptorPoolInfo.maxSets = maxDescriptorSets;
-    descriptorPoolInfo.flags = 0;
+    descriptorPoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
 
     vkCreateDescriptorPool(device.get(), &descriptorPoolInfo, nullptr, &this->descriptorPool);
   }
@@ -39,12 +39,13 @@ namespace Radiant {
   std::vector<VulkanDescriptorSet> VulkanDescriptorPool::allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts) {
     std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts;
     rawDescriptorSetLayouts.reserve(descriptorSetLayouts.size());
+
     for (VulkanDescriptorSetLayout& descriptorSetLayout : descriptorSetLayouts) {
       rawDescriptorSetLayouts.emplace_back(descriptorSetLayout.get());
     }
 
-    std::vector<VkDescriptorSet> rawDescriptorSets;
-    rawDescriptorSets.reserve(descriptorSetLayouts.size());
+    std::vector<VkDescriptorSet> rawDescriptorSets(descriptorSetLayouts.size());
+    //rawDescriptorSets.reserve(descriptorSetLayouts.size());
 
     VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
     descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -55,10 +56,12 @@ namespace Radiant {
     vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data());
 
     std::vector<VulkanDescriptorSet> wrappedDescriptorSets;
-    wrappedDescriptorSets.reserve(rawDescriptorSets.size());
+    wrappedDescriptorSets.reserve(descriptorSetLayouts.size());
+
     for (VkDescriptorSet& descriptorSet : rawDescriptorSets) {
       wrappedDescriptorSets.emplace_back(descriptorSet);
     }
+    //Logger::info(std::to_string(rawDescriptorSets.size()));
     return wrappedDescriptorSets;
   }
   
@@ -80,9 +83,9 @@ namespace Radiant {
         descriptorWrite.descriptorArrayElement,
         descriptorCount,
         descriptorWrite.descriptorType, 
-        descriptorWrite.imageInfo.data(), 
-        descriptorWrite.bufferInfo.data(), 
-        descriptorWrite.texelBufferViews.data()
+        descriptorWrite.imageInfo.size() != 0 ? descriptorWrite.imageInfo.data() : nullptr, 
+        descriptorWrite.bufferInfo.size() != 0 ? descriptorWrite.bufferInfo.data() : nullptr, 
+        descriptorWrite.texelBufferViews.size() != 0 ? descriptorWrite.texelBufferViews.data() : nullptr
       });
     }
 
@@ -103,8 +106,8 @@ namespace Radiant {
     }
 
     vkUpdateDescriptorSets(this->device, 
-        rawDescriptorWrites.size(), rawDescriptorWrites.data(), 
-        rawDescriptorCopies.size(), rawDescriptorCopies.data()
+        rawDescriptorWrites.size(), descriptorSetWrites.size() != 0 ? rawDescriptorWrites.data() : nullptr, 
+        rawDescriptorCopies.size(), descriptorSetCopies.size() != 0 ? rawDescriptorCopies.data() : nullptr
     );
   }
 }

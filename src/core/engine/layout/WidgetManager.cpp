@@ -31,7 +31,7 @@ namespace Radiant {
       widgets.pop();
 
       batch.instances.push_back(
-        {{255, 0, 0, 255}, {100, 100, 0}, {200, 200}}
+        {{255, 0, 0, 255}, {currentWidget->getPositionX(), currentWidget->getPositionY(), 0}, {200, 200}}
       );
 
       for (Widget* child : currentWidget->getChildren()) {

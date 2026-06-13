@@ -34,6 +34,7 @@ int main() {
 
   Radiant::Widget testWidget(
       engine.getRootWidget(),
+      100, 100,
       {Radiant::UnitType::PIXELS, 200},
       {Radiant::UnitType::PIXELS, 200}
   );

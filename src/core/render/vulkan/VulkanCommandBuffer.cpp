@@ -108,7 +108,7 @@ namespace Radiant {
     vkCmdBindIndexBuffer(this->commandBuffer, buffer.get(), offset, indexType);
   }
 
-  void VulkanCommandBuffer::bindDescriptorSets(VulkanPipeline pipeline, uint32_t firstSet, std::vector<VulkanDescriptorSet>& descriptorSets) {
+  void VulkanCommandBuffer::bindDescriptorSets(VulkanPipeline& pipeline, uint32_t firstSet, std::vector<VulkanDescriptorSet>& descriptorSets) {
     std::vector<VkDescriptorSet> rawDescriptorSets;
     rawDescriptorSets.reserve(descriptorSets.size());
     for (VulkanDescriptorSet& descriptorSet : descriptorSets) {

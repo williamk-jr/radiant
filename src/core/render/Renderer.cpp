@@ -2,10 +2,12 @@
 #include "radiant/core/render/Instance.h"
 #include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/Vertex.h"
+#include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
 #include <cstddef>
 #include <memory>
+#include <string>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
@@ -47,7 +49,6 @@ namespace Radiant {
     ) {
       this->updateSwapchain = true;
     }
-
 
     VulkanImage& currentImage = this->swapchain->getImage(imageIndex.value);
     VulkanImageView& currentImageView = this->swapchain->getImageView(imageIndex.value);
@@ -102,6 +103,19 @@ namespace Radiant {
 
     this->commandBuffers[currentFrame].beginRendering(&colorAttachment, nullptr, nullptr, renderArea, 0);
     this->commandBuffers[currentFrame].bindPipeline(*this->graphicsPipeline);
+
+    // Update uniform buffer
+    this->descriptorBuffer->resetOffset();
+    uint32_t frameBufferUniformData[2] = {this->frameBufferSize.width, this->frameBufferSize.height};
+    this->descriptorBuffer->append(frameBufferUniformData, sizeof(uint32_t)*2);
+    
+    // Update uniforms
+    this->descriptorPool->updateDescriptorSets({
+      VulkanWriteDescriptorSet{this->descriptorSets[currentFrame].get(), 0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, {
+        VkDescriptorBufferInfo{this->descriptorBuffer->get(), 0, sizeof(uint32_t)*2}
+      }, {}, {}}
+    }, {});
+    this->commandBuffers[currentFrame].bindDescriptorSets(*this->graphicsPipeline, 0, this->descriptorSets);
   }
 
   void Renderer::setViewport(float width, float height, float minDepth, float maxDepth) {
@@ -292,13 +306,16 @@ namespace Radiant {
         VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 
         VK_SHARING_MODE_EXCLUSIVE, std::vector<uint32_t>{}
     );
-
-    this->descriptorSetLayouts.emplace_back(*this->device, std::vector<VkDescriptorSetLayoutBinding>{
-      VkDescriptorSetLayoutBinding{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_ALL_GRAPHICS, nullptr}
-    });
+    
+    for (int i = 0; i < this->swapchain->getImageCount(); i++) {
+      this->descriptorSetLayouts.emplace_back(*this->device, std::vector<VkDescriptorSetLayoutBinding>{
+        VkDescriptorSetLayoutBinding{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr}
+      });
+    }
+    //VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT
 
     this->descriptorPool = std::make_unique<VulkanDescriptorPool>(*this->device, std::vector<VkDescriptorPoolSize>{
-      {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}
+      {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3}
     }, 10);
 
     this->descriptorSets = this->descriptorPool->allocateDescriptorSets(this->descriptorSetLayouts);

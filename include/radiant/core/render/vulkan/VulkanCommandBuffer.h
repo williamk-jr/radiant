@@ -37,7 +37,7 @@ namespace Radiant {
       void bindVertexBuffer(VulkanBuffer& buffer, uint32_t firstBinding, VkDeviceSize offset);
       void bindVertexBuffer(VulkanBuffer& buffer, uint32_t firstBinding, VkDeviceSize offset, VkDeviceSize size);
       void bindIndexBuffer(VulkanBuffer& buffer, VkDeviceSize offset, VkIndexType indexType);
-      void bindDescriptorSets(VulkanPipeline pipeline, uint32_t firstSet, std::vector<VulkanDescriptorSet>& descriptorSets);
+      void bindDescriptorSets(VulkanPipeline& pipeline, uint32_t firstSet, std::vector<VulkanDescriptorSet>& descriptorSets);
       void drawIndexed(uint32_t indexCount, uint32_t instanceCount);
 
 
