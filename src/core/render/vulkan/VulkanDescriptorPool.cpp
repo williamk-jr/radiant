@@ -36,7 +36,7 @@ namespace Radiant {
     vkResetDescriptorPool(this->device, this->descriptorPool, 0);
   }
 
-  void VulkanDescriptorPool::allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts) {
+  std::vector<VulkanDescriptorSet> VulkanDescriptorPool::allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts) {
     std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts;
     rawDescriptorSetLayouts.reserve(descriptorSetLayouts.size());
     for (VulkanDescriptorSetLayout& descriptorSetLayout : descriptorSetLayouts) {
@@ -55,10 +55,11 @@ namespace Radiant {
     vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data());
 
     std::vector<VulkanDescriptorSet> wrappedDescriptorSets;
-    this->descriptorSets.reserve(rawDescriptorSets.size());
+    wrappedDescriptorSets.reserve(rawDescriptorSets.size());
     for (VkDescriptorSet& descriptorSet : rawDescriptorSets) {
-      this->descriptorSets.emplace_back(descriptorSet);
+      wrappedDescriptorSets.emplace_back(descriptorSet);
     }
+    return wrappedDescriptorSets;
   }
   
   void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites, std::vector<VulkanCopyDescriptorSet> descriptorSetCopies) {
@@ -74,7 +75,7 @@ namespace Radiant {
 
       rawDescriptorWrites.emplace_back(VkWriteDescriptorSet{
         VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, nullptr, 
-        this->getDescriptorSet(descriptorWrite.descriptorIndex).get(),
+        descriptorWrite.descriptorSet,
         descriptorWrite.descriptorBindingIndex, 
         descriptorWrite.descriptorArrayElement,
         descriptorCount,
@@ -91,10 +92,10 @@ namespace Radiant {
     for (VulkanCopyDescriptorSet& descriptorCopy : descriptorSetCopies) {
       rawDescriptorCopies.emplace_back(VkCopyDescriptorSet{
         VK_STRUCTURE_TYPE_COPY_DESCRIPTOR_SET, nullptr, 
-        this->getDescriptorSet(descriptorCopy.srcDescriptorIndex).get(),
+        descriptorCopy.srcDescriptorSet,
         descriptorCopy.srcDecriptorBindingIndex,
         descriptorCopy.srcDescriptorArrayElement,
-        this->getDescriptorSet(descriptorCopy.dstDescriptorIndex).get(),
+        descriptorCopy.dstDescriptorSet,
         descriptorCopy.dstDecriptorBindingIndex,
         descriptorCopy.dstDescriptorArrayElement,
         descriptorCopy.descriptorCount
@@ -105,9 +106,5 @@ namespace Radiant {
         rawDescriptorWrites.size(), rawDescriptorWrites.data(), 
         rawDescriptorCopies.size(), rawDescriptorCopies.data()
     );
-  }
-
-  VulkanDescriptorSet& VulkanDescriptorPool::getDescriptorSet(uint32_t index) {
-    return this->descriptorSets[index];
   }
 }

@@ -7,7 +7,7 @@
 #include <vulkan/vulkan_core.h>
 namespace Radiant {
   struct VulkanWriteDescriptorSet {
-    uint32_t descriptorIndex;
+    VkDescriptorSet descriptorSet;
     uint32_t descriptorBindingIndex;
     uint32_t descriptorArrayElement;
     VkDescriptorType descriptorType;
@@ -18,11 +18,11 @@ namespace Radiant {
   };
 
   struct VulkanCopyDescriptorSet {
-    uint32_t srcDescriptorIndex;
+    VkDescriptorSet srcDescriptorSet;
     uint32_t srcDecriptorBindingIndex;
     uint32_t srcDescriptorArrayElement;
 
-    uint32_t dstDescriptorIndex;
+    VkDescriptorSet dstDescriptorSet;
     uint32_t dstDecriptorBindingIndex;
     uint32_t dstDescriptorArrayElement;
     uint32_t descriptorCount;
@@ -41,14 +41,12 @@ namespace Radiant {
       VkDescriptorPool get();
       void reset();
 
-      void allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts);
+      std::vector<VulkanDescriptorSet> allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts);
       void updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites, std::vector<VulkanCopyDescriptorSet> descriptorSetCopies);
       VulkanDescriptorSet& getDescriptorSet(uint32_t index);
 
     private:
       VkDescriptorPool descriptorPool;
       VkDevice device;
-
-      std::vector<VulkanDescriptorSet> descriptorSets;
   };
 }

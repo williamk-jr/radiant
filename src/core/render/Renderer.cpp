@@ -301,7 +301,7 @@ namespace Radiant {
       {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}
     }, 10);
 
-    this->descriptorPool->allocateDescriptorSets(this->descriptorSetLayouts);
+    this->descriptorSets = this->descriptorPool->allocateDescriptorSets(this->descriptorSetLayouts);
 
 
     VkPipelineColorBlendAttachmentState attachmentState{};
