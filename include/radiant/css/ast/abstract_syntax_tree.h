@@ -4,18 +4,20 @@
 #include <iostream>
 
 #include "radiant/css/ast/ast_node.h"
-#include "radiant/css/token.h"
+#include "radiant/css/Token.h"
 
-struct AstLocation {
-  AstNode* parent = nullptr;
-  int index = 0;
-};
+namespace Radiant {
+  struct AstLocation {
+    AstNode* parent = nullptr;
+    int index = 0;
+  };
 
-class AbstractSyntaxTree : public AstNode {
-  public:
-    AbstractSyntaxTree(std::vector<Token> tokens);
+  class AbstractSyntaxTree : public AstNode {
+    public:
+      AbstractSyntaxTree(std::vector<Token> tokens);
 
-    void display();
+      void display();
 
-  private:
-};
+    private:
+  };
+}

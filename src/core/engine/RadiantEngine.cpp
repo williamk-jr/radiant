@@ -16,6 +16,9 @@ namespace Radiant {
     this->indexBuffer = renderer->createIndexBuffer(2048);
 
 
+    this->stylesheetParser = std::make_unique<CssParser>();
+
+
     Quad2D quad;
     std::vector<Vertex> verticies = quad.getVerticies();
     std::vector<uint16_t> indicies = quad.getIndicies();
@@ -31,6 +34,10 @@ namespace Radiant {
     renderer->waitIdle();
   }
   
+  void RadiantEngine::loadStylesheet(std::filesystem::path path) {
+     
+  }
+
   std::shared_ptr<Widget> RadiantEngine::getRootWidget() {
     return this->widgetManager->getRootWidget();
   }

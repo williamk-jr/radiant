@@ -3,6 +3,7 @@
 #include "radiant/core/engine/layout/WidgetManager.h"
 #include "radiant/core/render/Renderer.h"
 #include "radiant/core/render/Window.h"
+#include "radiant/css/css_parser.h"
 #include <cstdint>
 #include <memory>
 namespace Radiant {
@@ -12,6 +13,7 @@ namespace Radiant {
       ~RadiantEngine();
 
       std::shared_ptr<Widget> getRootWidget();
+      void loadStylesheet(std::filesystem::path path);
       bool isRunning();
       void update();
     private:
@@ -22,5 +24,7 @@ namespace Radiant {
       std::unique_ptr<VertexBuffer> vertexBuffer;
       std::unique_ptr<InstanceBuffer> instanceBuffer;
       std::unique_ptr<IndexBuffer> indexBuffer;
+
+      std::unique_ptr<CssParser> stylesheetParser;
   };
 }
