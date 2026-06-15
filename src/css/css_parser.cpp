@@ -1,6 +1,8 @@
 #include "radiant/css/css_parser.h"
+#include "radiant/css/StyleSheetValue.h"
 #include "radiant/css/ast/abstract_syntax_tree.h"
 #include "radiant/css/ast/ast_node.h"
+#include "radiant/util/logger/Logger.h"
 #include <cctype>
 #include <filesystem>
 #include <iostream>
@@ -20,12 +22,37 @@ namespace Radiant {
     
     for (AstNode* node : abstractSyntaxTree.children) {
       if (node->type == AstNodeType::PROPERTY) {
-        StyleSheetValue styleSheetValue(node->children.size()); 
+        StyleSheetEntry styleSheetEntry;
+        styleSheetEntry.reserve(node->children.size());
 
         for (AstNode* valueNode : node->children) {
           std::string tokenValue(valueNode->token.getValue());
-
-          styleSheetValue.emplace_back();
+          
+          switch (valueNode->type) {
+            case Radiant::AstNodeType::UNIT:
+              styleSheetEntry.emplace_back(
+                StyleSheetValue::fromString(StyleSheetValueTypes::UNIT, tokenValue)
+              );
+              break;
+            case Radiant::AstNodeType::FLOAT:
+              styleSheetEntry.emplace_back(
+                StyleSheetValue::fromString(StyleSheetValueTypes::FLOAT, tokenValue)
+              );
+              break;
+            case Radiant::AstNodeType::INTEGER:
+              styleSheetEntry.emplace_back(
+                StyleSheetValue::fromString(StyleSheetValueTypes::INTEGER, tokenValue)
+              );
+              break;
+            case Radiant::AstNodeType::STRING:
+              styleSheetEntry.emplace_back(
+                StyleSheetValue::fromString(StyleSheetValueTypes::STRING, tokenValue)
+              );
+              break;
+            default:
+              Logger::error("Invalid Property Value: \""+tokenValue+"\"");
+              break;
+          }
         }
       }
     }

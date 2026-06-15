@@ -2,15 +2,15 @@
 #include <memory>
 
 namespace Radiant {
-  Widget::Widget(std::shared_ptr<Widget> parent, Unit width, Unit height) :
-    parent(parent), width(width), height(height) {
+  Widget::Widget(std::shared_ptr<Widget> parent, uint32_t width, uint32_t height) :
+    parent(parent) {
     if (parent != nullptr) {
       parent->addChild(this);
     }
   }
 
-  Widget::Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, Unit width, Unit height) :
-    parent(parent), positionX(positionX), positionY(positionY), width(width), height(height) {
+  Widget::Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, uint32_t width, uint32_t height) :
+    parent(parent), positionX(positionX), positionY(positionY) {
     if (parent != nullptr) {
       parent->addChild(this);
     }

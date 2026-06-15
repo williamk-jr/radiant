@@ -26,6 +26,9 @@ endif()
 add_executable(Radiant 
   src/main.cpp 
   src/css/css_parser.cpp
+  src/css/Token.cpp
+  src/css/StyleSheetValue.cpp
+  src/css/values/Unit.cpp
   src/css/ast/abstract_syntax_tree.cpp
   src/util/string_util.cpp
   src/util/logger/Logger.cpp
@@ -33,7 +36,6 @@ add_executable(Radiant
   src/core/engine/RadiantEngine.cpp
   src/core/engine/layout/WidgetManager.cpp
   src/core/engine/widgets/widget.cpp
-  src/core/engine/widgets/Unit.cpp
 
   src/core/render/vulkan/VulkanInstance.cpp
   src/core/render/vulkan/VulkanPhysicalDevice.cpp

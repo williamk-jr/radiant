@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include "radiant/core/engine/widgets/Unit.h"
 #include "radiant/core/render/renderable.h"
 
 namespace Radiant {
@@ -15,8 +14,8 @@ namespace Radiant {
   class Widget: public Renderable {
     public:
 
-      Widget(std::shared_ptr<Widget> parent, Unit width, Unit height);
-      Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, Unit width, Unit height);
+      Widget(std::shared_ptr<Widget> parent, uint32_t width, uint32_t height);
+      Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, uint32_t width, uint32_t height);
 
       uint32_t getPositionX();
       uint32_t getPositionY();
@@ -38,7 +37,5 @@ namespace Radiant {
       uint32_t positionX = 0;
       uint32_t positionY = 0;
 
-      Unit width;
-      Unit height;
   };
 }

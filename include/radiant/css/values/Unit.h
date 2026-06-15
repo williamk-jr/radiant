@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <unordered_map>
 
 namespace Radiant {
   enum class UnitType {
@@ -18,5 +19,7 @@ namespace Radiant {
     private:
       float value;
       UnitType unit;
+
+      static std::unordered_map<std::string, UnitType> UNIT_MAP;
   };
 }

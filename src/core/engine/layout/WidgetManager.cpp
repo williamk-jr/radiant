@@ -1,5 +1,4 @@
 #include "radiant/core/engine/layout/WidgetManager.h"
-#include "radiant/core/engine/widgets/Unit.h"
 #include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/batch/RenderBatch.h"
 #include <memory>
@@ -11,8 +10,8 @@ namespace Radiant {
 
     this->rootWidget = std::make_shared<Widget>(
         nullptr, 
-        Unit{UnitType::PIXELS, frameBufferSize.width}, 
-        Unit{UnitType::PIXELS, frameBufferSize.height}
+        frameBufferSize.width, 
+        frameBufferSize.height
     );
   }
   

@@ -7,18 +7,13 @@
 #include <utility>
 #include <variant>
 #include <vector>
-#include "radiant/core/engine/widgets/Unit.h"
+#include "radiant/css/StyleSheetValue.h"
 #include "radiant/util/string_util.h"
 #include "radiant/css/Token.h"
 
 namespace Radiant {
-  typedef std::vector<std::variant<
-    std::string, 
-    uint32_t, 
-    Unit
-  >> StyleSheetValue;
-
-  typedef std::unordered_map<std::string, StyleSheetValue> StyleSheet;
+  typedef std::vector<StyleSheetValue> StyleSheetEntry;
+  typedef std::unordered_map<std::string, StyleSheetEntry> StyleSheet;
 
   class CssParser {
     public:

@@ -1,4 +1,5 @@
 #include "radiant/core/engine/RadiantEngine.h"
+#include "radiant/css/values/Unit.h"
 #include "radiant/core/engine/widgets/widget.h"
 #include "radiant/core/render/Rect2D.h"
 #include <string>
@@ -35,8 +36,8 @@ int main() {
   Radiant::Widget testWidget(
       engine.getRootWidget(),
       100, 100,
-      {Radiant::UnitType::PIXELS, 200},
-      {Radiant::UnitType::PIXELS, 200}
+      200,
+      200
   );
 
   while (engine.isRunning()) {
