@@ -1,4 +1,5 @@
 #include "radiant/core/engine/widgets/widget.h"
+#include "radiant/css/values/Unit.h"
 #include <memory>
 
 namespace Radiant {
@@ -15,9 +16,18 @@ namespace Radiant {
       parent->addChild(this);
     }
   }
+  
+  void Widget::addStyle(std::string name, StyleSheetEntry entry) {
+    this->styleSheet.add(name, entry);
+  }
 
+  
   uint32_t Widget::getPositionX() {
-    return this->positionX;
+    Unit right = this->styleSheet.getOrDefault("right", 
+        {{Unit(0.0, UnitType::PIXEL)}}
+    )[0].get<Unit>().value();
+
+    return this->positionX + right.getValue();
   }
 
   uint32_t Widget::getPositionY() {

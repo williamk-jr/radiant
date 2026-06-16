@@ -1,4 +1,5 @@
 #include "radiant/css/css_parser.h"
+#include "radiant/css/StyleSheet.h"
 #include "radiant/css/StyleSheetValue.h"
 #include "radiant/css/ast/abstract_syntax_tree.h"
 #include "radiant/css/ast/ast_node.h"
@@ -12,48 +13,63 @@
 #include <vector>
 #include <algorithm>
 
-
 namespace Radiant {
   std::unordered_map<std::string, StyleSheet> CssParser::getStyleSheets(std::filesystem::path path) {
     std::vector<Token> tokens = this->tokenize(path); 
     AbstractSyntaxTree abstractSyntaxTree(tokens); 
+    abstractSyntaxTree.display();
 
     std::unordered_map<std::string, StyleSheet> stylesheets;
     
     for (AstNode* node : abstractSyntaxTree.children) {
-      if (node->type == AstNodeType::PROPERTY) {
-        StyleSheetEntry styleSheetEntry;
-        styleSheetEntry.reserve(node->children.size());
+      if (node->type == AstNodeType::SELECTOR) {
+        StyleSheet stylesheet;
 
-        for (AstNode* valueNode : node->children) {
-          std::string tokenValue(valueNode->token.getValue());
-          
-          switch (valueNode->type) {
-            case Radiant::AstNodeType::UNIT:
-              styleSheetEntry.emplace_back(
-                StyleSheetValue::fromString(StyleSheetValueTypes::UNIT, tokenValue)
-              );
-              break;
-            case Radiant::AstNodeType::FLOAT:
-              styleSheetEntry.emplace_back(
-                StyleSheetValue::fromString(StyleSheetValueTypes::FLOAT, tokenValue)
-              );
-              break;
-            case Radiant::AstNodeType::INTEGER:
-              styleSheetEntry.emplace_back(
-                StyleSheetValue::fromString(StyleSheetValueTypes::INTEGER, tokenValue)
-              );
-              break;
-            case Radiant::AstNodeType::STRING:
-              styleSheetEntry.emplace_back(
-                StyleSheetValue::fromString(StyleSheetValueTypes::STRING, tokenValue)
-              );
-              break;
-            default:
-              Logger::error("Invalid Property Value: \""+tokenValue+"\"");
-              break;
+        for (AstNode* propertyNode : node->children) {
+          if (propertyNode->type == AstNodeType::PROPERTY) {
+            StyleSheetEntry styleSheetEntry;
+            styleSheetEntry.reserve(node->children.size());
+
+            for (AstNode* valueNode : propertyNode->children) {
+              std::string tokenValue(valueNode->token.getValue());
+              
+              switch (valueNode->type) {
+                case Radiant::AstNodeType::UNIT:
+                  styleSheetEntry.emplace_back(
+                    StyleSheetValue::fromString(StyleSheetValueTypes::UNIT, tokenValue)
+                  );
+                  break;
+                case Radiant::AstNodeType::FLOAT:
+                  styleSheetEntry.emplace_back(
+                    StyleSheetValue::fromString(StyleSheetValueTypes::FLOAT, tokenValue)
+                  );
+                  break;
+                case Radiant::AstNodeType::INTEGER:
+                  styleSheetEntry.emplace_back(
+                    StyleSheetValue::fromString(StyleSheetValueTypes::INTEGER, tokenValue)
+                  );
+                  break;
+                case Radiant::AstNodeType::STRING:
+                  styleSheetEntry.emplace_back(
+                    StyleSheetValue::fromString(StyleSheetValueTypes::STRING, tokenValue)
+                  );
+                  break;
+                case Radiant::AstNodeType::IDENTIFIER:
+                  styleSheetEntry.emplace_back(
+                    StyleSheetValue::fromString(StyleSheetValueTypes::STRING, tokenValue)
+                  );
+                  break;
+                default:
+                  Logger::error("Invalid Property Value: \""+tokenValue+"\"");
+                  break;
+              }
+            }
+            
+            //stylesheet[propertyNode->token.getValue()] = styleSheetEntry;
+            stylesheet.add(propertyNode->token.getValue(), styleSheetEntry);
           }
         }
+        stylesheets[node->token.getValue()] = stylesheet;
       }
     }
     return stylesheets;

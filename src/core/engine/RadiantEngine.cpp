@@ -2,8 +2,10 @@
 #include "radiant/core/engine/layout/WidgetManager.h"
 #include "radiant/core/render/models/Quad2D.h"
 #include "radiant/core/render/Window.h"
+#include "radiant/css/css_parser.h"
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace Radiant {
   RadiantEngine::RadiantEngine(const std::string& title, uint32_t width, uint32_t height) {
@@ -17,6 +19,11 @@ namespace Radiant {
 
 
     this->stylesheetParser = std::make_unique<CssParser>();
+    std::unordered_map<std::string, StyleSheet> styleSheets = this->stylesheetParser->getStyleSheets("./assets/test.css");
+
+    for (std::pair<std::string, StyleSheet> entry : styleSheets) {
+      Logger::info(entry.first);
+    }
 
 
     Quad2D quad;

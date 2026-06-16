@@ -28,6 +28,7 @@ add_executable(Radiant
   src/css/css_parser.cpp
   src/css/Token.cpp
   src/css/StyleSheetValue.cpp
+  src/css/StyleSheet.cpp
   src/css/values/Unit.cpp
   src/css/ast/abstract_syntax_tree.cpp
   src/util/string_util.cpp

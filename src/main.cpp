@@ -1,7 +1,9 @@
 #include "radiant/core/engine/RadiantEngine.h"
+#include "radiant/css/StyleSheetValue.h"
 #include "radiant/css/values/Unit.h"
 #include "radiant/core/engine/widgets/widget.h"
 #include "radiant/core/render/Rect2D.h"
+#include <cstdint>
 #include <string>
 #define GLFW_INCLUDE_VULKAN
 
@@ -36,9 +38,12 @@ int main() {
   Radiant::Widget testWidget(
       engine.getRootWidget(),
       100, 100,
-      200,
-      200
+      200, 200
   );
+
+  testWidget.addStyle("right", {
+      {Radiant::Unit(-100.0, Radiant::UnitType::PIXEL)}
+  });
 
   while (engine.isRunning()) {
     engine.update(); 

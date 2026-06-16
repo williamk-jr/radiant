@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include "radiant/core/render/renderable.h"
+#include "radiant/css/css_parser.h"
 
 namespace Radiant {
   enum class PositionType {
@@ -16,6 +17,8 @@ namespace Radiant {
 
       Widget(std::shared_ptr<Widget> parent, uint32_t width, uint32_t height);
       Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, uint32_t width, uint32_t height);
+
+      void addStyle(std::string name, StyleSheetEntry entry);
 
       uint32_t getPositionX();
       uint32_t getPositionY();
@@ -36,6 +39,8 @@ namespace Radiant {
 
       uint32_t positionX = 0;
       uint32_t positionY = 0;
+
+      StyleSheet styleSheet;
 
   };
 }

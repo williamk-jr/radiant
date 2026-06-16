@@ -2,6 +2,7 @@
 #include "radiant/css/values/Unit.h"
 #include <charconv>
 #include <cstdint>
+#include <variant>
 
 namespace Radiant {
   StyleSheetValue::StyleSheetValue(StyleSheetVariant value) : value(value) {}
