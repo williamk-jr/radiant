@@ -14,7 +14,8 @@ namespace Radiant {
     STRING,
     INTEGER,
     FLOAT,
-    UNIT
+    UNIT,
+    COLOR
   };
 
   struct AstNode {

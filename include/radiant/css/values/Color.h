@@ -23,6 +23,7 @@ namespace Radiant::LibStyleSheets {
       uint8_t getBlue();
       uint8_t getAlpha();
 
+      static bool isColor(const std::string& str);
       static Color fromString(std::string color);
 
     private:

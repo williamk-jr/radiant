@@ -1,9 +1,12 @@
 #include "radiant/css/css_parser.h"
 #include "radiant/css/StyleSheet.h"
 #include "radiant/css/StyleSheetValue.h"
+#include "radiant/css/Token.h"
 #include "radiant/css/ast/abstract_syntax_tree.h"
 #include "radiant/css/ast/ast_node.h"
+#include "radiant/css/values/Color.h"
 #include "radiant/util/logger/Logger.h"
+#include "radiant/util/string_util.h"
 #include <cctype>
 #include <filesystem>
 #include <iostream>
@@ -64,6 +67,11 @@ namespace Radiant {
                 case Radiant::AstNodeType::IDENTIFIER:
                   styleSheetEntry.add(
                     StyleSheetValue::fromString(StyleSheetValueTypes::STRING, tokenValue)
+                  );
+                  break;
+                case Radiant::AstNodeType::COLOR:
+                  styleSheetEntry.add(
+                    StyleSheetValue::fromString(StyleSheetValueTypes::COLOR, tokenValue)
                   );
                   break;
                 default:
@@ -206,6 +214,7 @@ namespace Radiant {
       case TokenType::INTEGER: return "INTEGER";
       case TokenType::FLOAT: return "FLOAT";
       case TokenType::UNIT: return "UNIT";
+      case TokenType::COLOR: return "COLOR";
       case TokenType::INVALID: return "INVALID";
       default: throw std::invalid_argument("Unknown TokenType");
     }
@@ -216,6 +225,8 @@ namespace Radiant {
       return TokenType::STRING;
     } else if (this->isUnit(token)) {
       return TokenType::UNIT; 
+    } else if (LibStyleSheets::Color::isColor(token)) {
+      return TokenType::COLOR;
     } else if (string_util::isFloat(token)) {
       return TokenType::FLOAT;
     } else if (string_util::isInteger(token)) {

@@ -41,6 +41,11 @@ namespace Radiant::LibStyleSheets {
   uint8_t Color::getAlpha() {
     return this->rgba & 0x000000FF;
   }
+  
+  bool Color::isColor(const std::string& str) {
+    return Color::COLOR_KEYWORDS.find(str) != Color::COLOR_KEYWORDS.end() || string_util::isHexadecimal(str);
+            
+  }
 
   Color Color::fromString(std::string color) {
     if (Color::COLOR_KEYWORDS.find(color) != Color::COLOR_KEYWORDS.end()) {

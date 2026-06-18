@@ -1,5 +1,6 @@
 #include "radiant/css/ast/abstract_syntax_tree.h"
 #include "radiant/css/ast/ast_node.h"
+#include "radiant/util/logger/Logger.h"
 #include <stdexcept>
 
 namespace Radiant {
@@ -51,8 +52,11 @@ namespace Radiant {
         case TokenType::UNIT:
           parent->children.push_back(new AstNode{AstNodeType::UNIT, *token, parent});
           break;
+        case TokenType::COLOR:
+          parent->children.push_back(new AstNode{AstNodeType::COLOR, *token, parent});
+          break;
         default:
-          throw std::runtime_error("Big Error");
+          Logger::error("Unidentified token type.");
       }
     }
   }

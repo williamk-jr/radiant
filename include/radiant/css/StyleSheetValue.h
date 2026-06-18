@@ -1,5 +1,6 @@
 #pragma once 
 
+#include "radiant/css/values/Color.h"
 #include "radiant/css/values/Unit.h"
 #include <cstdint>
 #include <optional>
@@ -11,14 +12,16 @@ namespace Radiant {
     INTEGER,
     FLOAT,
     STRING,
-    UNIT
+    UNIT,
+    COLOR
   };
 
   typedef std::variant<
     std::string, 
     uint32_t, 
     float,
-    Unit
+    Unit,
+    LibStyleSheets::Color
   > StyleSheetVariant;
 
   class StyleSheetValue {
@@ -39,6 +42,9 @@ namespace Radiant {
         } else if constexpr (T == StyleSheetValueTypes::INTEGER) {
           uint32_t* unit = std::get_if<uint32_t>(&this->value);
           return unit == nullptr ? std::nullopt : std::optional<uint32_t>{*unit};
+        } else if constexpr (T == StyleSheetValueTypes::COLOR) {
+          LibStyleSheets::Color* unit = std::get_if<LibStyleSheets::Color>(&this->value);
+          return unit == nullptr ? std::nullopt : std::optional<LibStyleSheets::Color>{*unit};
         }
       }
 

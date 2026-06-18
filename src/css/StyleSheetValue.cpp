@@ -1,4 +1,5 @@
 #include "radiant/css/StyleSheetValue.h"
+#include "radiant/css/values/Color.h"
 #include "radiant/css/values/Unit.h"
 #include <charconv>
 #include <cstdint>
@@ -11,6 +12,9 @@ namespace Radiant {
     switch (type) {
       case StyleSheetValueTypes::UNIT: {
         return {Unit::fromString(strValue)};
+      }
+      case StyleSheetValueTypes::COLOR: {
+        return {LibStyleSheets::Color::fromString(strValue)};
       }
       case StyleSheetValueTypes::INTEGER: {
         uint32_t integer = 0;

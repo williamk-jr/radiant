@@ -12,6 +12,7 @@ namespace Radiant {
     INTEGER,
     FLOAT,
     UNIT,
+    COLOR,
     INVALID
   };
 
