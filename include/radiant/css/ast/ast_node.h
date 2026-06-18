@@ -9,6 +9,7 @@ namespace Radiant {
   enum class AstNodeType {
     ROOT,
     IDENTIFIER,
+    FUNCTION,
     SELECTOR,
     PROPERTY,
     STRING,

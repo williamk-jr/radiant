@@ -1,4 +1,5 @@
 #include "radiant/css/ast/abstract_syntax_tree.h"
+#include "radiant/css/Token.h"
 #include "radiant/css/ast/ast_node.h"
 #include "radiant/util/logger/Logger.h"
 #include <stdexcept>
@@ -14,14 +15,23 @@ namespace Radiant {
         case TokenType::BLOCK_OPEN:
           parent = parent->children.at(parent->children.size()-1);
           break;
+        case TokenType::PARAMETER_LIST_OPEN:
+          parent = parent->children.at(parent->children.size()-1);
+          break;
         case TokenType::COLON:
           parent = parent->children.at(parent->children.size()-1);
           break;
         case TokenType::BLOCK_CLOSE:
           parent = parent->parent;
           break;
+        case TokenType::PARAMETER_LIST_CLOSE:
+          parent = parent->parent;
+          break;
         case TokenType::SEMI_COLON:
           parent = parent->parent;
+          break;
+        case TokenType::PARAMETER_LIST_SEPARATOR:
+          //parent = parent->parent;
           break;
         case TokenType::IDENTFIER:
           if (lookahead == nullptr) {
@@ -34,6 +44,9 @@ namespace Radiant {
               break;
             case TokenType::COLON:
               parent->children.push_back(new AstNode{AstNodeType::PROPERTY, *token, parent});
+              break;
+            case TokenType::PARAMETER_LIST_OPEN:
+              parent->children.push_back(new AstNode{AstNodeType::FUNCTION, *token, parent});
               break;
             default:
               parent->children.push_back(new AstNode{AstNodeType::IDENTIFIER, *token, parent});

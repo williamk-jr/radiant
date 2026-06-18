@@ -13,7 +13,8 @@ namespace Radiant {
     FLOAT,
     STRING,
     UNIT,
-    COLOR
+    COLOR,
+    FUNCTION
   };
 
   typedef std::variant<

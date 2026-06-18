@@ -69,6 +69,13 @@ namespace Radiant {
                     StyleSheetValue::fromString(StyleSheetValueTypes::STRING, tokenValue)
                   );
                   break;
+                case Radiant::AstNodeType::FUNCTION:
+                  // TODO compile all function arguments into custom function object.
+
+                  //styleSheetEntry.add(
+                  //  StyleSheetValue::fromString(StyleSheetValueTypes::FUNCTION, tokenValue)
+                  //);
+                  break;
                 case Radiant::AstNodeType::COLOR:
                   styleSheetEntry.add(
                     StyleSheetValue::fromString(StyleSheetValueTypes::COLOR, tokenValue)
@@ -156,13 +163,19 @@ namespace Radiant {
 
         case '(':
           this->addToken(tokens, currentToken);
-          tokens.push_back(Token(TokenType::BLOCK_CLOSE, "}"));
+          tokens.push_back(Token(TokenType::PARAMETER_LIST_OPEN, "("));
           currentToken = "";
           break;
 
         case ')':
           this->addToken(tokens, currentToken);
-          tokens.push_back(Token(TokenType::BLOCK_CLOSE, "}"));
+          tokens.push_back(Token(TokenType::PARAMETER_LIST_CLOSE, ")"));
+          currentToken = "";
+          break;
+
+        case ',':
+          this->addToken(tokens, currentToken);
+          tokens.push_back(Token(TokenType::PARAMETER_LIST_SEPARATOR, ","));
           currentToken = "";
           break;
 
@@ -215,6 +228,9 @@ namespace Radiant {
       case TokenType::FLOAT: return "FLOAT";
       case TokenType::UNIT: return "UNIT";
       case TokenType::COLOR: return "COLOR";
+      case TokenType::PARAMETER_LIST_OPEN: return "PARAMETER_LIST_OPEN";
+      case TokenType::PARAMETER_LIST_CLOSE: return "PARAMETER_LIST_CLOSE";
+      case TokenType::PARAMETER_LIST_SEPARATOR: return "PARAMETER_LIST_SEPARATOR";
       case TokenType::INVALID: return "INVALID";
       default: throw std::invalid_argument("Unknown TokenType");
     }

@@ -5,6 +5,9 @@ namespace Radiant {
   enum class TokenType {
     BLOCK_OPEN,
     BLOCK_CLOSE,
+    PARAMETER_LIST_OPEN,
+    PARAMETER_LIST_CLOSE,
+    PARAMETER_LIST_SEPARATOR,
     COLON,
     SEMI_COLON,
     IDENTFIER,
