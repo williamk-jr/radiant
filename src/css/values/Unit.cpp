@@ -20,6 +20,14 @@ namespace Radiant {
     return this->unit;
   }
 
+  Unit Unit::resolve() {
+    switch (this->unit) {
+      case Radiant::UnitType::PERCENTAGE:
+        return *this;
+    }
+    return *this;
+  }
+
   Unit Unit::fromString(std::string str) {
     int valueEnd = string_util::findLastOf(str, [](unsigned char c) {
       return string_util::isCharNumeric(c);

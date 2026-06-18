@@ -28,6 +28,7 @@ add_executable(Radiant
   src/css/css_parser.cpp
   src/css/Token.cpp
   src/css/StyleSheetValue.cpp
+  src/css/StyleSheetEntry.cpp
   src/css/StyleSheet.cpp
   src/css/values/Unit.cpp
   src/css/ast/abstract_syntax_tree.cpp
@@ -35,6 +36,8 @@ add_executable(Radiant
   src/util/logger/Logger.cpp
 
   src/core/engine/RadiantEngine.cpp
+  src/core/engine/LayoutBox.cpp
+  src/core/engine/StyleSheetPropertyResolvers.cpp
   src/core/engine/layout/WidgetManager.cpp
   src/core/engine/widgets/widget.cpp
 

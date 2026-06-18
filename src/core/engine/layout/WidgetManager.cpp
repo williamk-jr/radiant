@@ -1,22 +1,27 @@
 #include "radiant/core/engine/layout/WidgetManager.h"
 #include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/batch/RenderBatch.h"
+#include "radiant/css/css_parser.h"
 #include <memory>
 #include <stack>
 
 namespace Radiant {
-  WidgetManager::WidgetManager(Window& window) {
+  WidgetManager::WidgetManager(Window& window, CssParser& styleSheetParser) : styleSheetParser(styleSheetParser) {
     Rect2D frameBufferSize = window.getFrameBufferSize();
 
-    this->rootWidget = std::make_shared<Widget>(
-        nullptr, 
+    this->rootWidget = std::make_shared<Widget>(Widget{
+        *this, 
         frameBufferSize.width, 
         frameBufferSize.height
-    );
+    });
   }
   
   std::shared_ptr<Widget> WidgetManager::getRootWidget() {
     return this->rootWidget;
+  }
+  
+  CssParser& WidgetManager::getStyleSheetParser() {
+    return this->styleSheetParser;
   }
   
   RenderBatch WidgetManager::createRenderBatch() {

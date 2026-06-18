@@ -1,4 +1,5 @@
 #pragma once
+#include "radiant/css/values/IValue.h"
 #include <string>
 #include <unordered_map>
 
@@ -8,12 +9,14 @@ namespace Radiant {
     PERCENTAGE
   };
 
-  class Unit {
+  class Unit : IValue<Unit> {
     public:
       Unit(float value, UnitType unit);
 
       float getValue();
       UnitType getUnit();
+
+      Unit resolve() override;
 
       static Unit fromString(std::string str);
     private:

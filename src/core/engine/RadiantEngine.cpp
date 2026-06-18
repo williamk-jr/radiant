@@ -1,7 +1,9 @@
 #include "radiant/core/engine/RadiantEngine.h"
+#include "radiant/core/engine/StyleSheetPropertyResolvers.h"
 #include "radiant/core/engine/layout/WidgetManager.h"
 #include "radiant/core/render/models/Quad2D.h"
 #include "radiant/core/render/Window.h"
+#include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/css_parser.h"
 #include <memory>
 #include <string>
@@ -11,14 +13,18 @@ namespace Radiant {
   RadiantEngine::RadiantEngine(const std::string& title, uint32_t width, uint32_t height) {
     this->window = std::make_unique<Window>(title, width, height);
     this->renderer = std::make_unique<Renderer>(*this->window, true);
-    this->widgetManager = std::make_unique<WidgetManager>(*this->window);
+
+    this->stylesheetParser = std::make_unique<CssParser>();
+    this->registerProperties();
+    
+    this->widgetManager = std::make_unique<WidgetManager>(*this->window, *this->stylesheetParser);
 
     this->vertexBuffer = renderer->createVertexBuffer(2048);
     this->instanceBuffer = renderer->createInstanceBuffer(2048);
     this->indexBuffer = renderer->createIndexBuffer(2048);
 
 
-    this->stylesheetParser = std::make_unique<CssParser>();
+
     std::unordered_map<std::string, StyleSheet> styleSheets = this->stylesheetParser->getStyleSheets("./assets/test.css");
 
     for (std::pair<std::string, StyleSheet> entry : styleSheets) {
@@ -35,6 +41,13 @@ namespace Radiant {
 
     this->vertexBuffer->append(verticies);
     this->indexBuffer->append(indicies);
+  }
+  
+  void RadiantEngine::registerProperties() {
+    this->stylesheetParser->registerProperty("top", {StyleSheetValueTypes::UNIT}, {{Unit{0.0f, UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
+    this->stylesheetParser->registerProperty("bottom", {StyleSheetValueTypes::UNIT}, {{Unit{0.0f, UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
+    this->stylesheetParser->registerProperty("left", {StyleSheetValueTypes::UNIT}, {{Unit{0.0f, UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
+    this->stylesheetParser->registerProperty("right", {StyleSheetValueTypes::UNIT}, {{Unit{0.0f, UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
   }
 
   RadiantEngine::~RadiantEngine() {

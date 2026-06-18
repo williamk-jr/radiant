@@ -14,6 +14,14 @@
 #include <algorithm>
 
 namespace Radiant {
+  void CssParser::registerProperty(std::string name, std::vector<StyleSheetValueTypes> signature, StyleSheetEntry defaultValue, PropertyResolver resolver) {
+    this->propertyRegistry[name] = {signature, defaultValue, resolver};
+  }
+
+  PropertyEntry CssParser::getPropertyEntry(std::string name) {
+    return this->propertyRegistry[name];
+  }
+
   std::unordered_map<std::string, StyleSheet> CssParser::getStyleSheets(std::filesystem::path path) {
     std::vector<Token> tokens = this->tokenize(path); 
     AbstractSyntaxTree abstractSyntaxTree(tokens); 
@@ -27,35 +35,34 @@ namespace Radiant {
 
         for (AstNode* propertyNode : node->children) {
           if (propertyNode->type == AstNodeType::PROPERTY) {
-            StyleSheetEntry styleSheetEntry;
-            styleSheetEntry.reserve(node->children.size());
+            StyleSheetEntry styleSheetEntry(node->children.size());
 
             for (AstNode* valueNode : propertyNode->children) {
               std::string tokenValue(valueNode->token.getValue());
               
               switch (valueNode->type) {
                 case Radiant::AstNodeType::UNIT:
-                  styleSheetEntry.emplace_back(
+                  styleSheetEntry.add(
                     StyleSheetValue::fromString(StyleSheetValueTypes::UNIT, tokenValue)
                   );
                   break;
                 case Radiant::AstNodeType::FLOAT:
-                  styleSheetEntry.emplace_back(
+                  styleSheetEntry.add(
                     StyleSheetValue::fromString(StyleSheetValueTypes::FLOAT, tokenValue)
                   );
                   break;
                 case Radiant::AstNodeType::INTEGER:
-                  styleSheetEntry.emplace_back(
+                  styleSheetEntry.add(
                     StyleSheetValue::fromString(StyleSheetValueTypes::INTEGER, tokenValue)
                   );
                   break;
                 case Radiant::AstNodeType::STRING:
-                  styleSheetEntry.emplace_back(
+                  styleSheetEntry.add(
                     StyleSheetValue::fromString(StyleSheetValueTypes::STRING, tokenValue)
                   );
                   break;
                 case Radiant::AstNodeType::IDENTIFIER:
-                  styleSheetEntry.emplace_back(
+                  styleSheetEntry.add(
                     StyleSheetValue::fromString(StyleSheetValueTypes::STRING, tokenValue)
                   );
                   break;

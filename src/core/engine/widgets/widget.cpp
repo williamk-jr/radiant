@@ -1,46 +1,50 @@
 #include "radiant/core/engine/widgets/widget.h"
+#include "radiant/core/engine/LayoutBox.h"
+#include "radiant/core/engine/layout/WidgetManager.h"
+#include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/values/Unit.h"
 #include <memory>
 
 namespace Radiant {
   Widget::Widget(std::shared_ptr<Widget> parent, uint32_t width, uint32_t height) :
-    parent(parent) {
+    parent(parent), manager(parent->manager), layoutBox(0, 0, width, height) {
     if (parent != nullptr) {
       parent->addChild(this);
     }
   }
 
   Widget::Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, uint32_t width, uint32_t height) :
-    parent(parent), positionX(positionX), positionY(positionY) {
+    parent(parent), manager(parent->manager), layoutBox(positionX, positionY, width, height) {
     if (parent != nullptr) {
       parent->addChild(this);
     }
   }
   
+  Widget::Widget(WidgetManager& manager, uint32_t width, uint32_t height) : 
+    parent(nullptr), manager(manager), layoutBox(0, 0, width, height) {
+
+  }
+  
   void Widget::addStyle(std::string name, StyleSheetEntry entry) {
     this->styleSheet.add(name, entry);
   }
-
   
   uint32_t Widget::getPositionX() {
-    Unit right = this->styleSheet.getOrDefault("right", 
-        {{Unit(0.0, UnitType::PIXEL)}}
-    )[0].get<Unit>().value();
-
-    return this->positionX + right.getValue();
+    Unit right = this->styleSheet.getAbsolute(this->manager.getStyleSheetParser(), "right").get<StyleSheetValueTypes::UNIT>(0).value();
+    Unit left = this->styleSheet.getAbsolute(this->manager.getStyleSheetParser(), "left").get<StyleSheetValueTypes::UNIT>(0).value();
+    return this->layoutBox.getPositionX() + right.getValue() - left.getValue();
   }
 
   uint32_t Widget::getPositionY() {
-    return this->positionY;
+    return this->layoutBox.getPositionY();
   }
   
   uint32_t Widget::getWidth() {
-
-    return 0;
+    return this->layoutBox.getWidth();
   }
-  uint32_t Widget::getHeight() {
 
-    return 0;
+  uint32_t Widget::getHeight() {
+    return this->layoutBox.getHeight();
   }
 
   std::vector<Widget*> Widget::getChildren() {

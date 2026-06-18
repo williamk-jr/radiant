@@ -2,10 +2,13 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include "radiant/core/engine/LayoutBox.h"
 #include "radiant/core/render/renderable.h"
 #include "radiant/css/css_parser.h"
 
 namespace Radiant {
+  class WidgetManager;
+
   enum class PositionType {
     ABSOLUTE,
     RELATIVE,
@@ -13,6 +16,7 @@ namespace Radiant {
   };
 
   class Widget: public Renderable {
+    friend WidgetManager;
     public:
 
       Widget(std::shared_ptr<Widget> parent, uint32_t width, uint32_t height);
@@ -37,10 +41,11 @@ namespace Radiant {
       std::vector<Widget*> children;
       PositionType positionType = PositionType::RELATIVE;
 
-      uint32_t positionX = 0;
-      uint32_t positionY = 0;
-
+      WidgetManager& manager; 
+      LayoutBox layoutBox;
       StyleSheet styleSheet;
+
+      Widget(WidgetManager& manager, uint32_t width, uint32_t height);
 
   };
 }
