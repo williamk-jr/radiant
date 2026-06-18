@@ -8,6 +8,7 @@ namespace Radiant {
 
       void updateLayout();
       float resolveRelativeStyle();
+
     private:
   };
 }

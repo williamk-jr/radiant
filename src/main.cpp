@@ -1,5 +1,6 @@
 #include "radiant/core/engine/RadiantEngine.h"
 #include "radiant/css/StyleSheetValue.h"
+#include "radiant/css/values/Color.h"
 #include "radiant/css/values/Unit.h"
 #include "radiant/core/engine/widgets/widget.h"
 #include "radiant/core/render/Rect2D.h"

@@ -31,6 +31,7 @@ add_executable(Radiant
   src/css/StyleSheetEntry.cpp
   src/css/StyleSheet.cpp
   src/css/values/Unit.cpp
+  src/css/values/Color.cpp
   src/css/ast/abstract_syntax_tree.cpp
   src/util/string_util.cpp
   src/util/logger/Logger.cpp

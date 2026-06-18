@@ -3,16 +3,19 @@
 #include <algorithm>
 #include <iostream>
 #include <functional>
+#include <unordered_set>
 
 
 namespace string_util {
   bool isAlphanumeric(const std::string& str);
   bool isAlphabetic(const std::string& str);
   bool isNumeric(const std::string& str);
+  bool isHexadecimal(const std::string& str);
 
   bool isCharAlphanumeric(unsigned char c);
   bool isCharAlphabetic(unsigned char c);
   bool isCharNumeric(unsigned char c);
+  bool isCharHexadecimal(unsigned char c);
 
   bool isFloat(const std::string& str);
   bool isInteger(const std::string& str);

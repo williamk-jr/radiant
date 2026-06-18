@@ -27,6 +27,12 @@ namespace string_util {
     }); 
   }
 
+  bool isHexadecimal(const std::string& str) {
+    return startsWith(str, "#") && std::all_of(str.begin()+1, str.end(), [](unsigned char c) {
+      return isCharHexadecimal(c);
+    });
+  }
+
   bool isCharAlphanumeric(unsigned char c) {
     return std::isalnum(c);
   }
@@ -37,6 +43,10 @@ namespace string_util {
 
   bool isCharNumeric(unsigned char c) {
     return std::isdigit(c);
+  }
+
+  bool isCharHexadecimal(unsigned char c) {
+    return std::isxdigit(c); 
   }
 
   bool isFloat(const std::string& str) { 
