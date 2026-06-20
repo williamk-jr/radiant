@@ -1,5 +1,6 @@
 
 #pragma once
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <iostream>
@@ -15,6 +16,7 @@
 
 namespace Radiant {
   using PropertyResolver = StyleSheetEntry (*)(StyleSheetEntry, float);
+  using RuntimeFunction = std::function<StyleSheetValue(std::vector<StyleSheetValue>)>;
 
   struct PropertyEntry {
     std::vector<StyleSheetValueTypes> signature;
@@ -22,10 +24,33 @@ namespace Radiant {
     PropertyResolver resolver;
   };
 
+  struct RegisteredFunction {
+    RuntimeFunction runtimeFunction;
+  };
+
+  template<typename R, typename... Args, std::size_t... Is>
+  static R invokeHelper(R(*fn)(Args...), std::vector<StyleSheetValue> params, std::index_sequence<Is...>) {
+    return fn(((params[Is].get<MapValue<Args>::value>().value()), ...));
+  }
+
+  template<typename R, typename... Args>
+  static RuntimeFunction wrapper(R(*fn)(Args...)) {
+    return [fn](std::vector<StyleSheetValue> params) {
+      return StyleSheetValue{ invokeHelper(fn, params, std::index_sequence_for<Args...>{}) }; 
+    };
+  };
+
   class CssParser {
     public:
       void registerProperty(std::string name, std::vector<StyleSheetValueTypes> signature, StyleSheetEntry defaultValue, PropertyResolver resolver);
       PropertyEntry getPropertyEntry(std::string name);
+
+
+      template<typename Fn>
+      RegisteredFunction registerFunction(std::string name, Fn function) {
+        RuntimeFunction wrapper = Radiant::wrapper(function);
+        return {wrapper};
+      }
 
       std::unordered_map<std::string, StyleSheet> getStyleSheets(std::filesystem::path path);
 
@@ -33,6 +58,7 @@ namespace Radiant {
       static std::string tokenTypeToString(TokenType tokenType);
     private:
       std::unordered_map<std::string, PropertyEntry> propertyRegistry;
+      std::unordered_map<std::string, RegisteredFunction> functionRegistry;
 
       TokenType identifyToken(std::string token);
       void addToken(std::vector<Token>& tokenList, std::string token);

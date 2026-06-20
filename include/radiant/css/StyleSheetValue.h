@@ -25,6 +25,30 @@ namespace Radiant {
     LibStyleSheets::Color
   > StyleSheetVariant;
 
+  template<typename T>
+  struct MapValue;
+
+  template<>
+  struct MapValue<std::string> {
+    static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::STRING;
+  };
+  template<>
+  struct MapValue<uint32_t> {
+    static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::INTEGER;
+  };
+  template<>
+  struct MapValue<float> {
+    static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::FLOAT;
+  };
+  template<>
+  struct MapValue<Unit> {
+    static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::UNIT;
+  };
+  template<>
+  struct MapValue<LibStyleSheets::Color> {
+    static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::COLOR;
+  };
+
   class StyleSheetValue {
     public:
       StyleSheetValue(StyleSheetVariant value);

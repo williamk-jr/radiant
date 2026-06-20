@@ -10,12 +10,19 @@
 #include <unordered_map>
 
 namespace Radiant {
+  long testFunc(uint32_t num) {
+    return 4*num;
+  }
+
   RadiantEngine::RadiantEngine(const std::string& title, uint32_t width, uint32_t height) {
     this->window = std::make_unique<Window>(title, width, height);
     this->renderer = std::make_unique<Renderer>(*this->window, true);
 
     this->stylesheetParser = std::make_unique<CssParser>();
     this->registerProperties();
+
+    RegisteredFunction func = this->stylesheetParser->registerFunction("testFunc", &testFunc);
+    func.runtimeFunction({{4}});
     
     this->widgetManager = std::make_unique<WidgetManager>(*this->window, *this->stylesheetParser);
 
