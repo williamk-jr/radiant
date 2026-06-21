@@ -1,6 +1,6 @@
 #include "radiant/css/StyleSheetEntry.h"
 
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   StyleSheetEntry::StyleSheetEntry(size_t capacity) {
     this->values.reserve(capacity);
   }

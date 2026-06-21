@@ -16,8 +16,8 @@
 #include <vector>
 #include <algorithm>
 
-namespace Radiant {
-  void CssParser::registerProperty(std::string name, std::vector<StyleSheetValueTypes> signature, StyleSheetEntry defaultValue, PropertyResolver resolver) {
+namespace Radiant::StyleSheetParser {
+  void CssParser::registerProperty(std::string name, std::vector<ValueTypes> signature, StyleSheetEntry defaultValue, PropertyResolver resolver) {
     this->propertyRegistry[name] = {signature, defaultValue, resolver};
   }
 
@@ -48,41 +48,41 @@ namespace Radiant {
               std::string tokenValue(valueNode->token.getValue());
               
               switch (valueNode->type) {
-                case Radiant::AstNodeType::UNIT:
+                case AstNodeType::UNIT:
                   styleSheetEntry.add(
-                    StyleSheetValue::fromString(StyleSheetValueTypes::UNIT, tokenValue)
+                    StyleSheetValue::fromString(ValueTypes::UNIT, tokenValue)
                   );
                   break;
-                case Radiant::AstNodeType::FLOAT:
+                case AstNodeType::FLOAT:
                   styleSheetEntry.add(
-                    StyleSheetValue::fromString(StyleSheetValueTypes::FLOAT, tokenValue)
+                    StyleSheetValue::fromString(ValueTypes::FLOAT, tokenValue)
                   );
                   break;
-                case Radiant::AstNodeType::INTEGER:
+                case AstNodeType::INTEGER:
                   styleSheetEntry.add(
-                    StyleSheetValue::fromString(StyleSheetValueTypes::INTEGER, tokenValue)
+                    StyleSheetValue::fromString(ValueTypes::INTEGER, tokenValue)
                   );
                   break;
-                case Radiant::AstNodeType::STRING:
+                case AstNodeType::STRING:
                   styleSheetEntry.add(
-                    StyleSheetValue::fromString(StyleSheetValueTypes::STRING, tokenValue)
+                    StyleSheetValue::fromString(ValueTypes::STRING, tokenValue)
                   );
                   break;
-                case Radiant::AstNodeType::IDENTIFIER:
+                case AstNodeType::IDENTIFIER:
                   styleSheetEntry.add(
-                    StyleSheetValue::fromString(StyleSheetValueTypes::STRING, tokenValue)
+                    StyleSheetValue::fromString(ValueTypes::STRING, tokenValue)
                   );
                   break;
-                case Radiant::AstNodeType::FUNCTION:
+                case AstNodeType::FUNCTION:
                   // TODO compile all function arguments into custom function object.
 
                   //styleSheetEntry.add(
                   //  StyleSheetValue::fromString(StyleSheetValueTypes::FUNCTION, tokenValue)
                   //);
                   break;
-                case Radiant::AstNodeType::COLOR:
+                case AstNodeType::COLOR:
                   styleSheetEntry.add(
-                    StyleSheetValue::fromString(StyleSheetValueTypes::COLOR, tokenValue)
+                    StyleSheetValue::fromString(ValueTypes::COLOR, tokenValue)
                   );
                   break;
                 default:
@@ -245,7 +245,7 @@ namespace Radiant {
       return TokenType::STRING;
     } else if (this->isUnit(token)) {
       return TokenType::UNIT; 
-    } else if (LibStyleSheets::Color::isColor(token)) {
+    } else if (Color::isColor(token)) {
       return TokenType::COLOR;
     } else if (string_util::isFloat(token)) {
       return TokenType::FLOAT;

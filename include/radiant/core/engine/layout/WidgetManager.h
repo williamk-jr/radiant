@@ -9,13 +9,13 @@
 namespace Radiant {
   class WidgetManager {
     public:
-      WidgetManager(Window& window, CssParser& styleSheetParser);
+      WidgetManager(Window& window, StyleSheetParser::CssParser& styleSheetParser);
       std::shared_ptr<Widget> getRootWidget();
-      CssParser& getStyleSheetParser();
+      StyleSheetParser::CssParser& getStyleSheetParser();
       RenderBatch createRenderBatch();
 
     private:
-      CssParser& styleSheetParser;
+      StyleSheetParser::CssParser& styleSheetParser;
       std::shared_ptr<Widget> rootWidget;
       //std::unordered_map<typename Key, typename Tp>
   };

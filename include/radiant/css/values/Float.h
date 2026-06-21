@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   class Float {
     public:
       Float();

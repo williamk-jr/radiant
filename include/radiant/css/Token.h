@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   enum class TokenType {
     BLOCK_OPEN,
     BLOCK_CLOSE,

@@ -5,7 +5,7 @@
 #include <vector>
 #include "radiant/css/Token.h"
 
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   enum class AstNodeType {
     ROOT,
     IDENTIFIER,

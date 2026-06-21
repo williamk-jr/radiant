@@ -3,5 +3,5 @@
 #include "radiant/css/StyleSheetValue.h"
 
 namespace Radiant::PropertyResolvers {
-  StyleSheetEntry UNIT_LIST_RESOLVER(StyleSheetEntry values, float);
+  StyleSheetParser::StyleSheetEntry UNIT_LIST_RESOLVER(StyleSheetParser::StyleSheetEntry values, float);
 }

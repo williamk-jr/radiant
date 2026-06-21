@@ -22,7 +22,7 @@ namespace Radiant {
       Widget(std::shared_ptr<Widget> parent, uint32_t width, uint32_t height);
       Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, uint32_t width, uint32_t height);
 
-      void addStyle(std::string name, StyleSheetEntry entry);
+      void addStyle(std::string name, StyleSheetParser::StyleSheetEntry entry);
 
       uint32_t getPositionX();
       uint32_t getPositionY();
@@ -43,7 +43,7 @@ namespace Radiant {
 
       WidgetManager& manager; 
       LayoutBox layoutBox;
-      StyleSheet styleSheet;
+      StyleSheetParser::StyleSheet styleSheet;
 
       Widget(WidgetManager& manager, uint32_t width, uint32_t height);
 

@@ -2,7 +2,7 @@
 #include "radiant/util/string_util.h"
 #include <string>
 
-namespace Radiant::LibStyleSheets {
+namespace Radiant::StyleSheetParser {
   std::unordered_map<std::string, Colors> Color::COLOR_KEYWORDS{
     {"red", Colors::RED},
     {"green", Colors::GREEN},

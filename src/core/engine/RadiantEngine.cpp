@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace Radiant {
-  Float testFunc(Float num, Float num2) {
+  StyleSheetParser::Float testFunc(StyleSheetParser::Float num, StyleSheetParser::Float num2) {
     return 4.0*num*num2;
   }
 
@@ -19,13 +19,13 @@ namespace Radiant {
     this->window = std::make_unique<Window>(title, width, height);
     this->renderer = std::make_unique<Renderer>(*this->window, true);
 
-    this->stylesheetParser = std::make_unique<CssParser>();
+    this->stylesheetParser = std::make_unique<StyleSheetParser::CssParser>();
     this->registerProperties();
 
     this->stylesheetParser->registerFunction("testFunc", &testFunc);
-    RegisteredFunction func = this->stylesheetParser->getFunction("testFunc");
+    StyleSheetParser::RegisteredFunction func = this->stylesheetParser->getFunction("testFunc");
 
-    Logger::info(std::to_string(func.runtimeFunction({{Float(4.0f)}, {Float(4.0f)}}).get<StyleSheetValueTypes::FLOAT>().value()));
+    Logger::info(std::to_string(func.runtimeFunction({{StyleSheetParser::Float(4.0f)}, {StyleSheetParser::Float(4.0f)}}).get<StyleSheetParser::ValueTypes::FLOAT>().value()));
     
     this->widgetManager = std::make_unique<WidgetManager>(*this->window, *this->stylesheetParser);
 
@@ -35,9 +35,9 @@ namespace Radiant {
 
 
 
-    std::unordered_map<std::string, StyleSheet> styleSheets = this->stylesheetParser->getStyleSheets("./assets/test.css");
+    std::unordered_map<std::string, StyleSheetParser::StyleSheet> styleSheets = this->stylesheetParser->getStyleSheets("./assets/test.css");
 
-    for (std::pair<std::string, StyleSheet> entry : styleSheets) {
+    for (std::pair<std::string, StyleSheetParser::StyleSheet> entry : styleSheets) {
       Logger::info(entry.first);
     }
 
@@ -54,10 +54,10 @@ namespace Radiant {
   }
   
   void RadiantEngine::registerProperties() {
-    this->stylesheetParser->registerProperty("top", {StyleSheetValueTypes::UNIT}, {{Unit{0.0f, UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
-    this->stylesheetParser->registerProperty("bottom", {StyleSheetValueTypes::UNIT}, {{Unit{0.0f, UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
-    this->stylesheetParser->registerProperty("left", {StyleSheetValueTypes::UNIT}, {{Unit{0.0f, UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
-    this->stylesheetParser->registerProperty("right", {StyleSheetValueTypes::UNIT}, {{Unit{0.0f, UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
+    this->stylesheetParser->registerProperty("top", {StyleSheetParser::ValueTypes::UNIT}, {{StyleSheetParser::Unit{0.0f, StyleSheetParser::UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
+    this->stylesheetParser->registerProperty("bottom", {StyleSheetParser::ValueTypes::UNIT}, {{StyleSheetParser::Unit{0.0f, StyleSheetParser::UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
+    this->stylesheetParser->registerProperty("left", {StyleSheetParser::ValueTypes::UNIT}, {{StyleSheetParser::Unit{0.0f, StyleSheetParser::UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
+    this->stylesheetParser->registerProperty("right", {StyleSheetParser::ValueTypes::UNIT}, {{StyleSheetParser::Unit{0.0f, StyleSheetParser::UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
   }
 
   RadiantEngine::~RadiantEngine() {

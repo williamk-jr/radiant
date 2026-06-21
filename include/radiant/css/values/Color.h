@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <unordered_map>
-namespace Radiant::LibStyleSheets {
+namespace Radiant::StyleSheetParser {
   enum class Colors : uint32_t {
     RED=0xFF0000FF,
     GREEN=0x00FF00FF,

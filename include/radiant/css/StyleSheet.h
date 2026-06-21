@@ -4,7 +4,7 @@
 #include "radiant/css/StyleSheetValue.h"
 #include <string>
 #include <vector>
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   class CssParser;
 
   class StyleSheet {

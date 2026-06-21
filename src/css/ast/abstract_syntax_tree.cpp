@@ -4,7 +4,7 @@
 #include "radiant/util/logger/Logger.h"
 #include <stdexcept>
 
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   AbstractSyntaxTree::AbstractSyntaxTree(std::vector<Token> tokens) : AstNode(Token(TokenType::IDENTFIER, "")) {
     AstNode* parent = this;
     for (int i = 0; i < tokens.size(); i++) {

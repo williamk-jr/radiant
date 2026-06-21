@@ -9,8 +9,8 @@
 #include <string>
 #include <variant>
 
-namespace Radiant {
-  enum class StyleSheetValueTypes {
+namespace Radiant::StyleSheetParser {
+  enum class ValueTypes {
     INTEGER,
     FLOAT,
     STRING,
@@ -24,7 +24,7 @@ namespace Radiant {
     Integer, 
     Float,
     Unit,
-    LibStyleSheets::Color
+    Color
   > StyleSheetVariant;
 
   template<typename T>
@@ -32,50 +32,50 @@ namespace Radiant {
 
   template<>
   struct MapValue<std::string> {
-    static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::STRING;
+    static constexpr ValueTypes value = ValueTypes::STRING;
   };
   template<>
   struct MapValue<Integer> {
-    static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::INTEGER;
+    static constexpr ValueTypes value = ValueTypes::INTEGER;
   };
   template<>
   struct MapValue<Float> {
-    static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::FLOAT;
+    static constexpr ValueTypes value = ValueTypes::FLOAT;
   };
   template<>
   struct MapValue<Unit> {
-    static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::UNIT;
+    static constexpr ValueTypes value = ValueTypes::UNIT;
   };
   template<>
-  struct MapValue<LibStyleSheets::Color> {
-    static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::COLOR;
+  struct MapValue<Color> {
+    static constexpr ValueTypes value = ValueTypes::COLOR;
   };
 
   class StyleSheetValue {
     public:
       StyleSheetValue(StyleSheetVariant value);
 
-      template<StyleSheetValueTypes T>
+      template<ValueTypes T>
       auto get() {
-        if constexpr (T == StyleSheetValueTypes::UNIT) {
+        if constexpr (T == ValueTypes::UNIT) {
           Unit* unit = std::get_if<Unit>(&this->value);
           return unit == nullptr ? std::nullopt : std::optional<Unit>{*unit};
-        } else if constexpr (T == StyleSheetValueTypes::STRING) {
+        } else if constexpr (T == ValueTypes::STRING) {
           std::string* unit = std::get_if<std::string>(&this->value);
           return unit == nullptr ? std::nullopt : std::optional<std::string>{*unit};
-        } else if constexpr (T == StyleSheetValueTypes::FLOAT) {
+        } else if constexpr (T == ValueTypes::FLOAT) {
           Float* unit = std::get_if<Float>(&this->value);
           return unit == nullptr ? std::nullopt : std::optional<Float>{*unit};
-        } else if constexpr (T == StyleSheetValueTypes::INTEGER) {
+        } else if constexpr (T == ValueTypes::INTEGER) {
           Integer* unit = std::get_if<Integer>(&this->value);
           return unit == nullptr ? std::nullopt : std::optional<Integer>{*unit};
-        } else if constexpr (T == StyleSheetValueTypes::COLOR) {
-          LibStyleSheets::Color* unit = std::get_if<LibStyleSheets::Color>(&this->value);
-          return unit == nullptr ? std::nullopt : std::optional<LibStyleSheets::Color>{*unit};
+        } else if constexpr (T == ValueTypes::COLOR) {
+          Color* unit = std::get_if<Color>(&this->value);
+          return unit == nullptr ? std::nullopt : std::optional<Color>{*unit};
         }
       }
 
-      static StyleSheetValue fromString(StyleSheetValueTypes type, std::string strValue);
+      static StyleSheetValue fromString(ValueTypes type, std::string strValue);
 
     private:
       StyleSheetVariant value;

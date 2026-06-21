@@ -3,7 +3,7 @@
 #include "radiant/util/string_util.h"
 #include <charconv>
 
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   std::unordered_map<std::string, UnitType> Unit::UNIT_MAP{
     {"%", UnitType::PERCENTAGE},
     {"px", UnitType::PIXEL}
@@ -22,7 +22,7 @@ namespace Radiant {
 
   Unit Unit::resolve() {
     switch (this->unit) {
-      case Radiant::UnitType::PERCENTAGE:
+      case UnitType::PERCENTAGE:
         return *this;
     }
     return *this;

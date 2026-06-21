@@ -43,7 +43,7 @@ int main() {
   );
 
   testWidget.addStyle("right", {
-      {Radiant::Unit(-100.0, Radiant::UnitType::PIXEL)}
+      {Radiant::StyleSheetParser::Unit(-100.0, Radiant::StyleSheetParser::UnitType::PIXEL)}
   });
 
   while (engine.isRunning()) {

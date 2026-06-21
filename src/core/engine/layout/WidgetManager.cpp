@@ -6,7 +6,7 @@
 #include <stack>
 
 namespace Radiant {
-  WidgetManager::WidgetManager(Window& window, CssParser& styleSheetParser) : styleSheetParser(styleSheetParser) {
+  WidgetManager::WidgetManager(Window& window, StyleSheetParser::CssParser& styleSheetParser) : styleSheetParser(styleSheetParser) {
     Rect2D frameBufferSize = window.getFrameBufferSize();
 
     this->rootWidget = std::make_shared<Widget>(Widget{
@@ -20,7 +20,7 @@ namespace Radiant {
     return this->rootWidget;
   }
   
-  CssParser& WidgetManager::getStyleSheetParser() {
+  StyleSheetParser::CssParser& WidgetManager::getStyleSheetParser() {
     return this->styleSheetParser;
   }
   

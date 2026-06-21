@@ -25,7 +25,7 @@ namespace Radiant {
       std::unique_ptr<InstanceBuffer> instanceBuffer;
       std::unique_ptr<IndexBuffer> indexBuffer;
 
-      std::unique_ptr<CssParser> stylesheetParser;
+      std::unique_ptr<StyleSheetParser::CssParser> stylesheetParser;
 
       void registerProperties();
   };

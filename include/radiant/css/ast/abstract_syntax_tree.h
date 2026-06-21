@@ -6,7 +6,7 @@
 #include "radiant/css/ast/ast_node.h"
 #include "radiant/css/Token.h"
 
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   struct AstLocation {
     AstNode* parent = nullptr;
     int index = 0;

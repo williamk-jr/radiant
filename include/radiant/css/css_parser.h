@@ -15,12 +15,12 @@
 #include "radiant/util/string_util.h"
 #include "radiant/css/Token.h"
 
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   using PropertyResolver = StyleSheetEntry (*)(StyleSheetEntry, float);
   using RuntimeFunction = std::function<StyleSheetValue(std::vector<StyleSheetValue>)>;
 
   struct PropertyEntry {
-    std::vector<StyleSheetValueTypes> signature;
+    std::vector<ValueTypes> signature;
     StyleSheetEntry defaultValue;
     PropertyResolver resolver;
   };
@@ -43,13 +43,13 @@ namespace Radiant {
 
   class CssParser {
     public:
-      void registerProperty(std::string name, std::vector<StyleSheetValueTypes> signature, StyleSheetEntry defaultValue, PropertyResolver resolver);
+      void registerProperty(std::string name, std::vector<ValueTypes> signature, StyleSheetEntry defaultValue, PropertyResolver resolver);
       PropertyEntry getPropertyEntry(std::string name);
 
 
       template<typename Fn>
       void registerFunction(std::string name, Fn function) {
-        this->functionRegistry[name] = {Radiant::wrapper(function)};
+        this->functionRegistry[name] = {wrapper(function)};
       }
 
       RegisteredFunction getFunction(std::string name);

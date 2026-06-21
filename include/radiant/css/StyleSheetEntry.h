@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <vector>
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   class StyleSheetEntry {
     public:
       StyleSheetEntry() = default;
@@ -13,7 +13,7 @@ namespace Radiant {
 
       void add(StyleSheetValue value);
 
-      template<StyleSheetValueTypes T>
+      template<ValueTypes T>
       auto get(size_t index) {
         return this->values[index].get<T>();
       }

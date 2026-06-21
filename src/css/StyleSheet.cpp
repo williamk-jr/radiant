@@ -2,7 +2,7 @@
 #include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/css_parser.h"
 
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   void StyleSheet::add(std::string name, StyleSheetEntry entry) {
     this->styles[name] = entry;
   }

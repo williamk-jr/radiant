@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   template<typename T>
   class IValue {
     public:

@@ -25,13 +25,13 @@ namespace Radiant {
 
   }
   
-  void Widget::addStyle(std::string name, StyleSheetEntry entry) {
+  void Widget::addStyle(std::string name, StyleSheetParser::StyleSheetEntry entry) {
     this->styleSheet.add(name, entry);
   }
   
   uint32_t Widget::getPositionX() {
-    Unit right = this->styleSheet.getAbsolute(this->manager.getStyleSheetParser(), "right").get<StyleSheetValueTypes::UNIT>(0).value();
-    Unit left = this->styleSheet.getAbsolute(this->manager.getStyleSheetParser(), "left").get<StyleSheetValueTypes::UNIT>(0).value();
+    StyleSheetParser::Unit right = this->styleSheet.getAbsolute(this->manager.getStyleSheetParser(), "right").get<StyleSheetParser::ValueTypes::UNIT>(0).value();
+    StyleSheetParser::Unit left = this->styleSheet.getAbsolute(this->manager.getStyleSheetParser(), "left").get<StyleSheetParser::ValueTypes::UNIT>(0).value();
     return this->layoutBox.getPositionX() + right.getValue() - left.getValue();
   }
 

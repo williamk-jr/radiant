@@ -5,28 +5,28 @@
 #include <cstdint>
 #include <variant>
 
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   StyleSheetValue::StyleSheetValue(StyleSheetVariant value) : value(value) {}
 
-  StyleSheetValue StyleSheetValue::fromString(StyleSheetValueTypes type, std::string strValue) {
+  StyleSheetValue StyleSheetValue::fromString(ValueTypes type, std::string strValue) {
     switch (type) {
-      case StyleSheetValueTypes::UNIT: {
+      case ValueTypes::UNIT: {
         return {Unit::fromString(strValue)};
       }
-      case StyleSheetValueTypes::COLOR: {
-        return {LibStyleSheets::Color::fromString(strValue)};
+      case ValueTypes::COLOR: {
+        return {Color::fromString(strValue)};
       }
-      case StyleSheetValueTypes::INTEGER: {
+      case ValueTypes::INTEGER: {
         int32_t integer = 0;
         std::from_chars_result result = std::from_chars(strValue.data(), strValue.data()+strValue.size(), integer);
         return {Integer(integer)};
       }
-      case StyleSheetValueTypes::FLOAT: {
+      case ValueTypes::FLOAT: {
         float floatingPoint = 0.0;
         std::from_chars_result result = std::from_chars(strValue.data(), strValue.data()+strValue.size(), floatingPoint);
         return {Float(floatingPoint)};
       }
-      case StyleSheetValueTypes::STRING: {
+      case ValueTypes::STRING: {
         return {strValue};
       }
     }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   class Integer {
     public:
       Integer();

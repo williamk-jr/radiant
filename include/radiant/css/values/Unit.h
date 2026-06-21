@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace Radiant {
+namespace Radiant::StyleSheetParser {
   enum class UnitType {
     PIXEL,
     PERCENTAGE
