@@ -8,10 +8,11 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace Radiant {
-  long testFunc(uint32_t num) {
-    return 4*num;
+  Float testFunc(Float num, Float num2) {
+    return 4.0*num*num2;
   }
 
   RadiantEngine::RadiantEngine(const std::string& title, uint32_t width, uint32_t height) {
@@ -21,8 +22,10 @@ namespace Radiant {
     this->stylesheetParser = std::make_unique<CssParser>();
     this->registerProperties();
 
-    RegisteredFunction func = this->stylesheetParser->registerFunction("testFunc", &testFunc);
-    func.runtimeFunction({{4}});
+    this->stylesheetParser->registerFunction("testFunc", &testFunc);
+    RegisteredFunction func = this->stylesheetParser->getFunction("testFunc");
+
+    Logger::info(std::to_string(func.runtimeFunction({{Float(4.0f)}, {Float(4.0f)}}).get<StyleSheetValueTypes::FLOAT>().value()));
     
     this->widgetManager = std::make_unique<WidgetManager>(*this->window, *this->stylesheetParser);
 

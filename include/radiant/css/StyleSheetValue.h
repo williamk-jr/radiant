@@ -2,6 +2,8 @@
 
 #include "radiant/css/values/Color.h"
 #include "radiant/css/values/Unit.h"
+#include "radiant/css/values/Integer.h"
+#include "radiant/css/values/Float.h"
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -19,8 +21,8 @@ namespace Radiant {
 
   typedef std::variant<
     std::string, 
-    uint32_t, 
-    float,
+    Integer, 
+    Float,
     Unit,
     LibStyleSheets::Color
   > StyleSheetVariant;
@@ -33,11 +35,11 @@ namespace Radiant {
     static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::STRING;
   };
   template<>
-  struct MapValue<uint32_t> {
+  struct MapValue<Integer> {
     static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::INTEGER;
   };
   template<>
-  struct MapValue<float> {
+  struct MapValue<Float> {
     static constexpr StyleSheetValueTypes value = StyleSheetValueTypes::FLOAT;
   };
   template<>
@@ -62,11 +64,11 @@ namespace Radiant {
           std::string* unit = std::get_if<std::string>(&this->value);
           return unit == nullptr ? std::nullopt : std::optional<std::string>{*unit};
         } else if constexpr (T == StyleSheetValueTypes::FLOAT) {
-          float* unit = std::get_if<float>(&this->value);
-          return unit == nullptr ? std::nullopt : std::optional<float>{*unit};
+          Float* unit = std::get_if<Float>(&this->value);
+          return unit == nullptr ? std::nullopt : std::optional<Float>{*unit};
         } else if constexpr (T == StyleSheetValueTypes::INTEGER) {
-          uint32_t* unit = std::get_if<uint32_t>(&this->value);
-          return unit == nullptr ? std::nullopt : std::optional<uint32_t>{*unit};
+          Integer* unit = std::get_if<Integer>(&this->value);
+          return unit == nullptr ? std::nullopt : std::optional<Integer>{*unit};
         } else if constexpr (T == StyleSheetValueTypes::COLOR) {
           LibStyleSheets::Color* unit = std::get_if<LibStyleSheets::Color>(&this->value);
           return unit == nullptr ? std::nullopt : std::optional<LibStyleSheets::Color>{*unit};

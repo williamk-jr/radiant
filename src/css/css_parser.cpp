@@ -25,6 +25,10 @@ namespace Radiant {
     return this->propertyRegistry[name];
   }
 
+  RegisteredFunction CssParser::getFunction(std::string name) {
+    return this->functionRegistry[name];
+  }
+
   std::unordered_map<std::string, StyleSheet> CssParser::getStyleSheets(std::filesystem::path path) {
     std::vector<Token> tokens = this->tokenize(path); 
     AbstractSyntaxTree abstractSyntaxTree(tokens); 

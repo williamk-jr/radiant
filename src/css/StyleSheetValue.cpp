@@ -17,14 +17,14 @@ namespace Radiant {
         return {LibStyleSheets::Color::fromString(strValue)};
       }
       case StyleSheetValueTypes::INTEGER: {
-        uint32_t integer = 0;
+        int32_t integer = 0;
         std::from_chars_result result = std::from_chars(strValue.data(), strValue.data()+strValue.size(), integer);
-        return {integer};
+        return {Integer(integer)};
       }
       case StyleSheetValueTypes::FLOAT: {
         float floatingPoint = 0.0;
         std::from_chars_result result = std::from_chars(strValue.data(), strValue.data()+strValue.size(), floatingPoint);
-        return {floatingPoint};
+        return {Float(floatingPoint)};
       }
       case StyleSheetValueTypes::STRING: {
         return {strValue};

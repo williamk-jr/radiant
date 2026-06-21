@@ -11,6 +11,7 @@
 #include "radiant/css/StyleSheet.h"
 #include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/StyleSheetValue.h"
+#include "radiant/util/logger/Logger.h"
 #include "radiant/util/string_util.h"
 #include "radiant/css/Token.h"
 
@@ -29,8 +30,8 @@ namespace Radiant {
   };
 
   template<typename R, typename... Args, std::size_t... Is>
-  static R invokeHelper(R(*fn)(Args...), std::vector<StyleSheetValue> params, std::index_sequence<Is...>) {
-    return fn(((params[Is].get<MapValue<Args>::value>().value()), ...));
+  static R invokeHelper(R(*fn)(Args...), std::vector<StyleSheetValue> params, std::index_sequence<Is...> indexSequence) {
+    return fn( params[Is].get<MapValue<Args>::value>().value()... );
   }
 
   template<typename R, typename... Args>
@@ -47,10 +48,11 @@ namespace Radiant {
 
 
       template<typename Fn>
-      RegisteredFunction registerFunction(std::string name, Fn function) {
-        RuntimeFunction wrapper = Radiant::wrapper(function);
-        return {wrapper};
+      void registerFunction(std::string name, Fn function) {
+        this->functionRegistry[name] = {Radiant::wrapper(function)};
       }
+
+      RegisteredFunction getFunction(std::string name);
 
       std::unordered_map<std::string, StyleSheet> getStyleSheets(std::filesystem::path path);
 
