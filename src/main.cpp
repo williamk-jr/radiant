@@ -19,7 +19,7 @@
 #include <GLFW/glfw3.h>
 
 #include "radiant/css/ast/abstract_syntax_tree.h"
-#include "radiant/css/css_parser.h"
+#include "radiant/css/Parser.h"
 #include "radiant/core/render/Renderer.h"
 #include "radiant/core/render/Window.h"
 

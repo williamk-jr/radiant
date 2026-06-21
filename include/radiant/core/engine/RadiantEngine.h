@@ -3,7 +3,7 @@
 #include "radiant/core/engine/layout/WidgetManager.h"
 #include "radiant/core/render/Renderer.h"
 #include "radiant/core/render/Window.h"
-#include "radiant/css/css_parser.h"
+#include "radiant/css/Parser.h"
 #include <cstdint>
 #include <memory>
 namespace Radiant {
@@ -25,7 +25,7 @@ namespace Radiant {
       std::unique_ptr<InstanceBuffer> instanceBuffer;
       std::unique_ptr<IndexBuffer> indexBuffer;
 
-      std::unique_ptr<StyleSheetParser::CssParser> stylesheetParser;
+      std::unique_ptr<StyleSheetParser::Parser> stylesheetParser;
 
       void registerProperties();
   };

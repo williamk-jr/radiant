@@ -4,7 +4,7 @@
 #include "radiant/core/render/models/Quad2D.h"
 #include "radiant/core/render/Window.h"
 #include "radiant/css/StyleSheetEntry.h"
-#include "radiant/css/css_parser.h"
+#include "radiant/css/Parser.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -19,7 +19,7 @@ namespace Radiant {
     this->window = std::make_unique<Window>(title, width, height);
     this->renderer = std::make_unique<Renderer>(*this->window, true);
 
-    this->stylesheetParser = std::make_unique<StyleSheetParser::CssParser>();
+    this->stylesheetParser = std::make_unique<StyleSheetParser::Parser>();
     this->registerProperties();
 
     this->stylesheetParser->registerFunction("testFunc", &testFunc);

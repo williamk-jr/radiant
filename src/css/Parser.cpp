@@ -1,4 +1,4 @@
-#include "radiant/css/css_parser.h"
+#include "radiant/css/Parser.h"
 #include "radiant/css/StyleSheet.h"
 #include "radiant/css/StyleSheetValue.h"
 #include "radiant/css/Token.h"
@@ -17,19 +17,19 @@
 #include <algorithm>
 
 namespace Radiant::StyleSheetParser {
-  void CssParser::registerProperty(std::string name, std::vector<ValueTypes> signature, StyleSheetEntry defaultValue, PropertyResolver resolver) {
+  void Parser::registerProperty(std::string name, std::vector<ValueTypes> signature, StyleSheetEntry defaultValue, PropertyResolver resolver) {
     this->propertyRegistry[name] = {signature, defaultValue, resolver};
   }
 
-  PropertyEntry CssParser::getPropertyEntry(std::string name) {
+  PropertyEntry Parser::getPropertyEntry(std::string name) {
     return this->propertyRegistry[name];
   }
 
-  RegisteredFunction CssParser::getFunction(std::string name) {
+  RegisteredFunction Parser::getFunction(std::string name) {
     return this->functionRegistry[name];
   }
 
-  std::unordered_map<std::string, StyleSheet> CssParser::getStyleSheets(std::filesystem::path path) {
+  std::unordered_map<std::string, StyleSheet> Parser::getStyleSheets(std::filesystem::path path) {
     std::vector<Token> tokens = this->tokenize(path); 
     AbstractSyntaxTree abstractSyntaxTree(tokens); 
     abstractSyntaxTree.display();
@@ -101,7 +101,7 @@ namespace Radiant::StyleSheetParser {
     return stylesheets;
   }
 
-  std::vector<Token> CssParser::tokenize(std::filesystem::path file) {
+  std::vector<Token> Parser::tokenize(std::filesystem::path file) {
     if (!std::filesystem::exists(file)) {
       std::cout << "Invalid Path: " << std::filesystem::absolute(file) << "\n";
     }
@@ -220,7 +220,7 @@ namespace Radiant::StyleSheetParser {
     return tokens;
   };
 
-  std::string CssParser::tokenTypeToString(TokenType tokenType) {
+  std::string tokenTypeToString(TokenType tokenType) {
     switch (tokenType) {
       case TokenType::BLOCK_OPEN: return "BLOCK_OPEN";
       case TokenType::BLOCK_CLOSE: return "BLOCK_CLOSE";
@@ -240,7 +240,7 @@ namespace Radiant::StyleSheetParser {
     }
   }
 
-  TokenType CssParser::identifyToken(std::string token) {
+  TokenType Parser::identifyToken(std::string token) {
     if (this->isString(token)) {
       return TokenType::STRING;
     } else if (this->isUnit(token)) {
@@ -257,7 +257,7 @@ namespace Radiant::StyleSheetParser {
     return TokenType::INVALID;
   }
 
-  void CssParser::addToken(std::vector<Token>& tokens, std::string token) {
+  void Parser::addToken(std::vector<Token>& tokens, std::string token) {
     if (token.empty()) {
       return;
     }
@@ -268,12 +268,12 @@ namespace Radiant::StyleSheetParser {
     ));
   }
 
-  bool CssParser::isString(const std::string& token) {
+  bool Parser::isString(const std::string& token) {
     return (string_util::startsWith(token, "\"") && string_util::endsWith(token, "\"")) ||
             string_util::startsWith(token, "\'") && string_util::endsWith(token, "\'");
   }
 
-  bool CssParser::isUnit(const std::string& token) {
+  bool Parser::isUnit(const std::string& token) {
     int lastDigitIndex = string_util::findLastOf(token, string_util::isCharNumeric);
     if (lastDigitIndex == -1) {
       return false;
@@ -285,7 +285,7 @@ namespace Radiant::StyleSheetParser {
     return string_util::isNumeric(number) && string_util::isAlphabetic(unit);
   }
 
-  bool CssParser::isIdentifier(const std::string& token) {
+  bool Parser::isIdentifier(const std::string& token) {
     return !string_util::isCharNumeric(token.at(0)) && string_util::containsOnly(token, [](unsigned char c) {
       return string_util::isCharAlphanumeric(c) || c == '-';
     }); 

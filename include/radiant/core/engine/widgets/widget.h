@@ -4,7 +4,7 @@
 #include <vector>
 #include "radiant/core/engine/LayoutBox.h"
 #include "radiant/core/render/renderable.h"
-#include "radiant/css/css_parser.h"
+#include "radiant/css/Parser.h"
 
 namespace Radiant {
   class WidgetManager;

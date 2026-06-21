@@ -1,6 +1,6 @@
 #include "radiant/css/StyleSheet.h"
 #include "radiant/css/StyleSheetEntry.h"
-#include "radiant/css/css_parser.h"
+#include "radiant/css/Parser.h"
 
 namespace Radiant::StyleSheetParser {
   void StyleSheet::add(std::string name, StyleSheetEntry entry) {
@@ -14,7 +14,7 @@ namespace Radiant::StyleSheetParser {
     return this->styles[name];
   }
   
-  StyleSheetEntry StyleSheet::getAbsolute(CssParser& parser, std::string name) {
+  StyleSheetEntry StyleSheet::getAbsolute(Parser& parser, std::string name) {
     PropertyEntry propertyEntry = parser.getPropertyEntry(name);
     return propertyEntry.resolver(
       this->getOrDefault(name, propertyEntry.defaultValue),

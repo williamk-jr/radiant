@@ -25,7 +25,7 @@ endif()
 # Add the executable
 add_executable(Radiant 
   src/main.cpp 
-  src/css/css_parser.cpp
+  src/css/Parser.cpp
   src/css/Token.cpp
   src/css/StyleSheetValue.cpp
   src/css/StyleSheetEntry.cpp

@@ -41,7 +41,7 @@ namespace Radiant::StyleSheetParser {
     };
   };
 
-  class CssParser {
+  class Parser {
     public:
       void registerProperty(std::string name, std::vector<ValueTypes> signature, StyleSheetEntry defaultValue, PropertyResolver resolver);
       PropertyEntry getPropertyEntry(std::string name);
