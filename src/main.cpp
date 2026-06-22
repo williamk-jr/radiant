@@ -46,6 +46,10 @@ int main() {
       {Radiant::StyleSheetParser::Unit(-100.0, Radiant::StyleSheetParser::UnitType::PIXEL)}
   });
 
+  testWidget.addStyle("background-color", {
+      {Radiant::StyleSheetParser::Color(0, 255, 0, 255)}
+  });
+
   while (engine.isRunning()) {
     engine.update(); 
   }

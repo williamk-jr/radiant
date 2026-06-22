@@ -5,6 +5,7 @@
 #include "radiant/css/ast/abstract_syntax_tree.h"
 #include "radiant/css/ast/ast_node.h"
 #include "radiant/css/values/Color.h"
+#include "radiant/css/values/Function.h"
 #include "radiant/util/logger/Logger.h"
 #include "radiant/util/string_util.h"
 #include <cctype>
@@ -46,52 +47,8 @@ namespace Radiant::StyleSheetParser {
 
             for (AstNode* valueNode : propertyNode->children) {
               std::string tokenValue(valueNode->token.getValue());
-              
-              switch (valueNode->type) {
-                case AstNodeType::UNIT:
-                  styleSheetEntry.add(
-                    StyleSheetValue::fromString(ValueTypes::UNIT, tokenValue)
-                  );
-                  break;
-                case AstNodeType::FLOAT:
-                  styleSheetEntry.add(
-                    StyleSheetValue::fromString(ValueTypes::FLOAT, tokenValue)
-                  );
-                  break;
-                case AstNodeType::INTEGER:
-                  styleSheetEntry.add(
-                    StyleSheetValue::fromString(ValueTypes::INTEGER, tokenValue)
-                  );
-                  break;
-                case AstNodeType::STRING:
-                  styleSheetEntry.add(
-                    StyleSheetValue::fromString(ValueTypes::STRING, tokenValue)
-                  );
-                  break;
-                case AstNodeType::IDENTIFIER:
-                  styleSheetEntry.add(
-                    StyleSheetValue::fromString(ValueTypes::STRING, tokenValue)
-                  );
-                  break;
-                case AstNodeType::FUNCTION:
-                  // TODO compile all function arguments into custom function object.
-
-                  //styleSheetEntry.add(
-                  //  StyleSheetValue::fromString(StyleSheetValueTypes::FUNCTION, tokenValue)
-                  //);
-                  break;
-                case AstNodeType::COLOR:
-                  styleSheetEntry.add(
-                    StyleSheetValue::fromString(ValueTypes::COLOR, tokenValue)
-                  );
-                  break;
-                default:
-                  Logger::error("Invalid Property Value: \""+tokenValue+"\"");
-                  break;
-              }
+              styleSheetEntry.add(this->getValue(valueNode)); 
             }
-            
-            //stylesheet[propertyNode->token.getValue()] = styleSheetEntry;
             stylesheet.add(propertyNode->token.getValue(), styleSheetEntry);
           }
         }
@@ -99,6 +56,34 @@ namespace Radiant::StyleSheetParser {
       }
     }
     return stylesheets;
+  }
+
+  StyleSheetValue Parser::getValue(AstNode* node) {
+    std::string tokenValue = node->token.getValue();
+
+    switch (node->type) {
+      case AstNodeType::UNIT: {
+        return StyleSheetValue::fromString(ValueTypes::UNIT, tokenValue);
+      } case AstNodeType::FLOAT: {
+        return StyleSheetValue::fromString(ValueTypes::FLOAT, tokenValue);
+      } case AstNodeType::INTEGER: {
+        return StyleSheetValue::fromString(ValueTypes::INTEGER, tokenValue);
+      } case AstNodeType::STRING: {
+        return StyleSheetValue::fromString(ValueTypes::STRING, tokenValue);
+      } case AstNodeType::IDENTIFIER: {
+        return StyleSheetValue::fromString(ValueTypes::STRING, tokenValue);
+      } case AstNodeType::COLOR: {
+        return StyleSheetValue::fromString(ValueTypes::COLOR, tokenValue);
+      } case AstNodeType::FUNCTION: {
+        std::vector<StyleSheetValue> parameters;
+        for (int i = 0; i < node->children.size(); i++) {
+          parameters.push_back(this->getValue(node->children[i]));
+        }
+        return StyleSheetValue(Function(tokenValue, parameters));
+      } default:
+        Logger::error("Invalid Property Value: \""+tokenValue+"\"");
+        break;
+    }
   }
 
   std::vector<Token> Parser::tokenize(std::filesystem::path file) {
@@ -275,7 +260,7 @@ namespace Radiant::StyleSheetParser {
 
   bool Parser::isUnit(const std::string& token) {
     int lastDigitIndex = string_util::findLastOf(token, string_util::isCharNumeric);
-    if (lastDigitIndex == -1) {
+    if (lastDigitIndex == -1 || lastDigitIndex == token.size()-1) {
       return false;
     }
 

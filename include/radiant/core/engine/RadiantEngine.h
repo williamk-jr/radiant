@@ -28,5 +28,6 @@ namespace Radiant {
       std::unique_ptr<StyleSheetParser::Parser> stylesheetParser;
 
       void registerProperties();
+      void registerFunctions();
   };
 }

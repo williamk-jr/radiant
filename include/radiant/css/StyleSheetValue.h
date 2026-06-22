@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "radiant/css/values/Color.h"
+#include "radiant/css/values/Function.h"
 #include "radiant/css/values/Unit.h"
 #include "radiant/css/values/Integer.h"
 #include "radiant/css/values/Float.h"
@@ -21,6 +22,7 @@ namespace Radiant::StyleSheetParser {
 
   typedef std::variant<
     std::string, 
+    Function,
     Integer, 
     Float,
     Unit,
@@ -50,6 +52,10 @@ namespace Radiant::StyleSheetParser {
   struct MapValue<Color> {
     static constexpr ValueTypes value = ValueTypes::COLOR;
   };
+  template<>
+  struct MapValue<Function> {
+    static constexpr ValueTypes value = ValueTypes::FUNCTION;
+  };
 
   class StyleSheetValue {
     public:
@@ -72,6 +78,9 @@ namespace Radiant::StyleSheetParser {
         } else if constexpr (T == ValueTypes::COLOR) {
           Color* unit = std::get_if<Color>(&this->value);
           return unit == nullptr ? std::nullopt : std::optional<Color>{*unit};
+        } else if constexpr (T == ValueTypes::FUNCTION) {
+          Function* unit = std::get_if<Function>(&this->value);
+          return unit == nullptr ? std::nullopt : std::optional<Function>{*unit};
         }
       }
 

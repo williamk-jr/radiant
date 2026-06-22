@@ -23,6 +23,7 @@ namespace Radiant {
       Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, uint32_t width, uint32_t height);
 
       void addStyle(std::string name, StyleSheetParser::StyleSheetEntry entry);
+      StyleSheetParser::StyleSheetEntry getStyle(std::string name, StyleSheetParser::StyleSheetEntry defaultEntry);
 
       uint32_t getPositionX();
       uint32_t getPositionY();

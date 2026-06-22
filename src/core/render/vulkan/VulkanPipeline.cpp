@@ -8,7 +8,7 @@ namespace Radiant {
   }
 
   VulkanPipeline::VulkanPipeline(VulkanPipeline&& other) noexcept :
-    pipeline(other.pipeline), layout(other.layout), shaderModules(other.shaderModules), device(other.device) {
+    pipeline(other.pipeline), bindPoint(other.bindPoint), layout(other.layout), shaderModules(other.shaderModules), device(other.device) {
     other.pipeline = nullptr;
     other.layout = nullptr;
     other.shaderModules.clear();

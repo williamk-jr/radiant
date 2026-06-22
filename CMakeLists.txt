@@ -25,6 +25,7 @@ endif()
 # Add the executable
 add_executable(Radiant 
   src/main.cpp 
+
   src/css/Parser.cpp
   src/css/Token.cpp
   src/css/StyleSheetValue.cpp
@@ -34,13 +35,16 @@ add_executable(Radiant
   src/css/values/Integer.cpp
   src/css/values/Float.cpp
   src/css/values/Color.cpp
+  src/css/values/Function.cpp
   src/css/ast/abstract_syntax_tree.cpp
+
   src/util/string_util.cpp
   src/util/logger/Logger.cpp
 
   src/core/engine/RadiantEngine.cpp
   src/core/engine/LayoutBox.cpp
   src/core/engine/StyleSheetPropertyResolvers.cpp
+  src/core/engine/StyleSheetStandardFunctions.cpp
   src/core/engine/layout/WidgetManager.cpp
   src/core/engine/widgets/widget.cpp
 

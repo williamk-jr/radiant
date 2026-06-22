@@ -1,5 +1,6 @@
 #include "radiant/core/engine/RadiantEngine.h"
 #include "radiant/core/engine/StyleSheetPropertyResolvers.h"
+#include "radiant/core/engine/StyleSheetStandardFunctions.h"
 #include "radiant/core/engine/layout/WidgetManager.h"
 #include "radiant/core/render/models/Quad2D.h"
 #include "radiant/core/render/Window.h"
@@ -11,36 +12,24 @@
 #include <vector>
 
 namespace Radiant {
-  StyleSheetParser::Float testFunc(StyleSheetParser::Float num, StyleSheetParser::Float num2) {
-    return 4.0*num*num2;
-  }
-
   RadiantEngine::RadiantEngine(const std::string& title, uint32_t width, uint32_t height) {
     this->window = std::make_unique<Window>(title, width, height);
     this->renderer = std::make_unique<Renderer>(*this->window, true);
 
     this->stylesheetParser = std::make_unique<StyleSheetParser::Parser>();
     this->registerProperties();
+    this->registerFunctions();
 
-    this->stylesheetParser->registerFunction("testFunc", &testFunc);
-    StyleSheetParser::RegisteredFunction func = this->stylesheetParser->getFunction("testFunc");
-
-    Logger::info(std::to_string(func.runtimeFunction({{StyleSheetParser::Float(4.0f)}, {StyleSheetParser::Float(4.0f)}}).get<StyleSheetParser::ValueTypes::FLOAT>().value()));
-    
     this->widgetManager = std::make_unique<WidgetManager>(*this->window, *this->stylesheetParser);
 
     this->vertexBuffer = renderer->createVertexBuffer(2048);
     this->instanceBuffer = renderer->createInstanceBuffer(2048);
     this->indexBuffer = renderer->createIndexBuffer(2048);
 
-
-
     std::unordered_map<std::string, StyleSheetParser::StyleSheet> styleSheets = this->stylesheetParser->getStyleSheets("./assets/test.css");
-
     for (std::pair<std::string, StyleSheetParser::StyleSheet> entry : styleSheets) {
       Logger::info(entry.first);
     }
-
 
     Quad2D quad;
     std::vector<Vertex> verticies = quad.getVerticies();
@@ -58,6 +47,10 @@ namespace Radiant {
     this->stylesheetParser->registerProperty("bottom", {StyleSheetParser::ValueTypes::UNIT}, {{StyleSheetParser::Unit{0.0f, StyleSheetParser::UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
     this->stylesheetParser->registerProperty("left", {StyleSheetParser::ValueTypes::UNIT}, {{StyleSheetParser::Unit{0.0f, StyleSheetParser::UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
     this->stylesheetParser->registerProperty("right", {StyleSheetParser::ValueTypes::UNIT}, {{StyleSheetParser::Unit{0.0f, StyleSheetParser::UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
+  }
+
+  void RadiantEngine::registerFunctions() {
+    this->stylesheetParser->registerFunction("rgb", &StyleSheetStandardFunctions::rgb);
   }
 
   RadiantEngine::~RadiantEngine() {

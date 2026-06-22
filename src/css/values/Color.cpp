@@ -12,10 +12,10 @@ namespace Radiant::StyleSheetParser {
   };
   
   Color::Color(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {
-    this->rgba = red;
-    this->rgba = (this->rgba << 8) | green;
-    this->rgba = (this->rgba << 16) | blue;
-    this->rgba = (this->rgba << 24) | alpha;
+    this->rgba = (red << 24) + (green << 16) + (blue << 8) + alpha;
+    //this->rgba = (this->rgba << 8) | green;
+    //this->rgba = (this->rgba << 16) | blue;
+    //this->rgba = (this->rgba << 24) | alpha;
   }
 
   Color::Color(uint32_t hex) {

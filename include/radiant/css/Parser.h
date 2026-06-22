@@ -11,6 +11,7 @@
 #include "radiant/css/StyleSheet.h"
 #include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/StyleSheetValue.h"
+#include "radiant/css/ast/ast_node.h"
 #include "radiant/util/logger/Logger.h"
 #include "radiant/util/string_util.h"
 #include "radiant/css/Token.h"
@@ -53,7 +54,6 @@ namespace Radiant::StyleSheetParser {
       }
 
       RegisteredFunction getFunction(std::string name);
-
       std::unordered_map<std::string, StyleSheet> getStyleSheets(std::filesystem::path path);
 
       std::vector<Token> tokenize(std::filesystem::path file);
@@ -63,6 +63,7 @@ namespace Radiant::StyleSheetParser {
       std::unordered_map<std::string, RegisteredFunction> functionRegistry;
 
       TokenType identifyToken(std::string token);
+      StyleSheetValue getValue(AstNode* value);
       void addToken(std::vector<Token>& tokenList, std::string token);
       
       bool isString(const std::string& token);
