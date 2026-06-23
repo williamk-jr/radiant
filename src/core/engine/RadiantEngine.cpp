@@ -14,7 +14,11 @@
 namespace Radiant {
   RadiantEngine::RadiantEngine(const std::string& title, uint32_t width, uint32_t height) {
     this->window = std::make_unique<Window>(title, width, height);
+#ifndef NDEBUG
     this->renderer = std::make_unique<Renderer>(*this->window, true);
+#else
+    this->renderer = std::make_unique<Renderer>(*this->window, false);
+#endif
 
     this->stylesheetParser = std::make_unique<StyleSheetParser::Parser>();
     this->registerProperties();

@@ -2,6 +2,7 @@
 #include "radiant/css/Token.h"
 #include "radiant/css/ast/ast_node.h"
 #include "radiant/util/logger/Logger.h"
+#include <stack>
 #include <stdexcept>
 
 namespace Radiant::StyleSheetParser {
@@ -71,6 +72,63 @@ namespace Radiant::StyleSheetParser {
         default:
           Logger::error("Unidentified token type.");
       }
+    }
+  }
+
+  std::unordered_map<std::string, StyleSheet> AbstractSyntaxTree::toStyleSheets() {
+    std::unordered_map<std::string, StyleSheet> stylesheets;
+    
+    // Level 1: selector blocks
+    for (AstNode* node : this->children) {
+      if (node->type == AstNodeType::SELECTOR) {
+        StyleSheet stylesheet;
+        
+        // Level 2: properties
+        for (AstNode* propertyNode : node->children) {
+          if (propertyNode->type == AstNodeType::PROPERTY) {
+            StyleSheetEntry styleSheetEntry(node->children.size());
+            
+            // Level 3: property values
+            for (AstNode* valueNode : propertyNode->children) {
+              std::string tokenValue(valueNode->token.getValue());
+              styleSheetEntry.add(this->valueOfNode(valueNode)); 
+            }
+            stylesheet.add(propertyNode->token.getValue(), styleSheetEntry);
+
+          }
+        }
+        stylesheets[node->token.getValue()] = stylesheet;
+
+      }
+    }
+    return stylesheets;
+  }
+
+  StyleSheetValue AbstractSyntaxTree::valueOfNode(AstNode* node) {
+    std::string tokenValue = node->token.getValue();
+
+    switch (node->type) {
+      case AstNodeType::UNIT: {
+        return StyleSheetValue::fromString(ValueTypes::UNIT, tokenValue);
+      } case AstNodeType::FLOAT: {
+        return StyleSheetValue::fromString(ValueTypes::FLOAT, tokenValue);
+      } case AstNodeType::INTEGER: {
+        return StyleSheetValue::fromString(ValueTypes::INTEGER, tokenValue);
+      } case AstNodeType::STRING: {
+        return StyleSheetValue::fromString(ValueTypes::STRING, tokenValue);
+      } case AstNodeType::IDENTIFIER: {
+        return StyleSheetValue::fromString(ValueTypes::STRING, tokenValue);
+      } case AstNodeType::COLOR: {
+        return StyleSheetValue::fromString(ValueTypes::COLOR, tokenValue);
+      } case AstNodeType::FUNCTION: {
+        std::vector<StyleSheetValue> parameters;
+        for (int i = 0; i < node->children.size(); i++) {
+          parameters.push_back(this->valueOfNode(node->children[i]));
+        }
+        return StyleSheetValue(Function(tokenValue, parameters));
+      } default:
+        Logger::error("Invalid Property Value: \""+tokenValue+"\"");
+        break;
     }
   }
 

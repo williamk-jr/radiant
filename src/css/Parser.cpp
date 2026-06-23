@@ -34,56 +34,7 @@ namespace Radiant::StyleSheetParser {
     std::vector<Token> tokens = this->tokenize(path); 
     AbstractSyntaxTree abstractSyntaxTree(tokens); 
     abstractSyntaxTree.display();
-
-    std::unordered_map<std::string, StyleSheet> stylesheets;
-    
-    for (AstNode* node : abstractSyntaxTree.children) {
-      if (node->type == AstNodeType::SELECTOR) {
-        StyleSheet stylesheet;
-
-        for (AstNode* propertyNode : node->children) {
-          if (propertyNode->type == AstNodeType::PROPERTY) {
-            StyleSheetEntry styleSheetEntry(node->children.size());
-
-            for (AstNode* valueNode : propertyNode->children) {
-              std::string tokenValue(valueNode->token.getValue());
-              styleSheetEntry.add(this->getValue(valueNode)); 
-            }
-            stylesheet.add(propertyNode->token.getValue(), styleSheetEntry);
-          }
-        }
-        stylesheets[node->token.getValue()] = stylesheet;
-      }
-    }
-    return stylesheets;
-  }
-
-  StyleSheetValue Parser::getValue(AstNode* node) {
-    std::string tokenValue = node->token.getValue();
-
-    switch (node->type) {
-      case AstNodeType::UNIT: {
-        return StyleSheetValue::fromString(ValueTypes::UNIT, tokenValue);
-      } case AstNodeType::FLOAT: {
-        return StyleSheetValue::fromString(ValueTypes::FLOAT, tokenValue);
-      } case AstNodeType::INTEGER: {
-        return StyleSheetValue::fromString(ValueTypes::INTEGER, tokenValue);
-      } case AstNodeType::STRING: {
-        return StyleSheetValue::fromString(ValueTypes::STRING, tokenValue);
-      } case AstNodeType::IDENTIFIER: {
-        return StyleSheetValue::fromString(ValueTypes::STRING, tokenValue);
-      } case AstNodeType::COLOR: {
-        return StyleSheetValue::fromString(ValueTypes::COLOR, tokenValue);
-      } case AstNodeType::FUNCTION: {
-        std::vector<StyleSheetValue> parameters;
-        for (int i = 0; i < node->children.size(); i++) {
-          parameters.push_back(this->getValue(node->children[i]));
-        }
-        return StyleSheetValue(Function(tokenValue, parameters));
-      } default:
-        Logger::error("Invalid Property Value: \""+tokenValue+"\"");
-        break;
-    }
+    return abstractSyntaxTree.toStyleSheets();
   }
 
   std::vector<Token> Parser::tokenize(std::filesystem::path file) {
@@ -99,7 +50,6 @@ namespace Radiant::StyleSheetParser {
     while (std::getline(stream, line)) {
       fileContents += line;
     }
-    
     
     std::string currentToken;
     bool isString = false;
@@ -197,10 +147,6 @@ namespace Radiant::StyleSheetParser {
       }
     }
 
-   // for (Token token : tokens) {
-   //   std::cout << CssParser::tokenTypeToString(token.getType()) << ": " << token.getValue() << "\n";
-   // }
-   // std::cout << fileContents << "\n";
     stream.close();
     return tokens;
   };
