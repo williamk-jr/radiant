@@ -11,6 +11,8 @@ namespace Radiant {
     if (parent != nullptr) {
       parent->addChild(this);
     }
+    this->layoutManager = std::make_unique<LayoutManager>();
+    this->updateLayout();
   }
 
   Widget::Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, uint32_t width, uint32_t height) :
@@ -18,15 +20,19 @@ namespace Radiant {
     if (parent != nullptr) {
       parent->addChild(this);
     }
+    this->layoutManager = std::make_unique<LayoutManager>();
+    this->updateLayout();
   }
   
   Widget::Widget(WidgetManager& manager, uint32_t width, uint32_t height) : 
     parent(nullptr), manager(manager), layoutBox(0, 0, width, height) {
-
+    this->layoutManager = std::make_unique<LayoutManager>();
+    this->updateLayout();
   }
   
   void Widget::addStyle(std::string name, StyleSheetParser::StyleSheetEntry entry) {
     this->styleSheet.add(name, entry);
+    this->updateLayout();
   }
   
   StyleSheetParser::StyleSheetEntry Widget::getStyle(std::string name, StyleSheetParser::StyleSheetEntry defaultEntry) {
@@ -34,8 +40,6 @@ namespace Radiant {
   }
   
   uint32_t Widget::getPositionX() {
-    //StyleSheetParser::Unit right = this->styleSheet.getAbsolute(this->manager.getStyleSheetParser(), "right").get<StyleSheetParser::ValueTypes::UNIT>(0).value();
-    //StyleSheetParser::Unit left = this->styleSheet.getAbsolute(this->manager.getStyleSheetParser(), "left").get<StyleSheetParser::ValueTypes::UNIT>(0).value();
     return this->layoutBox.getPositionX();
   }
 
@@ -50,9 +54,49 @@ namespace Radiant {
   uint32_t Widget::getHeight() {
     return this->layoutBox.getHeight();
   }
+  
+  LayoutManager& Widget::getLayoutManager() {
+    return *this->layoutManager;
+  }
+
+  void Widget::setPositionX(uint32_t x) {
+    this->layoutBox.setPositionX(x);
+  }
+
+  void Widget::setPositionY(uint32_t y) {
+    this->layoutBox.setPositionY(y);
+  }
+
+  void Widget::setWidth(uint32_t width) {
+    this->layoutBox.setWidth(width); 
+  }
+
+  void Widget::setHeight(uint32_t height) {
+    this->layoutBox.setHeight(height);
+  }
+
+  void Widget::setTopOffset(uint32_t offset) {
+    this->layoutBox.setTopOffset(offset);
+  }
+
+  void Widget::setBottomOffset(uint32_t offset) {
+    this->layoutBox.setBottomOffset(offset);
+  }
+
+  void Widget::setLeftOffset(uint32_t offset) {
+    this->layoutBox.setLeftOffset(offset);
+  }
+
+  void Widget::setRightOffset(uint32_t offset) {
+    this->layoutBox.setRightOffset(offset);
+  }
 
   std::vector<Widget*> Widget::getChildren() {
     return this->children;
+  }
+  
+  std::shared_ptr<Widget> Widget::getParent() {
+    return this->parent;
   }
   
   void Widget::addChild(Widget* child) {
@@ -60,22 +104,10 @@ namespace Radiant {
   }
 
   void Widget::render() {
-
+    
   }
 
   void Widget::updateLayout() {
-    uint32_t startX = 0;
-    uint32_t startY = 0;
-
-    switch (this->positionType) {
-      case PositionType::RELATIVE:
-        //startX = this->parent.getPositionX();
-        //startY = this->parent.getPositionY();
-
-        break;
-      case PositionType::ABSOLUTE:
-
-        break;
-    }
+    this->layoutManager->updateLayout(this);
   }
 }

@@ -6,6 +6,9 @@
 #include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
 #include <cstddef>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <memory>
 #include <string>
 #include <vector>
@@ -106,13 +109,16 @@ namespace Radiant {
 
     // Update uniform buffer
     this->descriptorBuffer->resetOffset();
-    uint32_t frameBufferUniformData[2] = {this->frameBufferSize.width, this->frameBufferSize.height};
-    this->descriptorBuffer->append(frameBufferUniformData, sizeof(uint32_t)*2);
+    //uint32_t frameBufferUniformData[2] = {this->frameBufferSize.width, this->frameBufferSize.height};
+    float aspect = (float)this->frameBufferSize.width / (float) this->frameBufferSize.height;
+    glm::mat4 orthoMatrix = glm::ortho(0.0f, (float)this->frameBufferSize.width, 0.0f, (float)this->frameBufferSize.height, -1.0f, 1.0f);
+    //glm::mat4 orthoMatrix = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+    this->descriptorBuffer->append(&orthoMatrix, sizeof(glm::mat4));
     
     // Update uniforms
     this->descriptorPool->updateDescriptorSets({
       VulkanWriteDescriptorSet{this->descriptorSets[currentFrame].get(), 0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, {
-        VkDescriptorBufferInfo{this->descriptorBuffer->get(), 0, sizeof(uint32_t)*2}
+        VkDescriptorBufferInfo{this->descriptorBuffer->get(), 0, sizeof(glm::mat4)}
       }, {}, {}}
     }, {});
     this->commandBuffers[currentFrame].bindDescriptorSets(*this->graphicsPipeline, 0, this->descriptorSets);

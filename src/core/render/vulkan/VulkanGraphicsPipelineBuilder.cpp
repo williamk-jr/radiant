@@ -189,9 +189,15 @@ namespace Radiant {
     }
     
     const char* cShaderPath = shaderPath.c_str();
+    Slang::ComPtr<slang::IBlob> diagnostics;
     Slang::ComPtr<slang::IModule> slangModule{
-      slangSession->loadModuleFromSource("test", cShaderPath, nullptr, nullptr)
+      slangSession->loadModuleFromSource("test", cShaderPath, nullptr, diagnostics.writeRef())
     };
+    
+    if (diagnostics != nullptr) {
+      const char* message = (const char*) diagnostics->getBufferPointer();
+      Logger::error(message);
+    }
 
     Slang::ComPtr<slang::IBlob> spirv;
     slangModule->getTargetCode(0, spirv.writeRef());

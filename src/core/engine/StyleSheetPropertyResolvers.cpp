@@ -9,7 +9,7 @@ namespace Radiant::PropertyResolvers {
     for (int i = 0; i < values.size(); i++) {
       StyleSheetParser::Unit relativeValue = values.get<StyleSheetParser::ValueTypes::UNIT>(i).value();
       //Logger::info("Value: " + std::to_string(relativeValue.getValue()));
-      resolvedValues.add({relativeValue.resolve()});
+      resolvedValues.add({relativeValue.resolve(0)});
     }
 
     return resolvedValues;

@@ -46,6 +46,7 @@ add_executable(Radiant
   src/core/engine/StyleSheetPropertyResolvers.cpp
   src/core/engine/StyleSheetStandardFunctions.cpp
   src/core/engine/layout/WidgetManager.cpp
+  src/core/engine/layout/LayoutManager.cpp
   src/core/engine/widgets/widget.cpp
 
   src/core/render/vulkan/VulkanInstance.cpp

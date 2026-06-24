@@ -1,12 +1,13 @@
 #pragma once
 
-#include "radiant/core/engine/widgets/widget.h"
 namespace Radiant {
+  class Widget;
+
   class LayoutManager {
     public:
-      LayoutManager(Widget* widget);
+      LayoutManager() = default;
 
-      void updateLayout();
+      void updateLayout(Widget* widget);
       float resolveRelativeStyle();
 
     private:

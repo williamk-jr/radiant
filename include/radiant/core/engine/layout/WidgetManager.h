@@ -10,6 +10,7 @@ namespace Radiant {
   class WidgetManager {
     public:
       WidgetManager(Window& window, StyleSheetParser::Parser& styleSheetParser);
+
       std::shared_ptr<Widget> getRootWidget();
       StyleSheetParser::Parser& getStyleSheetParser();
       RenderBatch createRenderBatch();

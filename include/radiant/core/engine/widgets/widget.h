@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include "radiant/core/engine/LayoutBox.h"
+#include "radiant/core/engine/layout/LayoutManager.h"
 #include "radiant/core/render/renderable.h"
 #include "radiant/css/Parser.h"
 
@@ -31,8 +32,22 @@ namespace Radiant {
       uint32_t getWidth();
       uint32_t getHeight();
 
+      LayoutManager& getLayoutManager();
+
+      void setPositionX(uint32_t x);
+      void setPositionY(uint32_t y);
+
+      void setWidth(uint32_t width);
+      void setHeight(uint32_t height);
+
+      void setTopOffset(uint32_t offset);
+      void setBottomOffset(uint32_t offset);
+      void setLeftOffset(uint32_t offset);
+      void setRightOffset(uint32_t offset);
+
       void updateLayout();
       std::vector<Widget*> getChildren();
+      std::shared_ptr<Widget> getParent();
       void addChild(Widget* child);
 
       void render() override;
@@ -43,6 +58,7 @@ namespace Radiant {
       PositionType positionType = PositionType::RELATIVE;
 
       WidgetManager& manager; 
+      std::unique_ptr<LayoutManager> layoutManager;
       LayoutBox layoutBox;
       StyleSheetParser::StyleSheet styleSheet;
 

@@ -8,11 +8,11 @@ namespace Radiant {
     positionX(positionX), positionY(positionY), width(width), height(height) {}
   
   uint32_t LayoutBox::getPositionX() {
-    return this->positionX;
+    return this->positionX + this->left - this->right;
   }
 
   uint32_t LayoutBox::getPositionY() {
-    return this->positionY;
+    return this->positionY + this->top - this->bottom;
   }
 
   uint32_t LayoutBox::getWidth() {
@@ -23,11 +23,35 @@ namespace Radiant {
     return this->height;
   }
 
-  void LayoutBox::offsetX(int32_t offset) {
-    this->positionX += offset;
+  void LayoutBox::setPositionX(uint32_t x) {
+    this->positionX = x;
   }
 
-  void LayoutBox::offsetY(int32_t offset) {
-    this-> positionY += offset;
+  void LayoutBox::setPositionY(uint32_t y) {
+    this->positionY = y;
+  }
+
+  void LayoutBox::setWidth(uint32_t width) {
+    this->width = width;
+  }
+
+  void LayoutBox::setHeight(uint32_t height) {
+    this->height = height;
+  }
+
+  void LayoutBox::setTopOffset(uint32_t offset) {
+    this->top = offset;
+  }
+
+  void LayoutBox::setBottomOffset(uint32_t offset) {
+    this->bottom = offset;
+  }
+
+  void LayoutBox::setLeftOffset(uint32_t offset) {
+    this->left = offset;
+  }
+
+  void LayoutBox::setRightOffset(uint32_t offset) {
+    this->right = offset;
   }
 }

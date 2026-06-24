@@ -1,5 +1,6 @@
 #pragma once
 #include "radiant/css/values/IValue.h"
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 
@@ -16,7 +17,7 @@ namespace Radiant::StyleSheetParser {
       float getValue();
       UnitType getUnit();
 
-      Unit resolve() override;
+      Unit resolve(float referenceLength) override;
 
       static Unit fromString(std::string str);
     private:

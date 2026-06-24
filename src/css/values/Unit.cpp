@@ -20,9 +20,11 @@ namespace Radiant::StyleSheetParser {
     return this->unit;
   }
 
-  Unit Unit::resolve() {
+  Unit Unit::resolve(float referenceLength) {
     switch (this->unit) {
       case UnitType::PERCENTAGE:
+        return Unit( (this->value/100) * referenceLength, UnitType::PIXEL );
+      case UnitType::PIXEL:
         return *this;
     }
     return *this;

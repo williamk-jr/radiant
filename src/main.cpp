@@ -38,12 +38,15 @@ int main() {
 
   Radiant::Widget testWidget(
       engine.getRootWidget(),
-      100, 100,
+      0, 0,
       200, 200
   );
 
-  testWidget.addStyle("right", {
-      {Radiant::StyleSheetParser::Unit(-100.0, Radiant::StyleSheetParser::UnitType::PIXEL)}
+  testWidget.addStyle("left", {
+      {Radiant::StyleSheetParser::Unit(10.0, Radiant::StyleSheetParser::UnitType::PIXEL)}
+  });
+  testWidget.addStyle("top", {
+      {Radiant::StyleSheetParser::Unit(10.0, Radiant::StyleSheetParser::UnitType::PIXEL)}
   });
 
   testWidget.addStyle("background-color", {

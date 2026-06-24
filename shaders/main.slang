@@ -19,7 +19,7 @@ struct VertexOutput {
 };
 
 struct ShaderData {
-  uint32_t2 frameBufferSize;
+  float4x4 orthoMatrix;
 };
 
 uniform ShaderData shaderData;
@@ -27,15 +27,14 @@ uniform ShaderData shaderData;
 [shader("vertex")]
 VertexOutput main(VertexInput vertex, uint instanceId : SV_InstanceID) {
   float2 normalizedVertexPosition = (vertex.position.xy + 1) / 2;
-
-  float sizeX = vertex.screenSize.x * normalizedVertexPosition.x;
-  float sizeY = vertex.screenSize.y * normalizedVertexPosition.y;
   
-  float newX = ( (vertex.screenPosition.x + sizeX) / (float)shaderData.frameBufferSize.x) * 2.0 - 1.0;
-  float newY = ( (vertex.screenPosition.y + sizeY) / (float)shaderData.frameBufferSize.y) * 2.0 - 1.0;
+  float2 size = vertex.screenSize * normalizedVertexPosition;
+  float2 vertexPos = size + vertex.screenPosition.xy;
+
+  float4 pos = mul(shaderData.orthoMatrix, float4(vertexPos, 0.0, 1.0));
 
   return {
-    float4(newX, newY, vertex.position.z, 1.0), vertex.normal, vertex.uv,
+    pos, vertex.normal, vertex.uv,
     vertex.color, vertex.screenPosition, vertex.screenSize
   };
 }
@@ -43,5 +42,4 @@ VertexOutput main(VertexInput vertex, uint instanceId : SV_InstanceID) {
 [shader("fragment")]
 float4 main(VertexOutput vertex) {
   return normalize(vertex.color);
-  //return float4(vertex.uv.x, vertex.uv.y, 0.0, 1.0);
 }
