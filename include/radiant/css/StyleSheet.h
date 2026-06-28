@@ -10,6 +10,8 @@ namespace Radiant::StyleSheetParser {
   class StyleSheet {
     public:
       void add(std::string name, StyleSheetEntry entry);
+      size_t size() const;
+
       StyleSheetEntry getOrDefault(std::string name, StyleSheetEntry defaultEntry);
       StyleSheetEntry getAbsolute(Parser& parser, std::string name);
       

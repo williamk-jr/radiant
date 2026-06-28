@@ -7,10 +7,36 @@
 #include <memory>
 #include <string>
 
+/*
+ * Finalize current position
+ * 
+ * Prevent overlap of children
+ *
+ * largestHeight = 0
+ *
+ * offsetX = 0
+ * offsetY = 0
+ *
+ * for child in children:
+ *    child.setPosition(offsetX, offsetY)
+ *
+ *    if ( (child.getX() + child.getWidth()) > (current.getX() + current.getWidth()) ):
+ *      offsetX = 0;
+ *      offsetY += largestHeight;
+ *      largestHeight = 0;
+ *    else:
+ *      offsetX += child.getWidth()
+ *      if (child.getHeight() > largestHeight):
+ *        largestHeight = child.getHeight()
+ *
+ *   
+ *
+ */
+
 namespace Radiant {
   void LayoutManager::updateLayout(Widget* widget) {
     std::shared_ptr<Widget> parent = widget->getParent();
-    std::vector<Widget*> children = widget->getChildren();  
+    std::vector<Widget*> children = widget->getChildren();
 
     uint32_t refWidth = parent != nullptr ? parent->getWidth() : 0;
     uint32_t refHeight = parent != nullptr ? parent->getHeight() : 0;
@@ -25,16 +51,34 @@ namespace Radiant {
     StyleSheetParser::Unit leftAbsolute = left.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refWidth); 
     StyleSheetParser::Unit rightAbsolute = right.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refWidth);
 
-    Logger::info("Abs val: " + std::to_string(topAbsolute.getValue()));
-    Logger::info("Current Pos: " + std::to_string(widget->getPositionY()));
-
     widget->setTopOffset(topAbsolute.getValue());
     widget->setBottomOffset(bottomAbsolute.getValue());
     widget->setLeftOffset(leftAbsolute.getValue());
     widget->setRightOffset(rightAbsolute.getValue());
     
+    
+    uint32_t offsetX = 0;
+    uint32_t offsetY = 0;
+    uint32_t largestHeight = 0;
 
-    Logger::info("Final pos: " + std::to_string(widget->getPositionY()));
-
+    for (Widget* child : children) {
+      // Prevent overflow, wrap to next line
+      if ( (child->getPositionX() + child->getWidth()) > (widget->getPositionX() + widget->getWidth()) ) {
+        offsetY += largestHeight;
+        offsetX = 0;
+        largestHeight = 0;
+      }
+      
+      // Update child
+      child->setPositionX(widget->getPositionX() + offsetX);
+      child->setPositionY(widget->getPositionY() + offsetY);
+      child->updateLayout();
+      
+      // Update offset
+      offsetX += child->getWidth();
+      if (child->getHeight() > largestHeight) {
+        largestHeight = child->getHeight();
+      }
+    }
   }
 }

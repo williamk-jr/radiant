@@ -5,6 +5,7 @@
 #include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/StyleSheetValue.h"
 #include "radiant/css/values/Color.h"
+#include "radiant/util/logger/Logger.h"
 #include <memory>
 #include <stack>
 #include <string>

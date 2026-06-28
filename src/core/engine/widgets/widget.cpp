@@ -1,42 +1,49 @@
 #include "radiant/core/engine/widgets/widget.h"
 #include "radiant/core/engine/LayoutBox.h"
+#include "radiant/core/engine/layout/LayoutManager.h"
 #include "radiant/core/engine/layout/WidgetManager.h"
+#include "radiant/css/StyleSheet.h"
 #include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/values/Unit.h"
+#include "radiant/util/logger/Logger.h"
 #include <memory>
+#include <string>
 
 namespace Radiant {
   Widget::Widget(std::shared_ptr<Widget> parent, uint32_t width, uint32_t height) :
     parent(parent), manager(parent->manager), layoutBox(0, 0, width, height) {
+    this->styleSheet = std::make_unique<StyleSheetParser::StyleSheet>();
     if (parent != nullptr) {
       parent->addChild(this);
     }
-    this->layoutManager = std::make_unique<LayoutManager>();
+    //this->layoutManager = std::make_unique<LayoutManager>();
     this->updateLayout();
   }
 
   Widget::Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, uint32_t width, uint32_t height) :
     parent(parent), manager(parent->manager), layoutBox(positionX, positionY, width, height) {
+    this->styleSheet = std::make_unique<StyleSheetParser::StyleSheet>();
     if (parent != nullptr) {
       parent->addChild(this);
     }
-    this->layoutManager = std::make_unique<LayoutManager>();
+    //this->layoutManager = std::make_unique<LayoutManager>();
     this->updateLayout();
   }
   
   Widget::Widget(WidgetManager& manager, uint32_t width, uint32_t height) : 
     parent(nullptr), manager(manager), layoutBox(0, 0, width, height) {
-    this->layoutManager = std::make_unique<LayoutManager>();
+    //this->layoutManager = std::make_unique<LayoutManager>();
+    this->styleSheet = std::make_unique<StyleSheetParser::StyleSheet>();
     this->updateLayout();
   }
-  
+
   void Widget::addStyle(std::string name, StyleSheetParser::StyleSheetEntry entry) {
-    this->styleSheet.add(name, entry);
+    this->styleSheet->add(name, entry);
     this->updateLayout();
   }
   
   StyleSheetParser::StyleSheetEntry Widget::getStyle(std::string name, StyleSheetParser::StyleSheetEntry defaultEntry) {
-    return this->styleSheet.getOrDefault(name, defaultEntry);
+    return this->styleSheet->getOrDefault(name, defaultEntry);
   }
   
   uint32_t Widget::getPositionX() {
@@ -56,7 +63,7 @@ namespace Radiant {
   }
   
   LayoutManager& Widget::getLayoutManager() {
-    return *this->layoutManager;
+    return this->layoutManager;
   }
 
   void Widget::setPositionX(uint32_t x) {
@@ -101,6 +108,7 @@ namespace Radiant {
   
   void Widget::addChild(Widget* child) {
     this->children.push_back(child);
+    this->updateLayout();
   }
 
   void Widget::render() {
@@ -108,6 +116,6 @@ namespace Radiant {
   }
 
   void Widget::updateLayout() {
-    this->layoutManager->updateLayout(this);
+    this->layoutManager.updateLayout(this);
   }
 }

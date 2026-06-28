@@ -55,12 +55,11 @@ namespace Radiant {
     private:
       std::shared_ptr<Widget> parent;
       std::vector<Widget*> children;
-      PositionType positionType = PositionType::RELATIVE;
 
       WidgetManager& manager; 
-      std::unique_ptr<LayoutManager> layoutManager;
+      LayoutManager layoutManager;
       LayoutBox layoutBox;
-      StyleSheetParser::StyleSheet styleSheet;
+      std::unique_ptr<StyleSheetParser::StyleSheet> styleSheet;
 
       Widget(WidgetManager& manager, uint32_t width, uint32_t height);
 

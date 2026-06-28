@@ -31,9 +31,9 @@ namespace Radiant {
     this->indexBuffer = renderer->createIndexBuffer(2048);
 
     std::unordered_map<std::string, StyleSheetParser::StyleSheet> styleSheets = this->stylesheetParser->getStyleSheets("./assets/test.css");
-    for (std::pair<std::string, StyleSheetParser::StyleSheet> entry : styleSheets) {
-      Logger::info(entry.first);
-    }
+    //for (std::pair<std::string, StyleSheetParser::StyleSheet>& entry : styleSheets) {
+    //  Logger::info(entry.first);
+    //}
 
     Quad2D quad;
     std::vector<Vertex> verticies = quad.getVerticies();

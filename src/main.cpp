@@ -1,10 +1,12 @@
 #include "radiant/core/engine/RadiantEngine.h"
+#include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/StyleSheetValue.h"
 #include "radiant/css/values/Color.h"
 #include "radiant/css/values/Unit.h"
 #include "radiant/core/engine/widgets/widget.h"
 #include "radiant/core/render/Rect2D.h"
 #include <cstdint>
+#include <memory>
 #include <string>
 #define GLFW_INCLUDE_VULKAN
 
@@ -35,23 +37,30 @@ int main() {
 
   const std::string applicationName = "Test";
   Radiant::RadiantEngine engine(applicationName, 500, 500);
+  
+  std::vector<std::shared_ptr<Radiant::Widget>> widgets;
 
-  Radiant::Widget testWidget(
+  for (int i = 0; i < 6; i++) {
+    widgets.push_back(std::make_shared<Radiant::Widget>(
       engine.getRootWidget(),
       0, 0,
-      200, 200
-  );
+      100, 100
+    ));
 
-  testWidget.addStyle("left", {
+    widgets[i]->addStyle("left", {
       {Radiant::StyleSheetParser::Unit(10.0, Radiant::StyleSheetParser::UnitType::PIXEL)}
-  });
-  testWidget.addStyle("top", {
-      {Radiant::StyleSheetParser::Unit(10.0, Radiant::StyleSheetParser::UnitType::PIXEL)}
-  });
+    });
 
-  testWidget.addStyle("background-color", {
+    widgets[i]->addStyle("background-color", {
       {Radiant::StyleSheetParser::Color(0, 255, 0, 255)}
-  });
+    });
+  }
+  //testWidget.addStyle("left", {
+  //    {Radiant::StyleSheetParser::Unit(10.0, Radiant::StyleSheetParser::UnitType::PIXEL)}
+  //});
+  //testWidget.addStyle("top", {
+  //    {Radiant::StyleSheetParser::Unit(10.0, Radiant::StyleSheetParser::UnitType::PERCENTAGE)}
+  //});
 
   while (engine.isRunning()) {
     engine.update(); 
