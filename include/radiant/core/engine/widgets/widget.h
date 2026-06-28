@@ -33,6 +33,7 @@ namespace Radiant {
       uint32_t getHeight();
 
       LayoutManager& getLayoutManager();
+      const LayoutBox& getLayoutBox();
 
       void setPositionX(uint32_t x);
       void setPositionY(uint32_t y);
@@ -59,7 +60,7 @@ namespace Radiant {
       WidgetManager& manager; 
       LayoutManager layoutManager;
       LayoutBox layoutBox;
-      std::unique_ptr<StyleSheetParser::StyleSheet> styleSheet;
+      StyleSheetParser::StyleSheet styleSheet;
 
       Widget(WidgetManager& manager, uint32_t width, uint32_t height);
 

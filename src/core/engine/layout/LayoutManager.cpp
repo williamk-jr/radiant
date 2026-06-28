@@ -55,29 +55,34 @@ namespace Radiant {
     widget->setBottomOffset(bottomAbsolute.getValue());
     widget->setLeftOffset(leftAbsolute.getValue());
     widget->setRightOffset(rightAbsolute.getValue());
-    
+
+    const LayoutBox& widgetLayoutBox = widget->getLayoutBox();
     
     uint32_t offsetX = 0;
     uint32_t offsetY = 0;
     uint32_t largestHeight = 0;
 
     for (Widget* child : children) {
+      const LayoutBox& childLayoutBox = child->getLayoutBox();
+      
+
       // Prevent overflow, wrap to next line
-      if ( (child->getPositionX() + child->getWidth()) > (widget->getPositionX() + widget->getWidth()) ) {
+      if ( (childLayoutBox.getMarginBoxX() + childLayoutBox.getMarginBoxWidth()) > (widgetLayoutBox.getContentBoxX() + widgetLayoutBox.getContentBoxWidth()) ) {
         offsetY += largestHeight;
         offsetX = 0;
         largestHeight = 0;
       }
       
       // Update child
-      child->setPositionX(widget->getPositionX() + offsetX);
-      child->setPositionY(widget->getPositionY() + offsetY);
+      child->setPositionX(widgetLayoutBox.getContentBoxX() + offsetX);
+      child->setPositionY(widgetLayoutBox.getContentBoxY() + offsetY);
       child->updateLayout();
       
       // Update offset
-      offsetX += child->getWidth();
-      if (child->getHeight() > largestHeight) {
-        largestHeight = child->getHeight();
+      offsetX += childLayoutBox.getMarginBoxWidth();
+      Logger::info(std::to_string(childLayoutBox.getMarginBoxWidth()));
+      if (childLayoutBox.getMarginBoxHeight() > largestHeight) {
+        largestHeight = childLayoutBox.getMarginBoxHeight();
       }
     }
   }

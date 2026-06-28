@@ -12,58 +12,56 @@
 namespace Radiant {
   Widget::Widget(std::shared_ptr<Widget> parent, uint32_t width, uint32_t height) :
     parent(parent), manager(parent->manager), layoutBox(0, 0, width, height) {
-    this->styleSheet = std::make_unique<StyleSheetParser::StyleSheet>();
     if (parent != nullptr) {
       parent->addChild(this);
     }
-    //this->layoutManager = std::make_unique<LayoutManager>();
     this->updateLayout();
   }
 
   Widget::Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, uint32_t width, uint32_t height) :
     parent(parent), manager(parent->manager), layoutBox(positionX, positionY, width, height) {
-    this->styleSheet = std::make_unique<StyleSheetParser::StyleSheet>();
     if (parent != nullptr) {
       parent->addChild(this);
     }
-    //this->layoutManager = std::make_unique<LayoutManager>();
     this->updateLayout();
   }
   
   Widget::Widget(WidgetManager& manager, uint32_t width, uint32_t height) : 
     parent(nullptr), manager(manager), layoutBox(0, 0, width, height) {
-    //this->layoutManager = std::make_unique<LayoutManager>();
-    this->styleSheet = std::make_unique<StyleSheetParser::StyleSheet>();
     this->updateLayout();
   }
 
   void Widget::addStyle(std::string name, StyleSheetParser::StyleSheetEntry entry) {
-    this->styleSheet->add(name, entry);
+    this->styleSheet.add(name, entry);
     this->updateLayout();
   }
   
   StyleSheetParser::StyleSheetEntry Widget::getStyle(std::string name, StyleSheetParser::StyleSheetEntry defaultEntry) {
-    return this->styleSheet->getOrDefault(name, defaultEntry);
+    return this->styleSheet.getOrDefault(name, defaultEntry);
   }
   
   uint32_t Widget::getPositionX() {
-    return this->layoutBox.getPositionX();
+    return this->layoutBox.getPaddingBoxX();
   }
 
   uint32_t Widget::getPositionY() {
-    return this->layoutBox.getPositionY();
+    return this->layoutBox.getPaddingBoxY();
   }
   
   uint32_t Widget::getWidth() {
-    return this->layoutBox.getWidth();
+    return this->layoutBox.getPaddingBoxWidth();
   }
 
   uint32_t Widget::getHeight() {
-    return this->layoutBox.getHeight();
+    return this->layoutBox.getPaddingBoxHeight();
   }
   
   LayoutManager& Widget::getLayoutManager() {
     return this->layoutManager;
+  }
+
+  const LayoutBox& Widget::getLayoutBox() {
+    return this->layoutBox;
   }
 
   void Widget::setPositionX(uint32_t x) {
