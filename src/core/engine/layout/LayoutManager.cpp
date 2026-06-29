@@ -56,6 +56,13 @@ namespace Radiant {
     widget->setLeftOffset(leftAbsolute.getValue());
     widget->setRightOffset(rightAbsolute.getValue());
 
+
+    /* Child Layout Manager.
+     * 
+     * All children are laid out in relation to the parent's content box.
+     * Children are position using their margin box, as it is the outermost layer in the box model.
+     */
+
     const LayoutBox& widgetLayoutBox = widget->getLayoutBox();
     
     uint32_t offsetX = 0;
@@ -64,10 +71,10 @@ namespace Radiant {
 
     for (Widget* child : children) {
       const LayoutBox& childLayoutBox = child->getLayoutBox();
-      
 
       // Prevent overflow, wrap to next line
-      if ( (childLayoutBox.getMarginBoxX() + childLayoutBox.getMarginBoxWidth()) > (widgetLayoutBox.getContentBoxX() + widgetLayoutBox.getContentBoxWidth()) ) {
+      if ( (childLayoutBox.getMarginBoxX() + childLayoutBox.getMarginBoxWidth()) > 
+           (widgetLayoutBox.getContentBoxX() + widgetLayoutBox.getContentBoxWidth()) ) {
         offsetY += largestHeight;
         offsetX = 0;
         largestHeight = 0;
@@ -80,7 +87,6 @@ namespace Radiant {
       
       // Update offset
       offsetX += childLayoutBox.getMarginBoxWidth();
-      Logger::info(std::to_string(childLayoutBox.getMarginBoxWidth()));
       if (childLayoutBox.getMarginBoxHeight() > largestHeight) {
         largestHeight = childLayoutBox.getMarginBoxHeight();
       }

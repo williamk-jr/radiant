@@ -57,6 +57,18 @@ namespace Radiant {
       void bindInstanceBuffer(InstanceBuffer& instanceBuffer, VkDeviceSize size);
       void bindIndexBuffer(IndexBuffer& indexBuffer);
 
+      template<typename T>
+      void updateUniformBuffer(T value) {
+        size_t currentOffset = this->descriptorBuffer->getOffset();
+        this->descriptorBuffer->append(&value, sizeof(T));
+
+        this->descriptorBufferWrites.push_back(
+            VkDescriptorBufferInfo{this->descriptorBuffer->get(), currentOffset, sizeof(T)}
+        );
+      }
+
+      void bindDescriptorSets();
+
       void drawIndexed(uint32_t indexCount, uint32_t instanceCount);
       void clear(Color color);
       void clear(Color color, VkRect2D clearArea);
@@ -94,6 +106,10 @@ namespace Radiant {
       std::unique_ptr<VulkanPipeline> graphicsPipeline;
 
       std::unique_ptr<RenderContext> context;
+      
+      std::vector<VkDescriptorBufferInfo> descriptorBufferWrites;
+
+
       int currentFrame = 0;
       bool updateSwapchain = false;
       Rect2D frameBufferSize;

@@ -6,6 +6,7 @@
 #include "radiant/core/render/Window.h"
 #include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/Parser.h"
+#include <glm/ext/matrix_clip_space.hpp>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -31,16 +32,10 @@ namespace Radiant {
     this->indexBuffer = renderer->createIndexBuffer(2048);
 
     std::unordered_map<std::string, StyleSheetParser::StyleSheet> styleSheets = this->stylesheetParser->getStyleSheets("./assets/test.css");
-    //for (std::pair<std::string, StyleSheetParser::StyleSheet>& entry : styleSheets) {
-    //  Logger::info(entry.first);
-    //}
 
     Quad2D quad;
     std::vector<Vertex> verticies = quad.getVerticies();
     std::vector<uint16_t> indicies = quad.getIndicies();
-    //std::vector<Instance> instances = {
-    //  {{255, 0, 0, 255}, {100, 100, 0}, {200, 200}}
-    //};
 
     this->vertexBuffer->append(verticies);
     this->indexBuffer->append(indicies);
@@ -75,7 +70,6 @@ namespace Radiant {
 
   void RadiantEngine::update() {
     RenderBatch batch = this->widgetManager->createRenderBatch();
-    //Logger::info(std::to_string(batch.instances.size()));
     if (!batch.instances.empty()) { // If empty, instanceBuffer does not need to be updated
       this->instanceBuffer->resetOffset();
       this->instanceBuffer->append(batch.instances);
@@ -85,9 +79,14 @@ namespace Radiant {
     renderer->beginFrame(*window);
     renderer->beginRendering(color);
 
+
     Radiant::Rect2D frameBufferSize = window->getFrameBufferSize();
     renderer->setViewport(frameBufferSize.width, frameBufferSize.height, 0, 1.0);
     renderer->setScissor(frameBufferSize.width, frameBufferSize.height);
+
+    glm::mat4 orthoMatrix = glm::ortho(0.0f, (float)frameBufferSize.width, 0.0f, (float)frameBufferSize.height, -1.0f, 1.0f);
+    renderer->updateUniformBuffer(orthoMatrix);
+    renderer->bindDescriptorSets();
 
     renderer->bindVertexBuffer(*this->vertexBuffer);
     renderer->bindInstanceBuffer(*this->instanceBuffer, sizeof(Instance)*batch.instances.size());

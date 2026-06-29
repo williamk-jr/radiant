@@ -92,7 +92,6 @@ namespace Radiant {
     }
 
     float* rawColor = clearColor.raw();
-
     std::vector<VkRenderingAttachmentInfo> colorAttachment(1);
     colorAttachment[0].sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
     colorAttachment[0].imageLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
@@ -107,20 +106,22 @@ namespace Radiant {
     this->commandBuffers[currentFrame].beginRendering(&colorAttachment, nullptr, nullptr, renderArea, 0);
     this->commandBuffers[currentFrame].bindPipeline(*this->graphicsPipeline);
 
-    // Update uniform buffer
+    // Clear uniform buffer and buffer writes from previous frame.
     this->descriptorBuffer->resetOffset();
-    //uint32_t frameBufferUniformData[2] = {this->frameBufferSize.width, this->frameBufferSize.height};
-    float aspect = (float)this->frameBufferSize.width / (float) this->frameBufferSize.height;
-    glm::mat4 orthoMatrix = glm::ortho(0.0f, (float)this->frameBufferSize.width, 0.0f, (float)this->frameBufferSize.height, -1.0f, 1.0f);
-    //glm::mat4 orthoMatrix = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
-    this->descriptorBuffer->append(&orthoMatrix, sizeof(glm::mat4));
-    
-    // Update uniforms
+    this->descriptorBufferWrites.clear();
+  }
+
+  void Renderer::bindDescriptorSets() {
     this->descriptorPool->updateDescriptorSets({
-      VulkanWriteDescriptorSet{this->descriptorSets[currentFrame].get(), 0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, {
-        VkDescriptorBufferInfo{this->descriptorBuffer->get(), 0, sizeof(glm::mat4)}
-      }, {}, {}}
+      VulkanWriteDescriptorSet{
+        this->descriptorSets[currentFrame].get(), 
+        0, 0, 
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 
+        this->descriptorBufferWrites, 
+        {}, {}
+      }
     }, {});
+
     this->commandBuffers[currentFrame].bindDescriptorSets(*this->graphicsPipeline, 0, this->descriptorSets);
   }
 
@@ -231,7 +232,6 @@ namespace Radiant {
 
     VulkanSemaphoreSubmitInfo frameFinishedSemaphoreSubmitInfo{};
     frameFinishedSemaphoreSubmitInfo.semaphore = &this->frameFinishedSemaphores[currentFrame];
-    
 
     this->graphicsQueue->submit(
         this->commandBuffers[currentFrame], 
@@ -323,7 +323,6 @@ namespace Radiant {
     this->descriptorPool = std::make_unique<VulkanDescriptorPool>(*this->device, std::vector<VkDescriptorPoolSize>{
       {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3}
     }, 10);
-
     this->descriptorSets = this->descriptorPool->allocateDescriptorSets(this->descriptorSetLayouts);
 
 
