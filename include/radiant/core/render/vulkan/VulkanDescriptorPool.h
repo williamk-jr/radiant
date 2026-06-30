@@ -28,8 +28,18 @@ namespace Radiant {
     uint32_t descriptorCount;
   };
 
+  /* VulkanDescriptorPool
+   *
+   * Wrapper for VkDescriptorPool.
+   * A pool of resources rom which all descriptor sets are allocated from.
+   */
   class VulkanDescriptorPool {
     public:
+      /*
+       * @param VulkanDevice& A reference to a valid vulkan device.
+       * @param std::vector<VkDescriptorPoolSize> A vector of sizes for each descriptor pool.
+       * @param uint32_t The maximum number of descriptor sets that can be allocated.
+       */
       VulkanDescriptorPool(VulkanDevice& device, std::vector<VkDescriptorPoolSize> poolSizes, uint32_t maxDescriptorSets);
       VulkanDescriptorPool(const VulkanDescriptorPool&) = delete;
       VulkanDescriptorPool& operator=(const VulkanDescriptorPool&) = delete;
@@ -38,12 +48,31 @@ namespace Radiant {
       VulkanDescriptorPool& operator=(VulkanDescriptorPool&&) noexcept = default;
       ~VulkanDescriptorPool();
 
+      /*
+       * @return A raw VkDescriptorPool.
+       */
       VkDescriptorPool get();
+
+      /*
+       * Resets descriptor pool, freeing all allocated descriptor sets.
+       */
       void reset();
 
+      /*
+       * Allocates descriptor sets.
+       *
+       * @param std::vector<VulkanDescriptorSetLayout>& A reference to a vector o descriptor set layouts.
+       * @return A vector of descriptor sets.
+       */
       std::vector<VulkanDescriptorSet> allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts);
+
+      /*
+       * Updates descriptor sets.
+       *
+       * @param std::vector<VulkanWriteDescriptorSet>> A vector of write instructions for each descriptor to be updated.
+       * @param std::vector<VulkanCopyDescriptorSet>> A vector of copy instructions for each descriptor to be updated.
+       */
       void updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites, std::vector<VulkanCopyDescriptorSet> descriptorSetCopies);
-      VulkanDescriptorSet& getDescriptorSet(uint32_t index);
 
     private:
       VkDescriptorPool descriptorPool;

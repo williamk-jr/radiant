@@ -8,6 +8,10 @@
 #include <vulkan/vulkan.h>
 
 namespace Radiant {
+  /* VulkanInstance
+   *
+   *  Wrapper class for VkInstance.
+   */
   class VulkanInstance {
     public:
       VulkanInstance(
@@ -22,11 +26,14 @@ namespace Radiant {
       VulkanInstance& operator=(VulkanInstance&&) noexcept = default;
       ~VulkanInstance();
       
+      /* 
+       * @return returns a raw VkInstance
+       */
       VkInstance get();
       
     private:
       VkInstance instance;
-
+      
       static VkBool32 debugCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
         VkDebugUtilsMessageTypeFlagsEXT messageTypes,

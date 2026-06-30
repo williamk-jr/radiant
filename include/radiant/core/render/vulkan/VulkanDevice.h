@@ -10,6 +10,11 @@
 
 
 namespace Radiant {
+  /* VulkanDevice
+   *
+   * A wrapper for VkDevice.
+   * Represents a logical device that handles dispatching commands to the physical device.
+   */
   class VulkanDevice {
     public:
       VulkanDevice(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface, std::vector<const char*>& extensions);
@@ -20,10 +25,24 @@ namespace Radiant {
       VulkanDevice& operator=(VulkanDevice&&) noexcept = default;
       ~VulkanDevice();
 
+      /*
+       * @return A raw VkDevice.
+       */
       VkDevice get();
+
+      /*
+       * @return Index to a queue with graphics capabilities.
+       */
       uint32_t getGraphicsQueueFamily();
+
+      /*
+       * @return Index to a queue with present capabilities.
+       */
       uint32_t getPresentQueueFamily();
       
+      /*
+       * Waits until this device is no longer processing any work.
+       */
       void waitIdle();
 
     private:

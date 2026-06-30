@@ -79,19 +79,21 @@ namespace Radiant {
     renderer->beginFrame(*window);
     renderer->beginRendering(color);
 
-
     Radiant::Rect2D frameBufferSize = window->getFrameBufferSize();
     renderer->setViewport(frameBufferSize.width, frameBufferSize.height, 0, 1.0);
     renderer->setScissor(frameBufferSize.width, frameBufferSize.height);
 
+    // Update uniforms
     glm::mat4 orthoMatrix = glm::ortho(0.0f, (float)frameBufferSize.width, 0.0f, (float)frameBufferSize.height, -1.0f, 1.0f);
     renderer->updateUniformBuffer(orthoMatrix);
     renderer->bindDescriptorSets();
 
+    // Bind buffers
     renderer->bindVertexBuffer(*this->vertexBuffer);
     renderer->bindInstanceBuffer(*this->instanceBuffer, sizeof(Instance)*batch.instances.size());
     renderer->bindIndexBuffer(*this->indexBuffer);
 
+    // Draw
     renderer->drawIndexed(6, batch.instances.size());
 
     renderer->endRendering();
