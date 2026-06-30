@@ -26,9 +26,27 @@
 #include "radiant/core/render/Window.h"
 
 #include "radiant/util/logger/Logger.h"
-bool physicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
-  return true;
-}
+
+/* TODO
+ *
+ * ----CSS Parser----
+ * - Integrate CSS parser with widget styles.
+ * - Implement CSS selectors.
+ *   - Turn parsed selectors into a lookup function.
+ *   - Integrate lookup function into widget identifier system.
+ * - Implement @ properties.
+ *
+ * ----Layout Manager----
+ * - Integrate more stylesheet properties.
+ * - Add grid and/or flexbox layouts.
+ *
+ * ----Widgets----
+ * - Implement text rendering.
+ * - Implement transparency.
+ *   - Include gamma-correct color blending.
+ * - Implement border styles.
+ */
+
 
 int main() {
   Radiant::Logger::shouldAllowColor(true);

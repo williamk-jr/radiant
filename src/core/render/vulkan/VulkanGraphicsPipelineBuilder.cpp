@@ -140,6 +140,7 @@ namespace Radiant {
       this->colorBlendStateInfo.blendConstants[2] = 0;
       this->colorBlendStateInfo.blendConstants[3] = 0;
     }
+    this->colorBlendStateInfo.logicOpEnable = VK_FALSE;
     this->colorBlendStateInfo.logicOp = logicOperation;
     this->colorBlendStateInfo.flags = 0;
     return *this;

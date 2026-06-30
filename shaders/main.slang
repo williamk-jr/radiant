@@ -32,14 +32,16 @@ VertexOutput main(VertexInput vertex, uint instanceId : SV_InstanceID) {
   float2 vertexPos = size + vertex.screenPosition.xy;
 
   float4 pos = mul(shaderData.orthoMatrix, float4(vertexPos, 0.0, 1.0));
+  float4 normalizedColor = vertex.color / float4(255);
+  float4 premultipliedColor = float4(normalizedColor.rgb*normalizedColor.a, normalizedColor.a);
 
   return {
     pos, vertex.normal, vertex.uv,
-    vertex.color, vertex.screenPosition, vertex.screenSize
+    premultipliedColor, vertex.screenPosition, vertex.screenSize
   };
 }
 
 [shader("fragment")]
 float4 main(VertexOutput vertex) {
-  return normalize(vertex.color);
+  return vertex.color;
 }
