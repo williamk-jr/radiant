@@ -20,7 +20,7 @@ namespace Radiant {
   }
   
   VulkanBuffer::VulkanBuffer(VulkanBuffer&& other) noexcept : 
-    buffer(other.buffer), allocation(other.allocation), allocationInfo(other.allocationInfo), memoryAllocator(other.memoryAllocator) {
+    buffer(other.buffer), size(other.size), allocation(other.allocation), allocationInfo(other.allocationInfo), memoryAllocator(other.memoryAllocator) {
     other.buffer = nullptr;
     other.allocation = nullptr;
     other.allocationInfo = {};
@@ -39,8 +39,12 @@ namespace Radiant {
     this->offset += size;
   }
 
-  size_t VulkanBuffer::getOffset() {
+  VkDeviceSize VulkanBuffer::getOffset() {
     return this->offset;
+  }
+  
+  VkDeviceSize VulkanBuffer::getSize() {
+    return this->size;
   }
   
   void VulkanBuffer::resetOffset() {

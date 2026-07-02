@@ -16,9 +16,11 @@ namespace Radiant {
       ~VulkanImageView();
       
       VkImageView get();
+      VkExtent3D getExtent();
 
     private:
       VkImageView imageView;
+      VkExtent3D extent;
       VkDevice device;
   };
 }

@@ -33,6 +33,7 @@ VertexOutput main(VertexInput vertex, uint instanceId : SV_InstanceID) {
 
   float4 pos = mul(shaderData.orthoMatrix, float4(vertexPos, 0.0, 1.0));
   float4 normalizedColor = vertex.color / float4(255);
+  //float4 premultipliedColor = pow(float4(normalizedColor.rgb*normalizedColor.a, normalizedColor.a), 2.2);
   float4 premultipliedColor = float4(normalizedColor.rgb*normalizedColor.a, normalizedColor.a);
 
   return {

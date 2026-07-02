@@ -3,9 +3,9 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-  VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkSwapchainCreateFlagsKHR swapchainFlags) {
+  VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkPresentModeKHR presentMode, VkSwapchainCreateFlagsKHR swapchainFlags) {
     this->device = device.get();
-    this->create(physicalDevice, device, surface, imageUsageFlags, swapchainFlags);
+    this->create(physicalDevice, device, surface, imageUsageFlags, presentMode, swapchainFlags);
   }
 
   VulkanSwapchain::VulkanSwapchain(VulkanSwapchain&& other) noexcept :
@@ -17,7 +17,7 @@ namespace Radiant {
     this->destroy();
   }
   
-  void VulkanSwapchain::create(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkSwapchainCreateFlagsKHR swapchainFlags) {
+  void VulkanSwapchain::create(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkPresentModeKHR presentMode, VkSwapchainCreateFlagsKHR swapchainFlags) {
     VkPhysicalDeviceSurfaceInfo2KHR surfaceInfo{};
     surfaceInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR;
     surfaceInfo.surface = surface.get();
@@ -44,7 +44,7 @@ namespace Radiant {
     swapchainInfo.imageArrayLayers = 1;
     swapchainInfo.imageUsage = imageUsageFlags;
     swapchainInfo.flags = swapchainFlags;
-    swapchainInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR; // Possibly add present mode selection;
+    swapchainInfo.presentMode = presentMode; // Possibly add present mode selection;
     swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; // Alpha selection;
     swapchainInfo.preTransform = surfaceCapabilities.surfaceCapabilities.currentTransform;
     swapchainInfo.clipped = VK_TRUE;
@@ -130,14 +130,14 @@ namespace Radiant {
     return {result, imageIndex};
   }
 
-  void VulkanSwapchain::recreate(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkSwapchainCreateFlagsKHR swapchainFlags) {
+  void VulkanSwapchain::recreate(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface, VkImageUsageFlags imageUsageFlags, VkPresentModeKHR presentMode, VkSwapchainCreateFlagsKHR swapchainFlags) {
     vkDeviceWaitIdle(this->device);
 
     this->imageViews.clear();
     this->images.clear();
     this->destroy(); 
     
-    this->create(physicalDevice, device, surface, imageUsageFlags, swapchainFlags);
+    this->create(physicalDevice, device, surface, imageUsageFlags, presentMode, swapchainFlags);
   }
 
   VkSurfaceFormat2KHR VulkanSwapchain::findSurfaceFormat(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface) {

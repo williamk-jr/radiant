@@ -44,6 +44,7 @@
  * - Implement text rendering.
  * - Implement transparency.
  *   - Include gamma-correct color blending.
+ *   - Read paper on weight-blended OIT.
  * - Implement border styles.
  */
 
@@ -70,7 +71,7 @@ int main() {
     });
 
     widgets[i]->addStyle("background-color", {
-      {Radiant::StyleSheetParser::Color(0, 255, 0, 255)}
+      {Radiant::StyleSheetParser::Color(0, 255, 0, 127)}
     });
   }
   //testWidget.addStyle("left", {

@@ -46,7 +46,7 @@ namespace Radiant {
     return this->image;
   }
   
-  //VkExtent3D VulkanImage::getExtent() {
-  //  return this->extent;
-  //}
+  VkExtent3D VulkanImage::getExtent() {
+    return this->extent;
+  }
 }

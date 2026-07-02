@@ -3,6 +3,7 @@
 #include "radiant/core/render/vulkan/VulkanBuffer.h"
 #include <cstddef>
 #include <memory>
+#include <vulkan/vulkan_core.h>
 namespace Radiant {
   template<typename T>
   class Buffer {
@@ -31,8 +32,8 @@ namespace Radiant {
         this->buffer->resetOffset();
       }
 
-      void size() {
-
+      VkDeviceSize size() {
+        return this->buffer->getSize();
       }
 
     private:

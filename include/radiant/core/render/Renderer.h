@@ -28,12 +28,8 @@
 
 namespace Radiant {
   struct RenderContext {
-    VulkanImageView& imageView;
     uint32_t imageIndex;
     bool rendering = false;
-
-    RenderContext(VulkanImageView& imageView, uint32_t imageIndex, bool rendering) :
-      imageView(imageView), imageIndex(imageIndex), rendering(rendering) {}
   };
 
 
@@ -105,7 +101,7 @@ namespace Radiant {
       std::vector<VulkanDescriptorSet> descriptorSets;
       std::unique_ptr<VulkanPipeline> graphicsPipeline;
 
-      std::unique_ptr<RenderContext> context;
+      RenderContext context;
       
       std::vector<VkDescriptorBufferInfo> descriptorBufferWrites;
 
@@ -115,6 +111,8 @@ namespace Radiant {
       Rect2D frameBufferSize;
       
       void initVulkan(Window& window, bool debug);
+      bool isSwapchainOutOfDate(Window& window, VulkanResult<uint32_t> imageIndex);
+
       std::vector<const char*> getInstanceExtensions(Window& window, bool debug);
       std::vector<const char*> getInstanceLayers(bool debug);
       static bool getPhysicalDeviceRequirements(VkPhysicalDevice& physicalDevice);

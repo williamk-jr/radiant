@@ -123,7 +123,7 @@ namespace Radiant {
     return *this;
   }
   
-  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withColorBlendState(std::vector<VkPipelineColorBlendAttachmentState> attachmentStates, float* blendConstants, VkLogicOp logicOperation) {
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withColorBlendState(std::vector<VkPipelineColorBlendAttachmentState> attachmentStates, float* blendConstants) {
     this->colorBlendAttachmentStates = attachmentStates;
 
     this->colorBlendStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -141,11 +141,29 @@ namespace Radiant {
       this->colorBlendStateInfo.blendConstants[3] = 0;
     }
     this->colorBlendStateInfo.logicOpEnable = VK_FALSE;
-    this->colorBlendStateInfo.logicOp = logicOperation;
     this->colorBlendStateInfo.flags = 0;
     return *this;
   }
   
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withColorBlendState(VkLogicOp logicOperation, float* blendConstants) {
+    this->colorBlendStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    if (blendConstants != nullptr) {
+      this->colorBlendStateInfo.blendConstants[0] = blendConstants[0];
+      this->colorBlendStateInfo.blendConstants[1] = blendConstants[1];
+      this->colorBlendStateInfo.blendConstants[2] = blendConstants[2];
+      this->colorBlendStateInfo.blendConstants[3] = blendConstants[3];
+    } else {
+      this->colorBlendStateInfo.blendConstants[0] = 0;
+      this->colorBlendStateInfo.blendConstants[1] = 0;
+      this->colorBlendStateInfo.blendConstants[2] = 0;
+      this->colorBlendStateInfo.blendConstants[3] = 0;
+    }
+    this->colorBlendStateInfo.logicOpEnable = VK_TRUE;
+    this->colorBlendStateInfo.logicOp = logicOperation;
+    this->colorBlendStateInfo.flags = 0;
+    return *this;
+  }
+
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withDepthStencilState(VulkanDepthTest depthTest, VulkanDepthBoundsTest depthBoundsTest, VulkanStencilTest stencilTest) {
     this->depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     this->depthStencilInfo.depthTestEnable = depthTest.enabled;

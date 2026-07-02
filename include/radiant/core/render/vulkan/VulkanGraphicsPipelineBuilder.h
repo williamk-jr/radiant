@@ -103,8 +103,12 @@ namespace Radiant {
 
       VulkanGraphicsPipelineBuilder& withColorBlendState(
           std::vector<VkPipelineColorBlendAttachmentState> attachmentStates, 
-          float blendConstants[4], 
-          VkLogicOp logicOperation
+          float blendConstants[4] 
+      );
+
+      VulkanGraphicsPipelineBuilder& withColorBlendState(
+          VkLogicOp logicOperation,
+          float blendConstants[4]
       );
 
       VulkanGraphicsPipelineBuilder& withDepthStencilState(

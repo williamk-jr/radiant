@@ -42,16 +42,19 @@ namespace Radiant {
       ) {
         if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
           Logger::info(pCallbackData->pMessage, {
+            {"VULKAN", MessageStyle::WHITE},
             {pCallbackData->pMessageIdName, MessageStyle::WHITE},
             LogPrefixes::time(MessageStyle::WHITE)
           }, 1);
         } else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
           Logger::warn(pCallbackData->pMessage, {
+            {"VULKAN", MessageStyle::WHITE},
             {pCallbackData->pMessageIdName, MessageStyle::WHITE},
             LogPrefixes::time(MessageStyle::WHITE)
           });
         } else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
           Logger::error(pCallbackData->pMessage, {
+            {"VULKAN", MessageStyle::WHITE},
             {pCallbackData->pMessageIdName, MessageStyle::WHITE},
             LogPrefixes::time(MessageStyle::WHITE)
           });

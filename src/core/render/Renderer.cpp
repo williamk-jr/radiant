@@ -5,6 +5,7 @@
 #include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
+#include <algorithm>
 #include <cstddef>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/glm.hpp>
@@ -44,13 +45,8 @@ namespace Radiant {
     this->fences[currentFrame].reset();
 
     VulkanResult<uint32_t> imageIndex = this->swapchain->acquireNextImage(&this->imageReadySemaphores[currentFrame], UINT64_MAX);
-
-    Rect2D newFrameBufferSize = window.getFrameBufferSize();
-    if (
-        (imageIndex.result == VK_ERROR_OUT_OF_DATE_KHR || imageIndex.result == VK_SUBOPTIMAL_KHR) && 
-        (newFrameBufferSize.width != this->frameBufferSize.width) || (newFrameBufferSize.height != this->frameBufferSize.height)
-    ) {
-      this->updateSwapchain = true;
+    if (this->isSwapchainOutOfDate(window, imageIndex)) {
+      this->updateSwapchain = true; // Swapchain updated at the end of frame.
     }
 
     VulkanImage& currentImage = this->swapchain->getImage(imageIndex.value);
@@ -79,29 +75,34 @@ namespace Radiant {
     std::vector<VkImageMemoryBarrier2> imageMemoryBarriers{imageMemoryBarrier};
     this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(imageMemoryBarriers, 0);
 
-    this->context = std::make_unique<RenderContext>(
-      currentImageView,
-      imageIndex.value,
-      true
-    );
+    // Global render state. Allows usage similar to OpenGL.
+    this->context.imageIndex = imageIndex.value;
+    this->context.rendering = true;
   }
 
   void Renderer::beginRendering(Color clearColor) {
-    if (!this->context->rendering) {
+    if (!this->context.rendering) {
       return;
     }
 
     float* rawColor = clearColor.raw();
+    VulkanImageView& imageView = this->swapchain->getImageView(this->context.imageIndex);
+
     std::vector<VkRenderingAttachmentInfo> colorAttachment(1);
     colorAttachment[0].sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
     colorAttachment[0].imageLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
-    colorAttachment[0].imageView = this->context->imageView.get(); 
+    colorAttachment[0].imageView = imageView.get(); 
     colorAttachment[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     colorAttachment[0].clearValue = {{rawColor[0], rawColor[1], rawColor[2], rawColor[3]}};
 
+    VkExtent3D imageViewExtent = imageView.getExtent();
+
     VkRect2D renderArea{};
-    renderArea.extent = {this->frameBufferSize.width, this->frameBufferSize.height};
+    renderArea.extent = {
+      std::min(this->frameBufferSize.width, imageViewExtent.width), 
+      std::min(this->frameBufferSize.height, imageViewExtent.height)
+    };
 
     this->commandBuffers[currentFrame].beginRendering(&colorAttachment, nullptr, nullptr, renderArea, 0);
     this->commandBuffers[currentFrame].bindPipeline(*this->graphicsPipeline);
@@ -126,14 +127,14 @@ namespace Radiant {
   }
 
   void Renderer::setViewport(float width, float height, float minDepth, float maxDepth) {
-    if (!this->context->rendering) {
+    if (!this->context.rendering) {
       return;
     }
     this->commandBuffers[currentFrame].setViewport(width, height, minDepth, maxDepth);
   }
 
   void Renderer::setScissor(uint32_t width, uint32_t height) {
-    if (!this->context->rendering) {
+    if (!this->context.rendering) {
       return;
     }
     this->commandBuffers[currentFrame].setScissor(width, height);
@@ -141,7 +142,7 @@ namespace Radiant {
 
 
   void Renderer::bindVertexBuffer(VertexBuffer& vertexBuffer) {
-    this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.get(), 0, 0);
+    this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.get(), 0, 0, vertexBuffer.size());
   }
 
   void Renderer::bindVertexBuffer(VertexBuffer& vertexBuffer, VkDeviceSize size) {
@@ -166,7 +167,7 @@ namespace Radiant {
   }
 
   void Renderer::clear(Color color) {
-    if (!this->context->rendering) {
+    if (!this->context.rendering) {
       return;
     }
     VkExtent2D swapchainExtent = {this->frameBufferSize.width, this->frameBufferSize.height};
@@ -174,7 +175,7 @@ namespace Radiant {
   }
 
   void Renderer::clear(Color color, VkRect2D clearArea) {
-    if (!this->context->rendering) {
+    if (!this->context.rendering) {
       return;
     }
     float* rawColor = color.raw();
@@ -193,16 +194,17 @@ namespace Radiant {
   }
 
   void Renderer::endRendering() {
-    if (!this->context->rendering) {
+    if (!this->context.rendering) {
       return;
     }
     this->commandBuffers[currentFrame].endRendering();
   }
 
   void Renderer::endFrame() {
-    if (!this->context->rendering) {
+    if (!this->context.rendering) {
       return;
     }
+
     VkImageSubresourceRange subresourceRange{};
     subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     subresourceRange.levelCount = 1;
@@ -216,13 +218,13 @@ namespace Radiant {
     presentImageMemoryBarrier.dstAccessMask = 0;
     presentImageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
     presentImageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-    presentImageMemoryBarrier.image = this->swapchain->getImage(this->context->imageIndex).get();
+    presentImageMemoryBarrier.image = this->swapchain->getImage(this->context.imageIndex).get();
     presentImageMemoryBarrier.subresourceRange = subresourceRange;
 
     std::vector<VkImageMemoryBarrier2> presentImageMemoryBarriers{presentImageMemoryBarrier};
     this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(presentImageMemoryBarriers, 0);
     this->commandBuffers[currentFrame].end();
-    this->context->rendering = false;
+    this->context.rendering = false;
   }
 
   void Renderer::submit() {
@@ -242,18 +244,19 @@ namespace Radiant {
   }
 
   void Renderer::present(Window& window) {
-    this->presentQueue->present(*this->swapchain, {this->context->imageIndex}, this->frameFinishedSemaphores[currentFrame]);
+    this->presentQueue->present(*this->swapchain, {this->context.imageIndex}, this->frameFinishedSemaphores[currentFrame]);
     this->currentFrame = (currentFrame+1)%swapchain->getImageCount();
 
     if (this->updateSwapchain) {
+      this->updateSwapchain = false;
       this->frameBufferSize = window.getFrameBufferSize();
 
-      this->updateSwapchain = false;
       this->swapchain->recreate(
           *this->physicalDevice,
           *this->device, 
           *this->surface, 
           VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+          VK_PRESENT_MODE_IMMEDIATE_KHR,
           0
       );
       return;
@@ -287,6 +290,7 @@ namespace Radiant {
         *this->device, 
         *this->surface, 
         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+        VK_PRESENT_MODE_IMMEDIATE_KHR,
         0
     );
 
@@ -330,9 +334,9 @@ namespace Radiant {
     attachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
     attachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
     attachmentState.colorBlendOp = VK_BLEND_OP_ADD;
-    attachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    attachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    attachmentState.alphaBlendOp = VK_BLEND_OP_ADD;
+    //attachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    //attachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    //attachmentState.alphaBlendOp = VK_BLEND_OP_SUBTRACT;
     attachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
     attachmentState.blendEnable = VK_TRUE;
 
@@ -361,7 +365,7 @@ namespace Radiant {
           VK_FALSE
       )
       .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_FRAGMENT_BIT)
-      .withColorBlendState({attachmentState}, nullptr, VK_LOGIC_OP_COPY)
+      .withColorBlendState({attachmentState}, nullptr)
       .withDynamicState({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
       .withViewportState(1, 1)
       .build()
@@ -370,5 +374,13 @@ namespace Radiant {
 
   bool Renderer::getPhysicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
     return true;
+  }
+
+  bool Renderer::isSwapchainOutOfDate(Window& window, VulkanResult<uint32_t> imageIndex) {
+    Rect2D newFrameBufferSize = window.getFrameBufferSize();
+    bool isSurfaceOutOfDate = imageIndex.result == VK_ERROR_OUT_OF_DATE_KHR || imageIndex.result == VK_SUBOPTIMAL_KHR;
+    bool isFrameBufferResized = (newFrameBufferSize.width != this->frameBufferSize.width) || 
+                                (newFrameBufferSize.height != this->frameBufferSize.height);
+    return isSurfaceOutOfDate && isFrameBufferResized;
   }
 }

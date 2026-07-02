@@ -32,12 +32,17 @@ namespace Radiant {
        * @param void* Pointer to data.
        * @param size_t Size of data.
        */
-      void append(void* data, size_t size);
+      void append(void* data, VkDeviceSize size);
 
       /*
        * @return Returns the current offset at which data will be appended.
        */
-      size_t getOffset();
+      VkDeviceSize getOffset();
+
+      /*
+       * @return Returns the current size in bytes of the buffer.
+       */
+      VkDeviceSize getSize();
 
       /*
        * Sets the data offset to zero.

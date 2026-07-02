@@ -12,9 +12,11 @@ namespace Radiant {
     imageViewInfo.flags = flags;
 
     vkCreateImageView(device.get(), &imageViewInfo, nullptr, &this->imageView);
+
+    this->extent = image.getExtent();
   }
   VulkanImageView::VulkanImageView(VulkanImageView&& other) noexcept :
-    imageView(other.imageView), device(other.device) {
+    imageView(other.imageView), extent(other.extent), device(other.device) {
     other.imageView = nullptr;
   }
   
@@ -24,5 +26,9 @@ namespace Radiant {
   
   VkImageView VulkanImageView::get() {
     return this->imageView;
+  }
+
+  VkExtent3D VulkanImageView::getExtent() {
+    return this->extent;
   }
 }
