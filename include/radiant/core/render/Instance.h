@@ -6,7 +6,7 @@
 namespace Radiant {
   struct Instance {
     glm::vec4 color;
-    glm::vec3 position;
+    glm::vec2 position;
     glm::vec2 size;
   };
 }

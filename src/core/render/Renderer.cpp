@@ -344,13 +344,12 @@ namespace Radiant {
       .withLayout(this->descriptorSetLayouts)
       .withRenderingInfo({VK_FORMAT_B8G8R8A8_SRGB}, VK_FORMAT_UNDEFINED, VK_FORMAT_UNDEFINED)
       .withVertexBindingDescription(sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX, {
-        {VK_FORMAT_R32G32B32_SFLOAT, 0},
-        {VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal)},
+        {VK_FORMAT_R32G32_SFLOAT, 0},
         {VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)},
       })
       .withVertexBindingDescription(sizeof(Instance), VK_VERTEX_INPUT_RATE_INSTANCE, {
         {VK_FORMAT_R32G32B32A32_SFLOAT, 0},
-        {VK_FORMAT_R32G32B32_SFLOAT, offsetof(Instance, position)},
+        {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, position)},
         {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, size)},
       })
       .withInputAssemblyState(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE)

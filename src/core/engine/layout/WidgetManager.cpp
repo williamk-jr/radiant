@@ -45,7 +45,7 @@ namespace Radiant {
 
       batch.instances.push_back({
         {backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), backgroundColor.getAlpha()}, 
-        {currentWidget->getPositionX(), currentWidget->getPositionY(), 0}, 
+        {currentWidget->getPositionX(), currentWidget->getPositionY()}, 
         {currentWidget->getWidth(), currentWidget->getHeight()}
       });
 

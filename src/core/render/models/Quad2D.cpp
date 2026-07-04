@@ -5,11 +5,11 @@ namespace Radiant {
   Quad2D::Quad2D() {
     
     this->verticies = {
-      //Position  Normal     UV
-      {{-1, 1, 0}, {0, 0, 1}, {0, 1}}, // Top Left
-      {{1, 1, 0}, {0, 0, 1}, {1, 1}}, // Top Right
-      {{-1, -1, 0}, {0, 0, 1}, {0, 0}}, // Bottom Left
-      {{1, -1, 0}, {0, 0, 1}, {1, 0}}  // Bottom Right
+      //Position   UV
+      {{-1,  1}, {0, 1}}, // Top Left
+      {{ 1,  1}, {1, 1}}, // Top Right
+      {{-1, -1}, {0, 0}}, // Bottom Left
+      {{ 1, -1}, {1, 0}}  // Bottom Right
     };
 
     this->indicies = {
