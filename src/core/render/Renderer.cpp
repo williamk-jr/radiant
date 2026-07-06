@@ -349,8 +349,12 @@ namespace Radiant {
       })
       .withVertexBindingDescription(sizeof(Instance), VK_VERTEX_INPUT_RATE_INSTANCE, {
         {VK_FORMAT_R32G32B32A32_SFLOAT, 0},
-        {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, position)},
-        {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, size)},
+        {VK_FORMAT_R32G32_SFLOAT,       offsetof(Instance, position)},
+        {VK_FORMAT_R32G32_SFLOAT,       offsetof(Instance, size)},
+
+        {VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(Instance, borderColor)},
+        {VK_FORMAT_R32G32_SFLOAT,       offsetof(Instance, borderPosition)},
+        {VK_FORMAT_R32G32_SFLOAT,       offsetof(Instance, borderSize)},
       })
       .withInputAssemblyState(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE)
       .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_VERTEX_BIT)

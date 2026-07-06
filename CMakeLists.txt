@@ -7,15 +7,19 @@ project(Radiant VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "") # Required by clangd
-#list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/lib/glm")
 
 # Find the GLM package
 find_package(Vulkan REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(slang REQUIRED)
 find_package(glm REQUIRED)
+find_package(freetype REQUIRED)
 
-#message(STATUS "Slang path: ${SLANG_EXECUTABL}")
+# Lists all imported targets. Makes it easy to find newly added targets from find_package.
+get_property(importTargets DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY IMPORTED_TARGETS)
+list(JOIN importTargets "\n\t" formatedImportTargets)
+message(STATUS "Imported Targets:\n\t${formatedImportTargets}")
+
 if (glfw3_FOUND)
   add_definitions(-DHAS_GLFW)
 elseif (SDL3_FOUND)
@@ -84,6 +88,7 @@ add_executable(Radiant
 
 target_link_libraries(Radiant 
   PRIVATE Vulkan::Vulkan
+  PRIVATE Freetype::Freetype
   PRIVATE slang::slang
   PRIVATE glm::glm
   PRIVATE glfw
@@ -92,7 +97,6 @@ target_link_libraries(Radiant
 target_include_directories(Radiant 
   PUBLIC ${CMAKE_SOURCE_DIR}/include
   PRIVATE ${Vulkan_INCLUDE_DIRS}  
-  #PRIVATE ${SLANG_INCLUDE_DIRS}  
 )
 
 if(NOT CMAKE_BUILD_TYPE)
