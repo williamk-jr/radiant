@@ -63,7 +63,7 @@ int main() {
     widgets.push_back(std::make_shared<Radiant::Widget>(
       engine.getRootWidget(),
       0, 0,
-      100, 100
+      200, 100
     ));
 
     widgets[i]->addStyle("left", {

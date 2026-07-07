@@ -46,6 +46,11 @@ float4 premultiplyAlpha(float4 color) {
   return float4(normalized.rgb*normalized.a, normalized.a);
 }
 
+bool point2DWithinBounds(float2 point, float2 min, float2 max) {
+  return (min.x <= point.x && point.x <= max.x) &&
+         (min.y <= point.y && point.y <= max.y);
+}
+
 [shader("vertex")]
 VertexOutput main(VertexInput vertex, uint instanceId : SV_InstanceID) {
   // Transform model-space 
@@ -75,16 +80,31 @@ float4 main(VertexOutput vertex) {
   // 1. Outside the circle mask at each corner.
   // 2. X and Y bounds of the quad must both be greater than
   //    the center of the circle mask.
-  if ((distance(bounds, float2(maskCenter)) > borderRadius) &&
-      (bounds.x > 1.0-borderRadius) && (bounds.y > 1.0-borderRadius)) {
+  bool outsideCircularMask = distance(bounds,float2(maskCenter)) > borderRadius;
+  if (outsideCircularMask && (bounds.x > 1.0-borderRadius) && (bounds.y > 1.0-borderRadius)) {
     discard;
   }
-
+  
+  // Fragment position starts as pixel coordinates, so we convert them to clip-space coordinates.
   float2 clipFragPos = toClip(vertex.position.xy).xy;
-  float2 s = step(vertex.screenMin, clipFragPos) - step(vertex.screenMax, clipFragPos);
+  if (point2DWithinBounds(clipFragPos, vertex.screenMin, vertex.screenMax)) { // Check if fragment is in content box.
 
-  if ((s.x*s.y) > 0.5) {
-    return vertex.color;
+    // Create UV coordinates for content box.
+    float2 contentUV = float2(
+      (clipFragPos.x-vertex.screenMin.x) / (vertex.screenMax.x-vertex.screenMin.x),
+      (clipFragPos.y-vertex.screenMin.y) / (vertex.screenMax.y-vertex.screenMin.y)
+    );
+    float2 absoluteContentBounds = abs(contentUV-0.5)*2.0;
+
+    // Check if pixel is in any of the 4 corners with side length borderRadius*2
+    if (!point2DWithinBounds(absoluteContentBounds, 1.0-(borderRadius*2), 1.0)) {
+      return vertex.color;
+    } else {
+      if ((distance(absoluteContentBounds, float2(1.0-borderRadius)) < borderRadius) ||
+          (absoluteContentBounds.x < 1.0-borderRadius) || (absoluteContentBounds.y < 1.0-borderRadius)) {
+        return vertex.color;
+      }
+    }
   }
 
 
