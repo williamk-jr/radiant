@@ -24,6 +24,5 @@ namespace Radiant {
       VkExtent3D extent;
       VmaAllocation imageMemory;
       VmaAllocator memoryAllocator;
-      //VulkanMemoryAllocator* allocator;
   };
 }

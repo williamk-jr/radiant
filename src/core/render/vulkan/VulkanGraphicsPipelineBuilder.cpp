@@ -184,7 +184,6 @@ namespace Radiant {
     }
 
     if (this->slangGlobalSession.get() == nullptr) {
-      //Logger::info("Creating slang session.");
       slang::createGlobalSession(slangGlobalSession.writeRef());
 
       slang::TargetDesc slangTargetDesc{};

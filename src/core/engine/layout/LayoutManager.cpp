@@ -73,7 +73,7 @@ namespace Radiant {
       const LayoutBox& childLayoutBox = child->getLayoutBox();
 
       // Prevent overflow, wrap to next line
-      if ( (childLayoutBox.getMarginBoxX() + childLayoutBox.getMarginBoxWidth()) > 
+      if ( (offsetX + childLayoutBox.getMarginBoxWidth()) > 
            (widgetLayoutBox.getContentBoxX() + widgetLayoutBox.getContentBoxWidth()) ) {
         offsetY += largestHeight;
         offsetX = 0;

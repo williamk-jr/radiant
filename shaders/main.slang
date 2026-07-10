@@ -5,10 +5,6 @@ struct VertexInput {
   float4 color;
   float2 screenPosition;
   float2 screenSize;
-
-  float4 borderColor;
-  float2 borderPosition;
-  float2 borderSize;
 };
 
 struct VertexOutput {
@@ -16,10 +12,8 @@ struct VertexOutput {
   float2 uv;
   
   float4 color;
-  float2 screenMin;
-  float2 screenMax;
-
-  float4 borderColor;
+  float2 screenPosition;
+  float2 screenSize;
 };
 
 struct ShaderData {
@@ -54,8 +48,8 @@ bool point2DWithinBounds(float2 point, float2 min, float2 max) {
 [shader("vertex")]
 VertexOutput main(VertexInput vertex, uint instanceId : SV_InstanceID) {
   // Transform model-space 
-  float2 scaledPosition = scale2D(vertex.position.xy, vertex.borderSize);
-  float2 translatedPosition = translate2D(scaledPosition, vertex.borderPosition);
+  float2 scaledPosition = scale2D(vertex.position.xy, vertex.screenSize);
+  float2 translatedPosition = translate2D(scaledPosition, vertex.screenPosition);
   float4 clipPosition = toClip(translatedPosition);
 
   float4 normalizedColor = vertex.color / float4(255);
@@ -63,50 +57,13 @@ VertexOutput main(VertexInput vertex, uint instanceId : SV_InstanceID) {
 
   return {
     clipPosition, vertex.uv,
-    premultiplyAlpha(vertex.color), toClip(vertex.screenPosition).xy, toClip(vertex.screenPosition+vertex.screenSize).xy,
-    premultiplyAlpha(vertex.borderColor)
+    premultiplyAlpha(vertex.color), 
+    vertex.screenPosition, 
+    vertex.screenSize,
   };
 }
 
 [shader("fragment")]
 float4 main(VertexOutput vertex) {
-  float borderRadius = 0.1;
-  float2 bounds = abs(vertex.uv-0.5)*2.0;
-
-  // Where 1.0 is the maximum value in any given direction;
-  float maskCenter = 1.0-borderRadius;
-
-  // The area to discard must be:
-  // 1. Outside the circle mask at each corner.
-  // 2. X and Y bounds of the quad must both be greater than
-  //    the center of the circle mask.
-  bool outsideCircularMask = distance(bounds,float2(maskCenter)) > borderRadius;
-  if (outsideCircularMask && (bounds.x > 1.0-borderRadius) && (bounds.y > 1.0-borderRadius)) {
-    discard;
-  }
-  
-  // Fragment position starts as pixel coordinates, so we convert them to clip-space coordinates.
-  float2 clipFragPos = toClip(vertex.position.xy).xy;
-  if (point2DWithinBounds(clipFragPos, vertex.screenMin, vertex.screenMax)) { // Check if fragment is in content box.
-
-    // Create UV coordinates for content box.
-    float2 contentUV = float2(
-      (clipFragPos.x-vertex.screenMin.x) / (vertex.screenMax.x-vertex.screenMin.x),
-      (clipFragPos.y-vertex.screenMin.y) / (vertex.screenMax.y-vertex.screenMin.y)
-    );
-    float2 absoluteContentBounds = abs(contentUV-0.5)*2.0;
-
-    // Check if pixel is in any of the 4 corners with side length borderRadius*2
-    if (!point2DWithinBounds(absoluteContentBounds, 1.0-(borderRadius*2), 1.0)) {
-      return vertex.color;
-    } else {
-      if ((distance(absoluteContentBounds, float2(1.0-borderRadius)) < borderRadius) ||
-          (absoluteContentBounds.x < 1.0-borderRadius) || (absoluteContentBounds.y < 1.0-borderRadius)) {
-        return vertex.color;
-      }
-    }
-  }
-
-
-  return vertex.borderColor;
+  return vertex.color;
 }

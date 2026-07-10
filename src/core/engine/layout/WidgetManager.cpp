@@ -47,11 +47,6 @@ namespace Radiant {
         {backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), backgroundColor.getAlpha()}, 
         {currentWidget->getPositionX(), currentWidget->getPositionY()}, 
         {currentWidget->getWidth(), currentWidget->getHeight()},
-        
-        // Border data.
-        {0, 0, 255, 255},
-        {currentWidget->getLayoutBox().getBorderBoxX(), currentWidget->getLayoutBox().getBorderBoxY()},
-        {currentWidget->getLayoutBox().getBorderBoxWidth(), currentWidget->getLayoutBox().getBorderBoxHeight()}
       });
 
       for (Widget* child : currentWidget->getChildren()) {
