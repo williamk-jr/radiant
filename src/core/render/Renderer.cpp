@@ -2,9 +2,12 @@
 #include "radiant/core/render/Instance.h"
 #include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/Vertex.h"
+#include "radiant/core/render/vulkan/VulkanBuffer.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
+#include "radiant/core/render/vulkan/VulkanFence.h"
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
+#include "radiant/core/render/vulkan/VulkanImage.h"
 #include <algorithm>
 #include <cstddef>
 #include <glm/ext/matrix_float4x4.hpp>
@@ -38,6 +41,87 @@ namespace Radiant {
 
   std::unique_ptr<InstanceBuffer> Renderer::createInstanceBuffer(VkDeviceSize size) {
     return std::make_unique<InstanceBuffer>(*this->memoryAllocator, size);
+  }
+  
+  void Renderer::loadTexture(void* buffer, uint32_t size, uint32_t width, uint32_t height) {
+    // CPU staging buffer.
+    VulkanBuffer stagingBuffer(
+        *this->memoryAllocator, 
+        size, 
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+        VK_SHARING_MODE_EXCLUSIVE, 
+        {}
+    );
+
+    stagingBuffer.append(buffer, size);
+
+    // GPU image.
+    VulkanImage image(*this->memoryAllocator, {width, height, 0});
+    VkImageSubresourceLayers subresource{};
+    subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    subresource.baseArrayLayer = 0;
+    subresource.layerCount = 1;
+    subresource.mipLevel = 0;
+
+    // Region to copy from buffer to image.
+    VkBufferImageCopy copyRegion{};
+    copyRegion.bufferRowLength = width;
+    copyRegion.bufferImageHeight = height;
+    copyRegion.bufferOffset = 0;
+
+    copyRegion.imageExtent = {width, height, 0};
+    copyRegion.imageOffset = {0,0,0};
+    copyRegion.imageSubresource = subresource;
+
+    // Preform the copy.
+    VulkanFence copyFinishedFence(*this->device, 0); 
+    this->commandBuffers[currentFrame].begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+    // Transfer image layout to transfer dst optimal.
+    VkImageMemoryBarrier2 toDstOptimal{};
+    toDstOptimal.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+    toDstOptimal.image = image.get();
+    toDstOptimal.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    toDstOptimal.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    toDstOptimal.srcAccessMask = 0;
+    toDstOptimal.dstAccessMask = VK_ACCESS_2_TRANSFER_READ_BIT | VK_ACCESS_2_TRANSFER_WRITE_BIT;
+    toDstOptimal.srcStageMask = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
+    toDstOptimal.dstStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
+
+    std::vector<VkImageMemoryBarrier2> transferImageMemoryBarriers{toDstOptimal};
+    this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(transferImageMemoryBarriers, 0);
+
+    std::vector<VkBufferImageCopy> copyRegions{copyRegion};
+    this->commandBuffers[currentFrame].copyBufferToImage(
+        stagingBuffer, image, 
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+        copyRegions
+    );
+
+    // Transfer image layout to shader read-only optimal.
+    VkImageMemoryBarrier2 toShaderReadOnlyOptimal{};
+    toShaderReadOnlyOptimal.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+    toShaderReadOnlyOptimal.image = image.get();
+    toShaderReadOnlyOptimal.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    toShaderReadOnlyOptimal.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+    toShaderReadOnlyOptimal.srcAccessMask = VK_ACCESS_2_TRANSFER_READ_BIT | VK_ACCESS_2_TRANSFER_WRITE_BIT;
+    toShaderReadOnlyOptimal.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
+    toShaderReadOnlyOptimal.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
+    toShaderReadOnlyOptimal.dstStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
+
+    std::vector<VkImageMemoryBarrier2> shaderImageMemoryBarriers{toDstOptimal};
+    this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(shaderImageMemoryBarriers, 0);
+
+    // End and submit.
+    this->commandBuffers[currentFrame].end();
+    this->graphicsQueue->submit(
+        this->commandBuffers[currentFrame],
+        nullptr, nullptr,
+        copyFinishedFence
+    );
+    copyFinishedFence.wait(1000);
+    // TODO Transfer image layout
   }
 
   void Renderer::beginFrame(Window& window) {

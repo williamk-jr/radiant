@@ -1,6 +1,8 @@
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
 #include "radiant/core/render/vulkan/VulkanBuffer.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
+#include "radiant/core/render/vulkan/VulkanImage.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -14,6 +16,10 @@ namespace Radiant {
 
   VkCommandBuffer VulkanCommandBuffer::get() {
     return this->commandBuffer;
+  }
+  
+  void VulkanCommandBuffer::copyBufferToImage(VulkanBuffer& buffer, VulkanImage& image, VkImageLayout imageLayout, std::vector<VkBufferImageCopy>& copyRegions) {
+    vkCmdCopyBufferToImage(this->commandBuffer, buffer.get(), image.get(), imageLayout, copyRegions.size(), copyRegions.data());
   }
 
   void VulkanCommandBuffer::begin(VkCommandBufferUsageFlags flags) {

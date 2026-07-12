@@ -34,6 +34,12 @@ namespace Radiant {
       VkCommandBuffer get();
 
       /*
+       *
+       *
+       */
+      void copyBufferToImage(VulkanBuffer& buffer, VulkanImage& image, VkImageLayout imageLayout, std::vector<VkBufferImageCopy>& copyRegions);
+
+      /*
        * Begins recording command buffer.
        *
        * @param VkCommandBufferUsageFlags Usage flags.

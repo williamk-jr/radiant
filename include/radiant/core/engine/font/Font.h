@@ -1,15 +1,13 @@
 #pragma once
 
+#include "radiant/core/engine/font/Bitmap.h"
 #include <filesystem>
 
 #include <ft2build.h>
 #include <freetype/freetype.h>
+#include <vector>
 namespace Radiant {
   class FontManager;
-
-  struct FontBBox {
-     
-  };
 
   class Font {
     friend FontManager;
@@ -21,6 +19,8 @@ namespace Radiant {
       Font(Font&&) noexcept;
       Font& operator=(Font&&) noexcept = default;
       ~Font();
+      
+      Bitmap getBitmapFromCharCode(unsigned long charCode);
       
       int getNumCharmaps();
       std::string getFamilyName();

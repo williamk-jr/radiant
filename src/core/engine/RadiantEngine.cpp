@@ -1,6 +1,8 @@
 #include "radiant/core/engine/RadiantEngine.h"
 #include "radiant/core/engine/StyleSheetPropertyResolvers.h"
 #include "radiant/core/engine/StyleSheetStandardFunctions.h"
+#include "radiant/core/engine/font/Bitmap.h"
+#include "radiant/core/engine/font/Font.h"
 #include "radiant/core/engine/layout/WidgetManager.h"
 #include "radiant/core/render/models/Quad2D.h"
 #include "radiant/core/render/Window.h"
@@ -15,6 +17,11 @@
 namespace Radiant {
   RadiantEngine::RadiantEngine(const std::string& title, uint32_t width, uint32_t height) {
     this->window = std::make_unique<Window>(title, width, height);
+    this->fontManager = std::make_unique<FontManager>();
+    Font notoSans = this->fontManager->loadFont("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf");
+    //Bitmap bitmap = notoSans.getBitmapFromCharCode('X');
+
+    // Enable debug logs.
 #ifndef NDEBUG
     this->renderer = std::make_unique<Renderer>(*this->window, true);
 #else

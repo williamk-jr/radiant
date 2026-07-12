@@ -41,17 +41,17 @@ namespace Radiant {
        * @param std::vector<VulkanSemaphoreSubmitInfo>* A pointer to a vector of semaphores to signal once execution of command buffers is complete.
        * @param VulkanFence& A reference to a valid vulkan fence to wait on before work can be submitted.
        */
-      void submit(std::vector<VulkanCommandBuffer*>& commandBuffers, std::vector<VulkanSemaphoreSubmitInfo>* waitSemaphores, std::vector<VulkanSemaphoreSubmitInfo>* signalSemaphores, VulkanFence& fence);
+      void submit(std::vector<VulkanCommandBuffer*>& commandBuffers, std::vector<VulkanSemaphoreSubmitInfo>& waitSemaphores, std::vector<VulkanSemaphoreSubmitInfo>& signalSemaphores, VulkanFence& fence);
 
       /*
        * Submits command buffers for their commands to be executed.
        *
        * @param VulkanCommandBuffer& A reference to a valid vulkan command buffer.
-       * @param std::vector<VulkanSemaphoreSubmitInfo>* A pointer to a vector of semaphores to be waited on.
-       * @param std::vector<VulkanSemaphoreSubmitInfo>* A pointer to a vector of semaphores to signal once execution of command buffers is complete.
+       * @param std::vector<VulkanSemaphoreSubmitInfo> A reference to a vector of semaphores to be waited on.
+       * @param std::vector<VulkanSemaphoreSubmitInfo> A reference to a vector of semaphores to signal once execution of command buffers is complete.
        * @param VulkanFence& A reference to a valid vulkan fence to wait on before work can be submitted.
        */
-      void submit(VulkanCommandBuffer& commandBuffer, std::vector<VulkanSemaphoreSubmitInfo>* waitSemaphores, std::vector<VulkanSemaphoreSubmitInfo>* signalSemaphores, VulkanFence& fence);
+      void submit(VulkanCommandBuffer& commandBuffer, std::vector<VulkanSemaphoreSubmitInfo>& waitSemaphores, std::vector<VulkanSemaphoreSubmitInfo>& signalSemaphores, VulkanFence& fence);
 
       /*
        * Submits command buffers for their commands to be executed.

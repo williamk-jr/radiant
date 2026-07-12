@@ -1,10 +1,22 @@
 #include "radiant/core/engine/font/FontManager.h"
 #include "radiant/core/engine/font/Font.h"
+#include "radiant/util/logger/Logger.h"
 #include <freetype/freetype.h>
+#include <freetype/fttypes.h>
+#include <string>
 
 namespace Radiant {
   FontManager::FontManager() {
-    FT_Init_FreeType(&this->freetype);
+    FT_Error error = FT_Init_FreeType(&this->freetype);
+    if (error) {
+      Logger::error("Failed to load Font Manager, error code: " + std::to_string(error), {
+        {"FONT", MessageStyle::WHITE},
+      });
+    } else {
+      Logger::info("Loaded Font Manager.", {
+        {"FONT", MessageStyle::WHITE},
+      }, 1);
+    }
   }
   FontManager::FontManager(FontManager&& other) noexcept :
     freetype(other.freetype) {

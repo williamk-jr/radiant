@@ -10,7 +10,7 @@ namespace Radiant {
     other.queue = nullptr;
   }
 
-  void VulkanQueue::submit(std::vector<VulkanCommandBuffer*>& commandBuffers, std::vector<VulkanSemaphoreSubmitInfo>* waitSemaphores, std::vector<VulkanSemaphoreSubmitInfo>* signalSemaphores, VulkanFence& fence) {
+  void VulkanQueue::submit(std::vector<VulkanCommandBuffer*>& commandBuffers, std::vector<VulkanSemaphoreSubmitInfo>& waitSemaphores, std::vector<VulkanSemaphoreSubmitInfo>& signalSemaphores, VulkanFence& fence) {
     std::vector<VkCommandBufferSubmitInfo> commandBufferSubmitInfos;
     commandBufferSubmitInfos.reserve(commandBuffers.size());
 
@@ -29,10 +29,10 @@ namespace Radiant {
     
     // Wait semaphores
     std::vector<VkSemaphoreSubmitInfo> waitSemaphoreInfos;
-    if (waitSemaphores != nullptr && !waitSemaphores->empty()) {
-      waitSemaphoreInfos.reserve(waitSemaphores->size());
+    if (!waitSemaphores.empty()) {
+      waitSemaphoreInfos.reserve(waitSemaphores.size());
 
-      for (VulkanSemaphoreSubmitInfo& i : *waitSemaphores) {
+      for (VulkanSemaphoreSubmitInfo& i : waitSemaphores) {
         VkSemaphoreSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
         submitInfo.semaphore = i.semaphore->get();
@@ -48,10 +48,10 @@ namespace Radiant {
     
     // Signal semaphores
     std::vector<VkSemaphoreSubmitInfo> signalSemaphoreInfos;
-    if (waitSemaphores != nullptr && !waitSemaphores->empty()) {
-      signalSemaphoreInfos.reserve(signalSemaphores->size());
+    if (!waitSemaphores.empty()) {
+      signalSemaphoreInfos.reserve(signalSemaphores.size());
 
-      for (VulkanSemaphoreSubmitInfo& i : *signalSemaphores) {
+      for (VulkanSemaphoreSubmitInfo& i : signalSemaphores) {
         VkSemaphoreSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
         submitInfo.semaphore = i.semaphore->get();
@@ -69,7 +69,7 @@ namespace Radiant {
     vkQueueSubmit2(this->queue, 1, &submitInfo, fence.get());
   }
   
-  void VulkanQueue::submit(VulkanCommandBuffer& commandBuffer, std::vector<VulkanSemaphoreSubmitInfo>* waitSemaphores, std::vector<VulkanSemaphoreSubmitInfo>* signalSemaphores, VulkanFence& fence) {
+  void VulkanQueue::submit(VulkanCommandBuffer& commandBuffer, std::vector<VulkanSemaphoreSubmitInfo>& waitSemaphores, std::vector<VulkanSemaphoreSubmitInfo>& signalSemaphores, VulkanFence& fence) {
     std::vector<VulkanCommandBuffer*> cb{&commandBuffer};
     this->submit(cb, waitSemaphores, signalSemaphores, fence);
   }
@@ -77,7 +77,7 @@ namespace Radiant {
   void VulkanQueue::submit(VulkanCommandBuffer& commandBuffer, VulkanSemaphoreSubmitInfo* waitSemaphore, VulkanSemaphoreSubmitInfo* signalSemaphore, VulkanFence& fence) { 
     std::vector<VulkanSemaphoreSubmitInfo> ws{*waitSemaphore};
     std::vector<VulkanSemaphoreSubmitInfo> ss{*signalSemaphore};
-    this->submit(commandBuffer, &ws, &ss, fence);
+    this->submit(commandBuffer, ws, ss, fence);
   }
 
   void VulkanQueue::present(VulkanSwapchain& swapchain, std::vector<uint32_t> imageIndicies, std::vector<VulkanSemaphore*>& waitSemaphores) {

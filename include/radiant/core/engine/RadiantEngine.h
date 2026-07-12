@@ -1,5 +1,6 @@
 #pragma once
 
+#include "radiant/core/engine/font/FontManager.h"
 #include "radiant/core/engine/layout/WidgetManager.h"
 #include "radiant/core/render/Renderer.h"
 #include "radiant/core/render/Window.h"
@@ -19,6 +20,7 @@ namespace Radiant {
     private:
       std::unique_ptr<Window> window;
       std::unique_ptr<WidgetManager> widgetManager;
+      std::unique_ptr<FontManager> fontManager;
 
       std::unique_ptr<Renderer> renderer;
       std::unique_ptr<VertexBuffer> vertexBuffer;

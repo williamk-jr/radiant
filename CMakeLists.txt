@@ -53,6 +53,10 @@ add_executable(Radiant
   src/core/engine/layout/LayoutManager.cpp
   src/core/engine/widgets/widget.cpp
 
+  src/core/engine/font/Bitmap.cpp
+  src/core/engine/font/Font.cpp
+  src/core/engine/font/FontManager.cpp
+
   src/core/render/vulkan/VulkanInstance.cpp
   src/core/render/vulkan/VulkanPhysicalDevice.cpp
   src/core/render/vulkan/VulkanDevice.cpp

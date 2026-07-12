@@ -5,6 +5,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "radiant/core/render/Color.h"
+#include "radiant/core/render/Texture.h"
 #include "radiant/core/render/buffers/IndexBuffer.h"
 #include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/buffers/InstanceBuffer.h"
@@ -41,6 +42,8 @@ namespace Radiant {
       std::unique_ptr<VertexBuffer> createVertexBuffer(VkDeviceSize size);
       std::unique_ptr<IndexBuffer> createIndexBuffer(VkDeviceSize size);
       std::unique_ptr<InstanceBuffer> createInstanceBuffer(VkDeviceSize size);
+
+      void loadTexture(void* buffer, uint32_t size, uint32_t width, uint32_t height);
 
       void beginFrame(Window& window);
       void beginRendering(Color clearColor);
