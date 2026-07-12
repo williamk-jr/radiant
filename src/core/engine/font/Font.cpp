@@ -3,6 +3,7 @@
 #include <cstring>
 #include <freetype/freetype.h>
 #include <freetype/ftimage.h>
+#include <string>
 
 namespace Radiant {
   Font::Font(FT_Library freetype, std::filesystem::path path) {
@@ -46,13 +47,23 @@ namespace Radiant {
   }
 
   Bitmap Font::getBitmapFromCharCode(unsigned long charCode) {
-    FT_Load_Char(this->fontFace, charCode, 0);
-    FT_Render_Glyph(this->fontFace->glyph, FT_RENDER_MODE_NORMAL);
+    int error = 0;
+    error = FT_Set_Char_Size(this->fontFace, 0, 16*64, 0, 72);
+
+    FT_UInt glyphIndex = FT_Get_Char_Index(this->fontFace, charCode);
+    error = FT_Load_Glyph(this->fontFace, glyphIndex, FT_LOAD_DEFAULT);
+    error = FT_Render_Glyph(this->fontFace->glyph, FT_RENDER_MODE_NORMAL);
+
+    if (error) {
+      Logger::info(std::to_string(error));
+    }
     FT_Bitmap glyphBitmap = this->fontFace->glyph->bitmap;
 
     size_t bufferSize = glyphBitmap.rows * glyphBitmap.pitch;
     size_t width = glyphBitmap.width;
     size_t height = glyphBitmap.rows;
+    //Logger::info(std::to_string(this->fontFace->glyph->bitmap_left));
+    //Logger::info(std::to_string(this->fontFace->glyph->bitmap_top));
 
     Bitmap bitmap(glyphBitmap.buffer, bufferSize, width, height);
     return bitmap; 
