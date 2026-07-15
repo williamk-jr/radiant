@@ -21,6 +21,11 @@ namespace Radiant {
     }
   }
   
+  Font::Font(const Font& other) : 
+    fontFace(other.fontFace) {
+    FT_Reference_Face(other.fontFace);
+  }
+  
   Font::Font(Font&& other) noexcept :
     fontFace(other.fontFace) {
     other.fontFace = nullptr;

@@ -28,6 +28,13 @@ namespace Radiant {
   }
 
   Font FontManager::loadFont(std::filesystem::path path) {
+    const char* rawPath = path.c_str();
+
+    FT_Face fontFace;
+    FT_Error error = FT_New_Face(freetype, rawPath, 0, &fontFace);
+
+    Logger::info(fontFace->family_name);
+
     return {this->freetype, path};
   }
 }

@@ -13,8 +13,8 @@ namespace Radiant {
     friend FontManager;
 
     public:
-      Font(const Font&) = delete;
-      Font& operator=(const Font&) = delete;
+      Font(const Font&);
+      Font& operator=(const Font&) = default;
 
       Font(Font&&) noexcept;
       Font& operator=(Font&&) noexcept = default;
@@ -30,6 +30,7 @@ namespace Radiant {
 
     private:
       Font(FT_Library library, std::filesystem::path path);
+      size_t size;
 
       FT_Face fontFace;
   };

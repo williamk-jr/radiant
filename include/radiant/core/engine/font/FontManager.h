@@ -5,6 +5,8 @@
 
 #include <ft2build.h>
 #include <freetype/freetype.h>
+#include <string>
+#include <unordered_map>
 
 namespace Radiant {
   class FontManager {
@@ -18,6 +20,7 @@ namespace Radiant {
       ~FontManager();
 
       Font loadFont(std::filesystem::path path);
+      Bitmap getBitmapFromCharCode(Font font, unsigned long charCode);
     private:
       FT_Library freetype;
   };

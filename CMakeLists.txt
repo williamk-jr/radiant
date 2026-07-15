@@ -55,6 +55,7 @@ add_executable(Radiant
 
   src/core/engine/font/Bitmap.cpp
   src/core/engine/font/Font.cpp
+  src/core/engine/font/FontCache.cpp
   src/core/engine/font/FontManager.cpp
 
   src/core/render/vulkan/VulkanInstance.cpp
