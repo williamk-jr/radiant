@@ -3,6 +3,7 @@
 #include "radiant/util/logger/Logger.h"
 #include <freetype/freetype.h>
 #include <freetype/fttypes.h>
+#include <memory>
 #include <string>
 
 namespace Radiant {
@@ -17,6 +18,8 @@ namespace Radiant {
         {"FONT", MessageStyle::WHITE},
       }, 1);
     }
+
+    this->fontCache = std::make_unique<FontCache>(this->freetype, 1024*4, FONT_CACHE_GLYPH | FONT_CACHE_SMALL_BITMAP);
   }
   FontManager::FontManager(FontManager&& other) noexcept :
     freetype(other.freetype) {

@@ -1,4 +1,5 @@
 #pragma once
+#include "radiant/core/engine/font/FontCacheNode.h"
 #include <cstdint>
 #include <filesystem>
 #include <freetype/freetype.h>
@@ -6,11 +7,11 @@
 #include <freetype/fttypes.h>
 
 namespace Radiant {
+  using FontCacheType = uint8_t;
 
-  enum class FontCacheType {
-    GLYPH,
-    SMALL_BITMAP,
-    BOTH
+  enum FontCacheTypes: uint8_t {
+    FONT_CACHE_GLYPH         = 0x01,
+    FONT_CACHE_SMALL_BITMAP  = 0x02
   };
 
   struct FontFaceId {
@@ -28,8 +29,8 @@ namespace Radiant {
       FontCache& operator=(FontCache&&) noexcept = default;
       ~FontCache();
 
-      void lookupGlyph(FontFaceId faceIdentifier, unsigned long charCode, int width, int height);
-      void lookupBitmap(FontFaceId faceIdentifier, unsigned long charCode, int width, int height);
+      FontCacheNode<FT_Glyph> lookupGlyph(FontFaceId faceIdentifier, unsigned long charCode, int width, int height);
+      FontCacheNode<FTC_SBit> lookupBitmap(FontFaceId faceIdentifier, unsigned long charCode, int width, int height);
 
     private:
       FTC_Manager cacheManager;

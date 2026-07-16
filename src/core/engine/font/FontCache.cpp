@@ -16,7 +16,13 @@ namespace Radiant {
         &this->cacheManager
     );
 
-    // TODO init caches.
+    if (cacheType & FONT_CACHE_GLYPH) {
+      FTC_ImageCache_New(this->cacheManager, &this->glyphImageCache);
+    }
+
+    if (cacheType & FONT_CACHE_SMALL_BITMAP) {
+      FTC_ImageCache_New(this->cacheManager, &this->glyphImageCache);
+    }
   }
   
   FontCache::FontCache(FontCache&& other) noexcept :
@@ -34,7 +40,7 @@ namespace Radiant {
     FTC_Manager_Done(this->cacheManager);
   }
 
-  void FontCache::lookupGlyph(FontFaceId faceIdentifier, unsigned long charCode, int width, int height) {
+  FontCacheNode<FT_Glyph> FontCache::lookupGlyph(FontFaceId faceIdentifier, unsigned long charCode, int width, int height) {
     FTC_ImageType imageType{};
     imageType->face_id = &faceIdentifier;
     imageType->width = width;
@@ -48,9 +54,10 @@ namespace Radiant {
     FTC_Node cacheNode;
     FT_UInt gindex = FT_Get_Char_Index(fontFace, charCode);
     FTC_ImageCache_Lookup(this->glyphImageCache, imageType, gindex, &glyph, &cacheNode);
+    return {this->cacheManager, glyph, cacheNode};
   }
 
-  void FontCache::lookupBitmap(FontFaceId faceIdentifier, unsigned long charCode, int width, int height) {
+  FontCacheNode<FTC_SBit> FontCache::lookupBitmap(FontFaceId faceIdentifier, unsigned long charCode, int width, int height) {
     FTC_ImageType imageType{};
     imageType->face_id = &faceIdentifier;
     imageType->width = width;
@@ -64,6 +71,7 @@ namespace Radiant {
     FTC_Node cacheNode;
     FT_UInt gindex = FT_Get_Char_Index(fontFace, charCode);
     FTC_SBitCache_Lookup(this->smallBitmapCache, imageType, gindex, &smallBitmap, &cacheNode);
+    return {this->cacheManager, smallBitmap, cacheNode};
   }
   
   FT_Error FontCache::requestFontFace(FTC_FaceID faceIdentifier, FT_Library freetype, FT_Pointer requestData, FT_Face* fontFace) {
