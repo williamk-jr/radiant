@@ -8,36 +8,10 @@
 
 namespace Radiant {
   FontManager::FontManager() {
-    FT_Error error = FT_Init_FreeType(&this->freetype);
-    if (error) {
-      Logger::error("Failed to load Font Manager, error code: " + std::to_string(error), {
-        {"FONT", MessageStyle::WHITE},
-      });
-    } else {
-      Logger::info("Loaded Font Manager.", {
-        {"FONT", MessageStyle::WHITE},
-      }, 1);
-    }
-
-    this->fontCache = std::make_unique<FontCache>(this->freetype, 1024*4, FONT_CACHE_GLYPH | FONT_CACHE_SMALL_BITMAP);
-  }
-  FontManager::FontManager(FontManager&& other) noexcept :
-    freetype(other.freetype) {
-    other.freetype = nullptr;
-  }
-
-  FontManager::~FontManager() {
-    FT_Done_FreeType(this->freetype);
+    this->fontCache = std::make_unique<FontCache>(1024*4, FONT_CACHE_GLYPH | FONT_CACHE_SMALL_BITMAP);
   }
 
   Font FontManager::loadFont(std::filesystem::path path) {
-    const char* rawPath = path.c_str();
-
-    FT_Face fontFace;
-    FT_Error error = FT_New_Face(freetype, rawPath, 0, &fontFace);
-
-    Logger::info(fontFace->family_name);
-
-    return {this->freetype, path};
+    return {*this->fontCache, {path, 0}};
   }
 }

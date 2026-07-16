@@ -6,33 +6,22 @@
 #include <string>
 
 namespace Radiant {
-  Font::Font(FT_Library freetype, std::filesystem::path path) {
-    const char* rawPath = path.c_str();
-    FT_Error error = FT_New_Face(freetype, rawPath, 0, &this->fontFace);
-
-    if (error) {
-      Logger::error("Failed to load Font: "+path.string()+". Error code: " + std::to_string(error), {
-        {"FONT", MessageStyle::WHITE},
-      });
-    } else {
-      Logger::info("Loaded Font: "+path.string(), {
-        {"FONT", MessageStyle::WHITE},
-      }, 1);
-    }
+  Font::Font(FontCache& fontCache, FontFaceId fontFaceIdentifier) : 
+    fontFaceIdentifier(fontFaceIdentifier) {
+    this->fontFace = fontCache.lookupFontFace(fontFaceIdentifier);
+    //FT_Reference_Face(this->fontFace);
   }
   
   Font::Font(const Font& other) : 
-    fontFace(other.fontFace) {
-    FT_Reference_Face(other.fontFace);
-  }
+    fontFaceIdentifier(other.fontFaceIdentifier), fontFace(other.fontFace) {}
   
   Font::Font(Font&& other) noexcept :
-    fontFace(other.fontFace) {
+    fontFaceIdentifier(other.fontFaceIdentifier), fontFace(other.fontFace) {
     other.fontFace = nullptr;
   }
 
   Font::~Font() {
-    FT_Done_Face(this->fontFace);
+    //FT_Done_Face(this->fontFace);
   }
   
   int Font::getNumCharmaps() {

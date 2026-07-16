@@ -21,7 +21,7 @@ namespace Radiant {
 
   class FontCache {
     public:
-      FontCache(FT_Library freetype, size_t cacheSize, FontCacheType cacheType);
+      FontCache(size_t cacheSize, FontCacheType cacheType);
       FontCache(const FontCache&);
       FontCache& operator=(const FontCache&) = default;
 
@@ -29,11 +29,15 @@ namespace Radiant {
       FontCache& operator=(FontCache&&) noexcept = default;
       ~FontCache();
 
+      FT_Face lookupFontFace(FontFaceId fontFaceId);
       FontCacheNode<FT_Glyph> lookupGlyph(FontFaceId faceIdentifier, unsigned long charCode, int width, int height);
       FontCacheNode<FTC_SBit> lookupBitmap(FontFaceId faceIdentifier, unsigned long charCode, int width, int height);
 
     private:
+      FT_Library freetype;
       FTC_Manager cacheManager;
+      FTC_CMapCache charMapCache;
+
       FTC_ImageCache glyphImageCache;
       FTC_SBitCache smallBitmapCache;
 

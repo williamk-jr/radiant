@@ -1,12 +1,26 @@
 #include "radiant/core/engine/font/FontCache.h"
+#include "radiant/util/logger/Logger.h"
 #include <cstddef>
 #include <freetype/freetype.h>
 #include <freetype/ftcache.h>
 #include <freetype/ftglyph.h>
 #include <freetype/fttypes.h>
+#include <string>
 
 namespace Radiant {
-  FontCache::FontCache(FT_Library freetype, size_t cacheSize, FontCacheType cacheType) {
+  FontCache::FontCache(size_t cacheSize, FontCacheType cacheType) {
+    FT_Error error = FT_Init_FreeType(&this->freetype);
+    if (error) {
+      Logger::error("Failed to load Font Manager, error code: " + std::to_string(error), {
+        {"FONT", MessageStyle::WHITE},
+      });
+    } else {
+      Logger::info("Loaded Font Manager.", {
+        {"FONT", MessageStyle::WHITE},
+      }, 1);
+    }
+
+
     FTC_Manager_New(
         freetype, 
         1024, 1024, 
@@ -15,6 +29,8 @@ namespace Radiant {
         nullptr,
         &this->cacheManager
     );
+
+    FTC_CMapCache_New(this->cacheManager, &this->charMapCache);
 
     if (cacheType & FONT_CACHE_GLYPH) {
       FTC_ImageCache_New(this->cacheManager, &this->glyphImageCache);
@@ -38,6 +54,14 @@ namespace Radiant {
 
   FontCache::~FontCache() {
     FTC_Manager_Done(this->cacheManager);
+    FT_Done_FreeType(this->freetype);
+  }
+  
+  FT_Face FontCache::lookupFontFace(FontFaceId fontFaceId) {
+    FT_Face fontFace;
+    FT_Error error = FTC_Manager_LookupFace(this->cacheManager, &fontFaceId, &fontFace);
+    Logger::info(fontFace->family_name);
+    return fontFace;
   }
 
   FontCacheNode<FT_Glyph> FontCache::lookupGlyph(FontFaceId faceIdentifier, unsigned long charCode, int width, int height) {
@@ -46,13 +70,10 @@ namespace Radiant {
     imageType->width = width;
     imageType->height = height;
     imageType->flags = FT_LOAD_DEFAULT;
-
-    FT_Face fontFace;
-    FTC_Manager_LookupFace(this->cacheManager, &faceIdentifier, &fontFace);
-
+    
     FT_Glyph glyph;
     FTC_Node cacheNode;
-    FT_UInt gindex = FT_Get_Char_Index(fontFace, charCode);
+    FT_UInt gindex = FTC_CMapCache_Lookup(this->charMapCache, &faceIdentifier, -1, charCode);
     FTC_ImageCache_Lookup(this->glyphImageCache, imageType, gindex, &glyph, &cacheNode);
     return {this->cacheManager, glyph, cacheNode};
   }
@@ -64,12 +85,9 @@ namespace Radiant {
     imageType->height = height;
     imageType->flags = FT_LOAD_DEFAULT;
 
-    FT_Face fontFace;
-    FTC_Manager_LookupFace(this->cacheManager, &faceIdentifier, &fontFace);
-
     FTC_SBit smallBitmap;
     FTC_Node cacheNode;
-    FT_UInt gindex = FT_Get_Char_Index(fontFace, charCode);
+    FT_UInt gindex = FTC_CMapCache_Lookup(this->charMapCache, &faceIdentifier, -1, charCode);
     FTC_SBitCache_Lookup(this->smallBitmapCache, imageType, gindex, &smallBitmap, &cacheNode);
     return {this->cacheManager, smallBitmap, cacheNode};
   }

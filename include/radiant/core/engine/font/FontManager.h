@@ -14,17 +14,10 @@ namespace Radiant {
   class FontManager {
     public:
       FontManager();
-      FontManager(const FontManager&) = delete;
-      FontManager& operator=(const FontManager&) = delete;
-
-      FontManager(FontManager&&) noexcept;
-      FontManager& operator=(FontManager&&) noexcept = default;
-      ~FontManager();
 
       Font loadFont(std::filesystem::path path);
       Bitmap getBitmapFromCharCode(Font font, unsigned long charCode);
     private:
-      FT_Library freetype;
       std::unique_ptr<FontCache> fontCache;
   };
 }

@@ -1,8 +1,10 @@
 #pragma once
 
 #include "radiant/core/engine/font/Bitmap.h"
+#include "radiant/core/engine/font/FontCache.h"
 #include <filesystem>
 
+#include <freetype/ftcache.h>
 #include <ft2build.h>
 #include <freetype/freetype.h>
 #include <vector>
@@ -29,9 +31,9 @@ namespace Radiant {
       bool isScalable();
 
     private:
-      Font(FT_Library library, std::filesystem::path path);
-      size_t size;
-
+      Font(FontCache& fontCache, FontFaceId fontFaceIdentifier);
+      FontFaceId fontFaceIdentifier;
       FT_Face fontFace;
+      size_t size;
   };
 }
