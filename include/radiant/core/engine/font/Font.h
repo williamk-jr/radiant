@@ -22,7 +22,8 @@ namespace Radiant {
       Font& operator=(Font&&) noexcept = default;
       ~Font();
       
-      Bitmap getBitmapFromCharCode(unsigned long charCode);
+      void setPointSize(uint32_t pointSize);
+      void setPixelSize(uint32_t pixelSize);
       
       int getNumCharmaps();
       std::string getFamilyName();
@@ -34,6 +35,8 @@ namespace Radiant {
       Font(FontCache& fontCache, FontFaceId fontFaceIdentifier);
       FontFaceId fontFaceIdentifier;
       FT_Face fontFace;
-      size_t size;
+
+      uint32_t size;
+      uint32_t dpi;
   };
 }

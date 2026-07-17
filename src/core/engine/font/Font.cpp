@@ -9,7 +9,6 @@ namespace Radiant {
   Font::Font(FontCache& fontCache, FontFaceId fontFaceIdentifier) : 
     fontFaceIdentifier(fontFaceIdentifier) {
     this->fontFace = fontCache.lookupFontFace(fontFaceIdentifier);
-    //FT_Reference_Face(this->fontFace);
   }
   
   Font::Font(const Font& other) : 
@@ -20,8 +19,14 @@ namespace Radiant {
     other.fontFace = nullptr;
   }
 
-  Font::~Font() {
-    //FT_Done_Face(this->fontFace);
+  Font::~Font() {}
+
+  void Font::setPointSize(uint32_t pointSize) {
+    this->size = (pointSize * this->dpi) / 72;
+  }
+
+  void Font::setPixelSize(uint32_t pixelSize) {
+    this->size = pixelSize;
   }
   
   int Font::getNumCharmaps() {
@@ -39,44 +44,4 @@ namespace Radiant {
   bool Font::isScalable() {
     return FT_IS_SCALABLE(this->fontFace);
   }
-
-  Bitmap Font::getBitmapFromCharCode(unsigned long charCode) {
-    int error = 0;
-    error = FT_Set_Char_Size(this->fontFace, 0, 16*64, 0, 72);
-
-    FT_UInt glyphIndex = FT_Get_Char_Index(this->fontFace, charCode);
-    error = FT_Load_Glyph(this->fontFace, glyphIndex, FT_LOAD_DEFAULT);
-    error = FT_Render_Glyph(this->fontFace->glyph, FT_RENDER_MODE_NORMAL);
-
-    if (error) {
-      Logger::info(std::to_string(error));
-    }
-    FT_Bitmap glyphBitmap = this->fontFace->glyph->bitmap;
-
-    size_t bufferSize = glyphBitmap.rows * glyphBitmap.pitch;
-    size_t width = glyphBitmap.width;
-    size_t height = glyphBitmap.rows;
-    //Logger::info(std::to_string(this->fontFace->glyph->bitmap_left));
-    //Logger::info(std::to_string(this->fontFace->glyph->bitmap_top));
-
-    Bitmap bitmap(glyphBitmap.buffer, bufferSize, width, height);
-    return bitmap; 
-  }
-  
-  //void Font::createBitmaps() {
-  //  FT_Load_Glyph(this->fontFace, 0, 0); // Load first glyph.
-  //  FT_GlyphSlot glyph = this->fontFace->glyph;
-
-  //  while (glyph != nullptr) {
-  //    FT_Render_Glyph(glyph, FT_RENDER_MODE_MONO); // Load bitmap;
-  //    FT_Bitmap bitmap = glyph->bitmap;
-
-  //    
-
-
-  //    glyph = this->fontFace->glyph->next; // Get next glyph;
-  //  }
-
-
-  //}
 }

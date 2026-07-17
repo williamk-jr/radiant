@@ -1,5 +1,6 @@
 #include "radiant/core/engine/font/FontManager.h"
 #include "radiant/core/engine/font/Font.h"
+#include "radiant/core/engine/font/FontCacheNode.h"
 #include "radiant/util/logger/Logger.h"
 #include <freetype/freetype.h>
 #include <freetype/fttypes.h>
@@ -13,5 +14,15 @@ namespace Radiant {
 
   Font FontManager::loadFont(std::filesystem::path path) {
     return {*this->fontCache, {path, 0}};
+  }
+
+  void FontManager::compileStringGeometry(Font font, std::string str) {
+    FT_Size fontSize = this->fontCache->lookupPixelFontSize(font.fontFaceIdentifier, font.size, font.size);
+    
+    for (char charCode : str) {
+      FontCacheNode<FT_Glyph> glyph = this->fontCache->lookupGlyph(font.fontFaceIdentifier, charCode, font.size, font.size);
+
+      
+    }
   }
 }

@@ -64,6 +64,32 @@ namespace Radiant {
     return fontFace;
   }
 
+  FT_Size FontCache::lookupPixelFontSize(FontFaceId fontFaceId, uint32_t width, uint32_t height) {
+    FTC_Scaler scaler{};
+    scaler->face_id = &fontFaceId;
+    scaler->width = width;
+    scaler->height = height;
+    scaler->pixel = true;
+    
+    FT_Size size;
+    FTC_Manager_LookupSize(this->cacheManager, scaler, &size);
+    return size;
+  } 
+
+  FT_Size FontCache::lookupPointFontSize(FontFaceId fontFaceId, uint32_t width, uint32_t height, uint32_t xResolution, uint32_t yResolution) {
+    FTC_Scaler scaler{};
+    scaler->face_id = &fontFaceId;
+    scaler->width = width*64;
+    scaler->height = height*64;
+    scaler->x_res = xResolution;
+    scaler->y_res = yResolution;
+    scaler->pixel = false;
+    
+    FT_Size size;
+    FTC_Manager_LookupSize(this->cacheManager, scaler, &size);
+    return size;
+  }
+
   FontCacheNode<FT_Glyph> FontCache::lookupGlyph(FontFaceId faceIdentifier, unsigned long charCode, int width, int height) {
     FTC_ImageType imageType{};
     imageType->face_id = &faceIdentifier;

@@ -30,6 +30,8 @@ namespace Radiant {
       ~FontCache();
 
       FT_Face lookupFontFace(FontFaceId fontFaceId);
+      FT_Size lookupPixelFontSize(FontFaceId fontFaceId, uint32_t width, uint32_t height);
+      FT_Size lookupPointFontSize(FontFaceId fontFaceId, uint32_t width, uint32_t height, uint32_t xResolution, uint32_t yResolution);
       FontCacheNode<FT_Glyph> lookupGlyph(FontFaceId faceIdentifier, unsigned long charCode, int width, int height);
       FontCacheNode<FTC_SBit> lookupBitmap(FontFaceId faceIdentifier, unsigned long charCode, int width, int height);
 
