@@ -2,8 +2,10 @@
 
 #include "radiant/core/engine/font/Font.h"
 #include "radiant/core/engine/font/FontCache.h"
+#include "radiant/core/engine/font/FontGPUCache.h"
 #include <filesystem>
 
+#include <freetype/ftglyph.h>
 #include <ft2build.h>
 #include <freetype/freetype.h>
 #include <memory>
@@ -19,5 +21,7 @@ namespace Radiant {
       void compileStringGeometry(Font font, std::string str);
     private:
       std::unique_ptr<FontCache> fontCache;
+      std::unique_ptr<FontGPUCache> fontGpuCache;
+      FT_BitmapGlyph toBitmapGlyph(FT_Glyph glyph, FT_Render_Mode renderMode);
   };
 }
