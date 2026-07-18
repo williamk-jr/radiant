@@ -1,5 +1,6 @@
 #pragma once
-#include "radiant/core/engine/font/FontCacheNode.h"
+#include "radiant/core/engine/font/cache/FontCacheIdentifier.h"
+#include "radiant/core/engine/font/cache/FontCacheNode.h"
 #include <cstdint>
 #include <filesystem>
 #include <freetype/freetype.h>
@@ -14,11 +15,6 @@ namespace Radiant {
     FONT_CACHE_SMALL_BITMAP  = 0x02
   };
 
-  struct FontFaceId {
-    std::filesystem::path path;
-    uint32_t faceId;
-  };
-
   class FontCache {
     public:
       FontCache(size_t cacheSize, FontCacheType cacheType);
@@ -29,11 +25,11 @@ namespace Radiant {
       FontCache& operator=(FontCache&&) noexcept = default;
       ~FontCache();
 
-      FT_Face lookupFontFace(FontFaceId fontFaceId);
-      FT_Size lookupPixelFontSize(FontFaceId fontFaceId, uint32_t width, uint32_t height);
-      FT_Size lookupPointFontSize(FontFaceId fontFaceId, uint32_t width, uint32_t height, uint32_t xResolution, uint32_t yResolution);
-      FontCacheNode<FT_Glyph> lookupGlyph(FontFaceId faceIdentifier, unsigned long charCode, int width, int height);
-      FontCacheNode<FTC_SBit> lookupBitmap(FontFaceId faceIdentifier, unsigned long charCode, int width, int height);
+      FT_Face lookupFontFace(FontCacheIdentifier fontFaceId);
+      FT_Size lookupPixelFontSize(FontCacheIdentifier fontFaceId, uint32_t width, uint32_t height);
+      FT_Size lookupPointFontSize(FontCacheIdentifier fontFaceId, uint32_t width, uint32_t height, uint32_t xResolution, uint32_t yResolution);
+      FontCacheNode<FT_Glyph> lookupGlyph(FontCacheIdentifier faceIdentifier, unsigned long charCode, int width, int height);
+      FontCacheNode<FTC_SBit> lookupBitmap(FontCacheIdentifier faceIdentifier, unsigned long charCode, int width, int height);
 
     private:
       FT_Library freetype;

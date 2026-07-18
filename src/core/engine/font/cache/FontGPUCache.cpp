@@ -1,10 +1,11 @@
-#include "radiant/core/engine/font/FontGPUCache.h"
+#include "radiant/core/engine/font/cache/FontGPUCache.h"
 #include "radiant/core/render/TextureAtlas.h"
 #include <freetype/ftglyph.h>
 #include <memory>
 #include <utility>
 
 namespace Radiant {
+  // TODO Write custom hash function for glyph identifiers.
   FontGPUCache::FontGPUCache() {
     this->textureAtlas = std::make_unique<TextureAtlas>(2048, 2048);
   }

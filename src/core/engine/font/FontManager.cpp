@@ -1,7 +1,7 @@
 #include "radiant/core/engine/font/FontManager.h"
 #include "radiant/core/engine/font/Font.h"
-#include "radiant/core/engine/font/FontCacheNode.h"
-#include "radiant/core/engine/font/FontGPUCache.h"
+#include "radiant/core/engine/font/cache/FontCacheNode.h"
+#include "radiant/core/engine/font/cache/FontGPUCache.h"
 #include "radiant/util/logger/Logger.h"
 #include <freetype/freetype.h>
 #include <freetype/ftglyph.h>
@@ -26,14 +26,14 @@ namespace Radiant {
       FontCacheNode<FT_Glyph> glyphNode = this->fontCache->lookupGlyph(font.fontFaceIdentifier, charCode, font.size, font.size);
       FT_BitmapGlyph bitmapGlyph = this->toBitmapGlyph(glyphNode.getValue(), FT_RENDER_MODE_NORMAL);
       
-      GlyphIdentifier glyphId = {font.fontFaceIdentifier.faceId, (unsigned long)charCode};
+      GlyphIdentifier glyphId = {font.fontFaceIdentifier, (unsigned long)charCode};
       if (!fontGpuCache->hasEntry(glyphId)) {
         fontGpuCache->addEntry(bitmapGlyph->bitmap, glyphId);
       }
     }
   }
   
-  FT_BitmapGlyph toBitmapGlyph(FT_Glyph glyph, FT_Render_Mode renderMode) {
+  FT_BitmapGlyph FontManager::toBitmapGlyph(FT_Glyph glyph, FT_Render_Mode renderMode) {
     if (glyph->format != FT_GLYPH_FORMAT_BITMAP) {
       FT_Glyph_To_Bitmap(&glyph, renderMode, nullptr, false);
     }

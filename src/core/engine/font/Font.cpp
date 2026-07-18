@@ -1,4 +1,5 @@
 #include "radiant/core/engine/font/Font.h"
+#include "radiant/core/engine/font/cache/FontCacheIdentifier.h"
 #include "radiant/util/logger/Logger.h"
 #include <cstring>
 #include <freetype/freetype.h>
@@ -6,7 +7,7 @@
 #include <string>
 
 namespace Radiant {
-  Font::Font(FontCache& fontCache, FontFaceId fontFaceIdentifier) : 
+  Font::Font(FontCache& fontCache, FontCacheIdentifier fontFaceIdentifier) : 
     fontFaceIdentifier(fontFaceIdentifier) {
     this->fontFace = fontCache.lookupFontFace(fontFaceIdentifier);
   }

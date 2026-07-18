@@ -1,4 +1,5 @@
-#include "radiant/core/engine/font/FontCache.h"
+#include "radiant/core/engine/font/cache/FontCache.h"
+#include "radiant/core/engine/font/cache/FontCacheIdentifier.h"
 #include "radiant/util/logger/Logger.h"
 #include <cstddef>
 #include <freetype/freetype.h>
@@ -57,14 +58,14 @@ namespace Radiant {
     FT_Done_FreeType(this->freetype);
   }
   
-  FT_Face FontCache::lookupFontFace(FontFaceId fontFaceId) {
+  FT_Face FontCache::lookupFontFace(FontCacheIdentifier fontFaceId) {
     FT_Face fontFace;
     FT_Error error = FTC_Manager_LookupFace(this->cacheManager, &fontFaceId, &fontFace);
     Logger::info(fontFace->family_name);
     return fontFace;
   }
 
-  FT_Size FontCache::lookupPixelFontSize(FontFaceId fontFaceId, uint32_t width, uint32_t height) {
+  FT_Size FontCache::lookupPixelFontSize(FontCacheIdentifier fontFaceId, uint32_t width, uint32_t height) {
     FTC_Scaler scaler{};
     scaler->face_id = &fontFaceId;
     scaler->width = width;
@@ -76,7 +77,7 @@ namespace Radiant {
     return size;
   } 
 
-  FT_Size FontCache::lookupPointFontSize(FontFaceId fontFaceId, uint32_t width, uint32_t height, uint32_t xResolution, uint32_t yResolution) {
+  FT_Size FontCache::lookupPointFontSize(FontCacheIdentifier fontFaceId, uint32_t width, uint32_t height, uint32_t xResolution, uint32_t yResolution) {
     FTC_Scaler scaler{};
     scaler->face_id = &fontFaceId;
     scaler->width = width*64;
@@ -90,7 +91,7 @@ namespace Radiant {
     return size;
   }
 
-  FontCacheNode<FT_Glyph> FontCache::lookupGlyph(FontFaceId faceIdentifier, unsigned long charCode, int width, int height) {
+  FontCacheNode<FT_Glyph> FontCache::lookupGlyph(FontCacheIdentifier faceIdentifier, unsigned long charCode, int width, int height) {
     FTC_ImageType imageType{};
     imageType->face_id = &faceIdentifier;
     imageType->width = width;
@@ -104,7 +105,7 @@ namespace Radiant {
     return {this->cacheManager, glyph, cacheNode};
   }
 
-  FontCacheNode<FTC_SBit> FontCache::lookupBitmap(FontFaceId faceIdentifier, unsigned long charCode, int width, int height) {
+  FontCacheNode<FTC_SBit> FontCache::lookupBitmap(FontCacheIdentifier faceIdentifier, unsigned long charCode, int width, int height) {
     FTC_ImageType imageType{};
     imageType->face_id = &faceIdentifier;
     imageType->width = width;
@@ -119,7 +120,7 @@ namespace Radiant {
   }
   
   FT_Error FontCache::requestFontFace(FTC_FaceID faceIdentifier, FT_Library freetype, FT_Pointer requestData, FT_Face* fontFace) {
-    FontFaceId* faceId = static_cast<FontFaceId*>(faceIdentifier); 
+    FontCacheIdentifier* faceId = static_cast<FontCacheIdentifier*>(faceIdentifier); 
     const char* rawPath = faceId->path.c_str();
 
     return FT_New_Face(freetype, rawPath, faceId->faceId, fontFace);

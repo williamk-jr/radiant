@@ -1,7 +1,8 @@
 #pragma once
 
 #include "radiant/core/engine/font/Bitmap.h"
-#include "radiant/core/engine/font/FontCache.h"
+#include "radiant/core/engine/font/cache/FontCache.h"
+#include "radiant/core/engine/font/cache/FontCacheIdentifier.h"
 #include <filesystem>
 
 #include <freetype/ftcache.h>
@@ -32,8 +33,8 @@ namespace Radiant {
       bool isScalable();
 
     private:
-      Font(FontCache& fontCache, FontFaceId fontFaceIdentifier);
-      FontFaceId fontFaceIdentifier;
+      Font(FontCache& fontCache, FontCacheIdentifier fontFaceIdentifier);
+      FontCacheIdentifier fontFaceIdentifier;
       FT_Face fontFace;
 
       uint32_t size;

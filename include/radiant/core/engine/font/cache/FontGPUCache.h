@@ -1,5 +1,6 @@
 #pragma once
 
+#include "radiant/core/engine/font/cache/FontCacheIdentifier.h"
 #include "radiant/core/render/TextureAtlas.h"
 #include <cstdint>
 #include <freetype/ftglyph.h>
@@ -7,15 +8,28 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+
 namespace Radiant {
   struct GlyphIdentifier {
-    uint32_t fontId;
+    FontCacheIdentifier fontId;
     unsigned long charCode;
+    
+    bool operator==(const GlyphIdentifier& other) const {
+      return this->fontId == other.fontId && this->charCode == other.charCode;
+    }
   };
 
   struct GlyphAtlasLocation {
     float uMin, vMin;
     float uMax, vMax;
+  };
+
+  struct GlyphIdentifierHasher {
+    std::size_t operator()(const GlyphIdentifier& id) const noexcept {
+      std::size_t hash = FontCacheIdentifierHasher{}(id.fontId);
+      hash_util::combineHash<uint32_t>(hash, id.charCode);
+      return hash;
+    }
   };
 
   /*
@@ -44,7 +58,7 @@ namespace Radiant {
       const TextureAtlas& getTextureAtlas();
 
     private:
-      std::unordered_map<GlyphIdentifier, GlyphAtlasLocation> cache;
+      std::unordered_map<GlyphIdentifier, GlyphAtlasLocation, GlyphIdentifierHasher> cache;
       std::unique_ptr<TextureAtlas> textureAtlas;
       bool cacheDirty;
 

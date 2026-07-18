@@ -55,7 +55,8 @@ add_executable(Radiant
 
   src/core/engine/font/Bitmap.cpp
   src/core/engine/font/Font.cpp
-  src/core/engine/font/FontCache.cpp
+  src/core/engine/font/cache/FontCache.cpp
+  src/core/engine/font/cache/FontGPUCache.cpp
   src/core/engine/font/FontManager.cpp
 
   src/core/render/vulkan/VulkanInstance.cpp
@@ -84,6 +85,7 @@ add_executable(Radiant
   src/core/render/Color.cpp
   src/core/render/Renderer.cpp
   src/core/render/Window.cpp
+  src/core/render/TextureAtlas.cpp
   src/core/render/models/Model.cpp
   src/core/render/models/Quad2D.cpp
   src/core/render/buffers/VertexBuffer.cpp

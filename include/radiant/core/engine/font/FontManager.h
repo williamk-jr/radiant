@@ -1,8 +1,8 @@
 #pragma once
 
 #include "radiant/core/engine/font/Font.h"
-#include "radiant/core/engine/font/FontCache.h"
-#include "radiant/core/engine/font/FontGPUCache.h"
+#include "radiant/core/engine/font/cache/FontCache.h"
+#include "radiant/core/engine/font/cache/FontGPUCache.h"
 #include <filesystem>
 
 #include <freetype/ftglyph.h>
