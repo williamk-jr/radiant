@@ -19,6 +19,9 @@ namespace Radiant {
     this->window = std::make_unique<Window>(title, width, height);
     this->fontManager = std::make_unique<FontManager>();
     Font notoSans = this->fontManager->loadFont("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf");
+
+    notoSans.setPointSize(16);
+    this->fontManager->compileStringGeometry(notoSans, "Hello World.");
     //Bitmap bitmap = notoSans.getBitmapFromCharCode('x');
 
     // Enable debug logs.

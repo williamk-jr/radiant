@@ -13,6 +13,14 @@ namespace Radiant {
         FTC_Node_Unref(this->node, this->manager);
       }
 
+      static FontCacheNode<T> empty() {
+        return {nullptr, 0, nullptr};
+      }
+
+      bool isEmpty() {
+        return this->node == nullptr;
+      }
+
       T getValue() {
         return this->value;
       }

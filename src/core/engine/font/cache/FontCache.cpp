@@ -66,56 +66,67 @@ namespace Radiant {
   }
 
   FT_Size FontCache::lookupPixelFontSize(FontCacheIdentifier fontFaceId, uint32_t width, uint32_t height) {
-    FTC_Scaler scaler{};
-    scaler->face_id = &fontFaceId;
-    scaler->width = width;
-    scaler->height = height;
-    scaler->pixel = true;
+
+    FTC_ScalerRec scaler{};
+    scaler.face_id = &fontFaceId;
+    scaler.width = width;
+    scaler.height = height;
+    scaler.pixel = true;
     
     FT_Size size;
-    FTC_Manager_LookupSize(this->cacheManager, scaler, &size);
+    FT_Error error = FTC_Manager_LookupSize(this->cacheManager, &scaler, &size);
     return size;
   } 
 
   FT_Size FontCache::lookupPointFontSize(FontCacheIdentifier fontFaceId, uint32_t width, uint32_t height, uint32_t xResolution, uint32_t yResolution) {
-    FTC_Scaler scaler{};
-    scaler->face_id = &fontFaceId;
-    scaler->width = width*64;
-    scaler->height = height*64;
-    scaler->x_res = xResolution;
-    scaler->y_res = yResolution;
-    scaler->pixel = false;
+    FTC_ScalerRec scaler{};
+    scaler.face_id = &fontFaceId;
+    scaler.width = width*64;
+    scaler.height = height*64;
+    scaler.x_res = xResolution;
+    scaler.y_res = yResolution;
+    scaler.pixel = false;
     
     FT_Size size;
-    FTC_Manager_LookupSize(this->cacheManager, scaler, &size);
+    FT_Error error = FTC_Manager_LookupSize(this->cacheManager, &scaler, &size);
     return size;
   }
 
   FontCacheNode<FT_Glyph> FontCache::lookupGlyph(FontCacheIdentifier faceIdentifier, unsigned long charCode, int width, int height) {
-    FTC_ImageType imageType{};
-    imageType->face_id = &faceIdentifier;
-    imageType->width = width;
-    imageType->height = height;
-    imageType->flags = FT_LOAD_DEFAULT;
+    FTC_ImageTypeRec imageType{};
+    imageType.face_id = &faceIdentifier;
+    imageType.width = width;
+    imageType.height = height;
+    imageType.flags = FT_LOAD_DEFAULT;
     
     FT_Glyph glyph;
     FTC_Node cacheNode;
-    FT_UInt gindex = FTC_CMapCache_Lookup(this->charMapCache, &faceIdentifier, -1, charCode);
-    FTC_ImageCache_Lookup(this->glyphImageCache, imageType, gindex, &glyph, &cacheNode);
+    FT_UInt gindex = FTC_CMapCache_Lookup(this->charMapCache, &faceIdentifier, 0, charCode);
+
+    if (gindex == 0) {
+      return FontCacheNode<FT_Glyph>::empty();
+    }
+
+    FTC_ImageCache_Lookup(this->glyphImageCache, &imageType, gindex, &glyph, &cacheNode);
     return {this->cacheManager, glyph, cacheNode};
   }
 
   FontCacheNode<FTC_SBit> FontCache::lookupBitmap(FontCacheIdentifier faceIdentifier, unsigned long charCode, int width, int height) {
-    FTC_ImageType imageType{};
-    imageType->face_id = &faceIdentifier;
-    imageType->width = width;
-    imageType->height = height;
-    imageType->flags = FT_LOAD_DEFAULT;
+    FTC_ImageTypeRec imageType{};
+    imageType.face_id = &faceIdentifier;
+    imageType.width = width;
+    imageType.height = height;
+    imageType.flags = FT_LOAD_DEFAULT;
 
     FTC_SBit smallBitmap;
     FTC_Node cacheNode;
-    FT_UInt gindex = FTC_CMapCache_Lookup(this->charMapCache, &faceIdentifier, -1, charCode);
-    FTC_SBitCache_Lookup(this->smallBitmapCache, imageType, gindex, &smallBitmap, &cacheNode);
+    FT_UInt gindex = FTC_CMapCache_Lookup(this->charMapCache, &faceIdentifier, 0, charCode);
+
+    if (gindex == 0) {
+      return FontCacheNode<FTC_SBit>::empty();
+    }
+
+    FTC_SBitCache_Lookup(this->smallBitmapCache, &imageType, gindex, &smallBitmap, &cacheNode);
     return {this->cacheManager, smallBitmap, cacheNode};
   }
   

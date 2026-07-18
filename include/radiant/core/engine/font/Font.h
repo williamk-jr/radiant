@@ -23,6 +23,7 @@ namespace Radiant {
       Font& operator=(Font&&) noexcept = default;
       ~Font();
       
+      uint32_t getPixelSize();
       void setPointSize(uint32_t pointSize);
       void setPixelSize(uint32_t pixelSize);
       
@@ -37,7 +38,7 @@ namespace Radiant {
       FontCacheIdentifier fontFaceIdentifier;
       FT_Face fontFace;
 
-      uint32_t size;
-      uint32_t dpi;
+      uint32_t size = 0;
+      uint32_t dpi = 72; // TODO get actual dpi.
   };
 }

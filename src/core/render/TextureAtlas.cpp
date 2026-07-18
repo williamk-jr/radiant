@@ -1,12 +1,15 @@
 #include "radiant/core/render/TextureAtlas.h"
+#include "radiant/util/logger/Logger.h"
 #include <algorithm>
 #include <cstdint>
+#include <string>
 #include <vector>
 
 namespace Radiant {
   TextureAtlas::TextureAtlas(uint32_t width, uint32_t height) : 
     width(width), height(height) {
-      this->buffer = std::vector<uint8_t>(width*height*4);
+      this->buffer = std::vector<uint8_t>();
+      this->buffer.reserve(width*height*4);
   }
   
   void TextureAtlas::addTexture(uint8_t* buffer, uint32_t size, uint32_t width, uint32_t height) {
@@ -20,14 +23,15 @@ namespace Radiant {
       this->rowOffset = height;
     }
 
+    //Logger::info(std::to_string(this->cursorX));
     for (int y = 0; y < height; y++) {
       uint8_t* src = buffer + (width * y * 4);
       uint8_t* dst = this->buffer.data() + (this->cursorX * (this->cursorY + y) * 4);
 
       std::copy(src, src+(width*4), dst);
 
-      cursorX += width;
     }
+    cursorX += width*4;
   }
   uint32_t TextureAtlas::getCursorX() {
     return this->cursorX;

@@ -16,11 +16,11 @@ namespace Radiant {
 
     private:
       std::vector<uint8_t> buffer;
-      uint32_t width;
-      uint32_t height;
+      uint32_t width = 0;
+      uint32_t height = 0;
 
-      uint32_t cursorX;
-      uint32_t cursorY;
-      uint32_t rowOffset;
+      uint32_t cursorX = 0;
+      uint32_t cursorY = 0;
+      uint32_t rowOffset = 0;
   };
 }

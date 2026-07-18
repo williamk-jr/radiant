@@ -13,14 +13,18 @@ namespace Radiant {
   }
   
   Font::Font(const Font& other) : 
-    fontFaceIdentifier(other.fontFaceIdentifier), fontFace(other.fontFace) {}
+    fontFaceIdentifier(other.fontFaceIdentifier), fontFace(other.fontFace), size(other.size), dpi(other.dpi) {}
   
   Font::Font(Font&& other) noexcept :
-    fontFaceIdentifier(other.fontFaceIdentifier), fontFace(other.fontFace) {
+    fontFaceIdentifier(other.fontFaceIdentifier), fontFace(other.fontFace), size(other.size), dpi(other.dpi) {
     other.fontFace = nullptr;
   }
 
   Font::~Font() {}
+
+  uint32_t Font::getPixelSize() {
+    return this->size; 
+  };
 
   void Font::setPointSize(uint32_t pointSize) {
     this->size = (pointSize * this->dpi) / 72;

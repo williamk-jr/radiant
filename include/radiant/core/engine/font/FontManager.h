@@ -18,7 +18,7 @@ namespace Radiant {
       FontManager();
 
       Font loadFont(std::filesystem::path path);
-      void compileStringGeometry(Font font, std::string str);
+      void compileStringGeometry(Font& font, std::string str);
     private:
       std::unique_ptr<FontCache> fontCache;
       std::unique_ptr<FontGPUCache> fontGpuCache;

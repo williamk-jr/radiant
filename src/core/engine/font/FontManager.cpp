@@ -19,11 +19,17 @@ namespace Radiant {
     return {*this->fontCache, {path, 0}};
   }
 
-  void FontManager::compileStringGeometry(Font font, std::string str) {
-    FT_Size fontSize = this->fontCache->lookupPixelFontSize(font.fontFaceIdentifier, font.size, font.size);
+  void FontManager::compileStringGeometry(Font& font, std::string str) {
+    FT_Size fontSize = this->fontCache->lookupPixelFontSize(font.fontFaceIdentifier, font.getPixelSize(), font.getPixelSize());
+    Logger::info(std::to_string(font.getPixelSize()));
     
     for (char charCode : str) {
       FontCacheNode<FT_Glyph> glyphNode = this->fontCache->lookupGlyph(font.fontFaceIdentifier, charCode, font.size, font.size);
+      if (glyphNode.isEmpty()) {
+        Logger::info("Could not load char: " + std::to_string(charCode));
+        continue;
+      }
+
       FT_BitmapGlyph bitmapGlyph = this->toBitmapGlyph(glyphNode.getValue(), FT_RENDER_MODE_NORMAL);
       
       GlyphIdentifier glyphId = {font.fontFaceIdentifier, (unsigned long)charCode};

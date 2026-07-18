@@ -5,7 +5,6 @@
 #include <utility>
 
 namespace Radiant {
-  // TODO Write custom hash function for glyph identifiers.
   FontGPUCache::FontGPUCache() {
     this->textureAtlas = std::make_unique<TextureAtlas>(2048, 2048);
   }
@@ -24,6 +23,7 @@ namespace Radiant {
 
     this->textureAtlas->addTexture(bitmap.buffer, bufferSize, width, height);
 
+    // TODO fix uv
     std::pair<float, float> uvMax = this->calculateUV(
         this->textureAtlas->getCursorX(), 
         this->textureAtlas->getCursorY(), 
