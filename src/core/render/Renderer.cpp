@@ -204,6 +204,7 @@ namespace Radiant {
   }
 
   void Renderer::bindDescriptorSets() {
+    //std::cout << descriptorBufferWrites[0].offset << "\n";
     this->descriptorPool->updateDescriptorSets({
       VulkanWriteDescriptorSet{
         this->descriptorSets[currentFrame].get(), 
@@ -212,7 +213,7 @@ namespace Radiant {
         this->descriptorBufferWrites, 
         {}, {}
       }
-    }, {});
+    });
 
     this->commandBuffers[currentFrame].bindDescriptorSets(*this->graphicsPipeline, 0, this->descriptorSets);
   }

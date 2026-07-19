@@ -1,7 +1,9 @@
 #include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include "radiant/util/logger/Logger.h"
 #include <algorithm>
+#include <string>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
@@ -61,11 +63,28 @@ namespace Radiant {
     for (VkDescriptorSet& descriptorSet : rawDescriptorSets) {
       wrappedDescriptorSets.emplace_back(descriptorSet);
     }
-    //Logger::info(std::to_string(rawDescriptorSets.size()));
     return wrappedDescriptorSets;
   }
   
   void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites, std::vector<VulkanCopyDescriptorSet> descriptorSetCopies) {
+    std::vector<VkWriteDescriptorSet> rawDescriptorWrites = this->toRawDescriptorWrites(descriptorSetWrites);
+    std::vector<VkCopyDescriptorSet> rawDescriptorCopies = this->toRawDescriptorCopies(descriptorSetCopies);
+
+    vkUpdateDescriptorSets(this->device, 
+        rawDescriptorWrites.size(), descriptorSetWrites.size() != 0 ? rawDescriptorWrites.data() : nullptr, 
+        rawDescriptorCopies.size(), descriptorSetCopies.size() != 0 ? rawDescriptorCopies.data() : nullptr
+    );
+  }
+
+  void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites) {
+    this->updateDescriptorSets(descriptorSetWrites, {});
+  }
+
+  void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanCopyDescriptorSet> descriptorSetCopies) {
+    this->updateDescriptorSets({}, descriptorSetCopies);
+  }
+  
+  std::vector<VkWriteDescriptorSet> VulkanDescriptorPool::toRawDescriptorWrites(std::vector<VulkanWriteDescriptorSet>& descriptorSetWrites) {
     std::vector<VkWriteDescriptorSet> rawDescriptorWrites;
     rawDescriptorWrites.reserve(descriptorSetWrites.size());
 
@@ -88,7 +107,10 @@ namespace Radiant {
         descriptorWrite.texelBufferViews.size() != 0 ? descriptorWrite.texelBufferViews.data() : nullptr
       });
     }
+    return rawDescriptorWrites;
+  }
 
+  std::vector<VkCopyDescriptorSet> VulkanDescriptorPool::toRawDescriptorCopies(std::vector<VulkanCopyDescriptorSet>& descriptorSetCopies) {
     std::vector<VkCopyDescriptorSet> rawDescriptorCopies;
     rawDescriptorCopies.reserve(descriptorSetCopies.size());
 
@@ -104,10 +126,6 @@ namespace Radiant {
         descriptorCopy.descriptorCount
       });
     }
-
-    vkUpdateDescriptorSets(this->device, 
-        rawDescriptorWrites.size(), descriptorSetWrites.size() != 0 ? rawDescriptorWrites.data() : nullptr, 
-        rawDescriptorCopies.size(), descriptorSetCopies.size() != 0 ? rawDescriptorCopies.data() : nullptr
-    );
+    return rawDescriptorCopies;
   }
 }

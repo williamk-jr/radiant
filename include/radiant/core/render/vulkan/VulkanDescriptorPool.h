@@ -74,8 +74,27 @@ namespace Radiant {
        */
       void updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites, std::vector<VulkanCopyDescriptorSet> descriptorSetCopies);
 
+      /*
+       * Updates descriptor sets.
+       *
+       * @param std::vector<VulkanWriteDescriptorSet>> A vector of write instructions for each descriptor to be updated.
+       */
+      void updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites);
+      
+      /*
+       * Updates descriptor sets.
+       *
+       * @param std::vector<VulkanCopyDescriptorSet>> A vector of copy instructions for each descriptor to be updated.
+       */
+      void updateDescriptorSets(std::vector<VulkanCopyDescriptorSet> descriptorSetCopies);
+
+
+
     private:
       VkDescriptorPool descriptorPool;
       VkDevice device;
+
+      std::vector<VkWriteDescriptorSet> toRawDescriptorWrites(std::vector<VulkanWriteDescriptorSet>& descriptorSetWrites);
+      std::vector<VkCopyDescriptorSet> toRawDescriptorCopies(std::vector<VulkanCopyDescriptorSet>& descriptorSetWrites);
   };
 }
