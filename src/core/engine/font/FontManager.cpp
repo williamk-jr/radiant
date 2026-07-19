@@ -2,6 +2,7 @@
 #include "radiant/core/engine/font/Font.h"
 #include "radiant/core/engine/font/cache/FontCacheNode.h"
 #include "radiant/core/engine/font/cache/FontGPUCache.h"
+#include "radiant/core/render/TextureAtlas.h"
 #include "radiant/util/logger/Logger.h"
 #include <freetype/freetype.h>
 #include <freetype/ftglyph.h>
@@ -21,7 +22,7 @@ namespace Radiant {
 
   void FontManager::compileStringGeometry(Font& font, std::string str) {
     FT_Size fontSize = this->fontCache->lookupPixelFontSize(font.fontFaceIdentifier, font.getPixelSize(), font.getPixelSize());
-    Logger::info(std::to_string(font.getPixelSize()));
+    //Logger::info(std::to_string(font.getPixelSize()));
     
     for (char charCode : str) {
       FontCacheNode<FT_Glyph> glyphNode = this->fontCache->lookupGlyph(font.fontFaceIdentifier, charCode, font.size, font.size);
@@ -30,13 +31,16 @@ namespace Radiant {
         continue;
       }
 
-      FT_BitmapGlyph bitmapGlyph = this->toBitmapGlyph(glyphNode.getValue(), FT_RENDER_MODE_NORMAL);
-      
       GlyphIdentifier glyphId = {font.fontFaceIdentifier, (unsigned long)charCode};
       if (!fontGpuCache->hasEntry(glyphId)) {
+        FT_BitmapGlyph bitmapGlyph = this->toBitmapGlyph(glyphNode.getValue(), FT_RENDER_MODE_NORMAL);
         fontGpuCache->addEntry(bitmapGlyph->bitmap, glyphId);
       }
     }
+  }
+
+  TextureAtlas& FontManager::getTextureAtlas() {
+    return this->fontGpuCache->getTextureAtlas();
   }
   
   FT_BitmapGlyph FontManager::toBitmapGlyph(FT_Glyph glyph, FT_Render_Mode renderMode) {

@@ -7,11 +7,16 @@
 
 namespace Radiant {
 
-  VulkanCommandBuffer::VulkanCommandBuffer(VkCommandBuffer commandBuffer) : commandBuffer(commandBuffer) {}
+  VulkanCommandBuffer::VulkanCommandBuffer(VkDevice device, VkCommandBuffer commandBuffer, VkCommandPool commandPool) : 
+    commandBuffer(commandBuffer), commandPool(commandPool), device(device) {}
 
   VulkanCommandBuffer::VulkanCommandBuffer(VulkanCommandBuffer&& other) noexcept :
-    commandBuffer(other.commandBuffer) {
+    commandBuffer(other.commandBuffer), commandPool(other.commandPool), device(other.device){
     other.commandBuffer = nullptr;
+  }
+
+  VulkanCommandBuffer::~VulkanCommandBuffer() {
+    vkFreeCommandBuffers(this->device, this->commandPool, 1, &commandBuffer);
   }
 
   VkCommandBuffer VulkanCommandBuffer::get() {

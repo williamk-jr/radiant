@@ -45,10 +45,14 @@ namespace Radiant {
     wrappedCommandBuffers.reserve(count);
 
     for (auto buffer : commandBuffers) {
-      wrappedCommandBuffers.emplace_back(buffer);
+      wrappedCommandBuffers.emplace_back(this->device, buffer, this->commandPool);
     }
 
     return wrappedCommandBuffers;
+  }
+
+  VulkanCommandBuffer VulkanCommandPool::allocateCommandBuffer(VkCommandBufferLevel level) {
+    return std::move(this->allocateCommandBuffers(1, level)[0]);
   }
 
   void VulkanCommandPool::freeCommandBuffers(std::vector<VulkanCommandBuffer> commandBuffers) {

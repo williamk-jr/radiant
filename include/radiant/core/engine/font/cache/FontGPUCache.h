@@ -55,7 +55,7 @@ namespace Radiant {
 
       bool isDirty();
 
-      const TextureAtlas& getTextureAtlas();
+      TextureAtlas& getTextureAtlas();
 
     private:
       std::unordered_map<GlyphIdentifier, GlyphAtlasLocation, GlyphIdentifierHasher> cache;

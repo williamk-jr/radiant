@@ -21,12 +21,13 @@ namespace Radiant {
       /*
        * @param a valid VkCommandBuffer.
        */
-      VulkanCommandBuffer(VkCommandBuffer commandBuffer);
+      VulkanCommandBuffer(VkDevice device, VkCommandBuffer commandBuffer, VkCommandPool commandPool);
       VulkanCommandBuffer(const VulkanCommandBuffer&) = delete;
       VulkanCommandBuffer& operator=(const VulkanCommandBuffer&) = delete;
 
       VulkanCommandBuffer(VulkanCommandBuffer&&) noexcept;
       VulkanCommandBuffer& operator=(VulkanCommandBuffer&&) noexcept = default;
+      ~VulkanCommandBuffer();
 
       /*
        * @return A raw VkCommandBuffer.
@@ -193,6 +194,8 @@ namespace Radiant {
     private:
       friend class VulkanCommandPool;
       VkCommandBuffer commandBuffer;
+      VkDevice device;
+      VkCommandPool commandPool;
       
   };
 }

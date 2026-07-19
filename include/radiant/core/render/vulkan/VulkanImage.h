@@ -7,6 +7,8 @@ namespace Radiant {
   class VulkanImage {
     public:
       VulkanImage(VulkanMemoryAllocator& allocator, VkExtent3D extent);
+      VulkanImage(VulkanMemoryAllocator& allocator, VkExtent3D extent, VkFormat format, VkImageUsageFlags flags);
+
       VulkanImage(VkImage image, VkExtent2D extent);
       VulkanImage(const VulkanImage&) = delete;
       VulkanImage& operator=(const VulkanImage&) = delete;

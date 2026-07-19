@@ -41,6 +41,13 @@ namespace Radiant {
       std::vector<VulkanCommandBuffer> allocateCommandBuffers(int count, VkCommandBufferLevel level);
 
       /*
+       * Allocates a single command buffer.
+       *
+       * @param VkCommandBufferLevel The level allocated command buffers will be. 
+       */
+      VulkanCommandBuffer allocateCommandBuffer(VkCommandBufferLevel level);
+
+      /*
        * Frees allocated command buffers.
        * 
        * @param std::vector<VulkanCommandBuffer> command buffers to free.

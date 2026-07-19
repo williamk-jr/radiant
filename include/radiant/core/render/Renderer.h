@@ -43,7 +43,7 @@ namespace Radiant {
       std::unique_ptr<IndexBuffer> createIndexBuffer(VkDeviceSize size);
       std::unique_ptr<InstanceBuffer> createInstanceBuffer(VkDeviceSize size);
 
-      void loadTexture(void* buffer, uint32_t size, uint32_t width, uint32_t height);
+      VulkanImage loadTexture(void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize);
 
       void beginFrame(Window& window);
       void beginRendering(Color clearColor);

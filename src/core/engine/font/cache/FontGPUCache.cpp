@@ -6,7 +6,7 @@
 
 namespace Radiant {
   FontGPUCache::FontGPUCache() {
-    this->textureAtlas = std::make_unique<TextureAtlas>(2048, 2048);
+    this->textureAtlas = std::make_unique<TextureAtlas>(2048, 2048, 1);
   }
 
   void FontGPUCache::addEntry(FT_Bitmap& bitmap, GlyphIdentifier identifier) {
@@ -44,13 +44,7 @@ namespace Radiant {
     return this->cacheDirty;
   }
 
-  const TextureAtlas& FontGPUCache::getTextureAtlas() {
-    if (!this->isDirty()) {
-      return *this->textureAtlas;
-    }
-
-
-
+  TextureAtlas& FontGPUCache::getTextureAtlas() {
     return *this->textureAtlas;
   }
   

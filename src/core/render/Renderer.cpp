@@ -3,6 +3,7 @@
 #include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/Vertex.h"
 #include "radiant/core/render/vulkan/VulkanBuffer.h"
+#include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
 #include "radiant/core/render/vulkan/VulkanFence.h"
@@ -43,7 +44,9 @@ namespace Radiant {
     return std::make_unique<InstanceBuffer>(*this->memoryAllocator, size);
   }
   
-  void Renderer::loadTexture(void* buffer, uint32_t size, uint32_t width, uint32_t height) {
+  VulkanImage Renderer::loadTexture(void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize) {
+    uint32_t size = width*height*pixelSize;
+
     // CPU staging buffer.
     VulkanBuffer stagingBuffer(
         *this->memoryAllocator, 
@@ -55,8 +58,10 @@ namespace Radiant {
 
     stagingBuffer.append(buffer, size);
 
+    VulkanCommandBuffer commandBuffer = this->commandPool->allocateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+
     // GPU image.
-    VulkanImage image(*this->memoryAllocator, {width, height, 0});
+    VulkanImage image(*this->memoryAllocator, {width, height, 1}, VK_FORMAT_A8_UNORM, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
     VkImageSubresourceLayers subresource{};
     subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     subresource.baseArrayLayer = 0;
@@ -69,13 +74,17 @@ namespace Radiant {
     copyRegion.bufferImageHeight = height;
     copyRegion.bufferOffset = 0;
 
-    copyRegion.imageExtent = {width, height, 0};
+    copyRegion.imageExtent = {width, height, 1};
     copyRegion.imageOffset = {0,0,0};
     copyRegion.imageSubresource = subresource;
 
     // Preform the copy.
-    VulkanFence copyFinishedFence(*this->device, 0); 
-    this->commandBuffers[currentFrame].begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+    VkImageSubresourceRange subresourceRange{};
+    subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    subresourceRange.levelCount = 1;
+    subresourceRange.layerCount = 1;
 
     // Transfer image layout to transfer dst optimal.
     VkImageMemoryBarrier2 toDstOptimal{};
@@ -87,12 +96,13 @@ namespace Radiant {
     toDstOptimal.dstAccessMask = VK_ACCESS_2_TRANSFER_READ_BIT | VK_ACCESS_2_TRANSFER_WRITE_BIT;
     toDstOptimal.srcStageMask = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
     toDstOptimal.dstStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
+    toDstOptimal.subresourceRange = subresourceRange;
 
     std::vector<VkImageMemoryBarrier2> transferImageMemoryBarriers{toDstOptimal};
-    this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(transferImageMemoryBarriers, 0);
+    commandBuffer.pipelineImageMemoryBarrier(transferImageMemoryBarriers, 0);
 
     std::vector<VkBufferImageCopy> copyRegions{copyRegion};
-    this->commandBuffers[currentFrame].copyBufferToImage(
+    commandBuffer.copyBufferToImage(
         stagingBuffer, image, 
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
         copyRegions
@@ -109,19 +119,16 @@ namespace Radiant {
     toShaderReadOnlyOptimal.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
     toShaderReadOnlyOptimal.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
     toShaderReadOnlyOptimal.dstStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
+    toShaderReadOnlyOptimal.subresourceRange = subresourceRange;
 
     std::vector<VkImageMemoryBarrier2> shaderImageMemoryBarriers{toDstOptimal};
-    this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(shaderImageMemoryBarriers, 0);
+    commandBuffer.pipelineImageMemoryBarrier(shaderImageMemoryBarriers, 0);
 
     // End and submit.
-    this->commandBuffers[currentFrame].end();
-    this->graphicsQueue->submit(
-        this->commandBuffers[currentFrame],
-        nullptr, nullptr,
-        copyFinishedFence
-    );
-    copyFinishedFence.wait(1000);
-    // TODO Transfer image layout
+    commandBuffer.end();
+    this->graphicsQueue->submit(commandBuffer, {}, {}, nullptr);
+    this->graphicsQueue->waitIdle();
+    return image;
   }
 
   void Renderer::beginFrame(Window& window) {
@@ -321,9 +328,9 @@ namespace Radiant {
 
     this->graphicsQueue->submit(
         this->commandBuffers[currentFrame], 
-        &imageReadySemaphoreSubmitInfo, 
-        &frameFinishedSemaphoreSubmitInfo, 
-        this->fences[currentFrame]
+        {imageReadySemaphoreSubmitInfo}, 
+        {frameFinishedSemaphoreSubmitInfo}, 
+        &this->fences[currentFrame]
     );
   }
 

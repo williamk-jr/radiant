@@ -1,16 +1,22 @@
 #include "radiant/core/render/vulkan/VulkanImage.h"
+#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-  VulkanImage::VulkanImage(VulkanMemoryAllocator& allocator, VkExtent3D extent) : memoryAllocator(allocator.get()), extent(extent) {
+  VulkanImage::VulkanImage(VulkanMemoryAllocator& allocator, VkExtent3D extent) : 
+    VulkanImage(allocator, extent, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT) {}
+
+  VulkanImage::VulkanImage(VulkanMemoryAllocator& allocator, VkExtent3D extent, VkFormat format, VkImageUsageFlags flags) : 
+    memoryAllocator(allocator.get()), extent(extent) {
+
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
     imageInfo.extent = extent;
-    imageInfo.format = VK_FORMAT_B8G8R8A8_SRGB;
+    imageInfo.format = format;
     imageInfo.arrayLayers = 1;
     imageInfo.mipLevels = 1;
     imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    imageInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+    imageInfo.usage = flags;
     imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     //imageInfo.flags = 0;

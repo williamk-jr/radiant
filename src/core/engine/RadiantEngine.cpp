@@ -4,6 +4,7 @@
 #include "radiant/core/engine/font/Bitmap.h"
 #include "radiant/core/engine/font/Font.h"
 #include "radiant/core/engine/layout/WidgetManager.h"
+#include "radiant/core/render/TextureAtlas.h"
 #include "radiant/core/render/models/Quad2D.h"
 #include "radiant/core/render/Window.h"
 #include "radiant/css/StyleSheetEntry.h"
@@ -49,6 +50,11 @@ namespace Radiant {
 
     this->vertexBuffer->append(verticies);
     this->indexBuffer->append(indicies);
+
+
+    TextureAtlas& textureAtlas = this->fontManager->getTextureAtlas();
+    this->fontAtlasGpu = std::make_unique<VulkanImage>(this->renderer->loadTexture(
+          textureAtlas.getBuffer(), textureAtlas.getWidth(), textureAtlas.getHeight(), textureAtlas.getPixelSize()));
   }
   
   void RadiantEngine::registerProperties() {

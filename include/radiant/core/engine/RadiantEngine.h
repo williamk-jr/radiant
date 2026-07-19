@@ -28,6 +28,7 @@ namespace Radiant {
       std::unique_ptr<IndexBuffer> indexBuffer;
 
       std::unique_ptr<StyleSheetParser::Parser> stylesheetParser;
+      std::unique_ptr<VulkanImage> fontAtlasGpu;
 
       void registerProperties();
       void registerFunctions();
