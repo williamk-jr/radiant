@@ -66,6 +66,21 @@ namespace Radiant {
     return wrappedDescriptorSets;
   }
   
+  VulkanDescriptorSet VulkanDescriptorPool::allocateDescriptorSet(VulkanDescriptorSetLayout& descriptorSetLayout) {
+    std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts{descriptorSetLayout.get()};
+
+    VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
+    descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    descriptorSetAllocateInfo.descriptorPool = this->descriptorPool;
+    descriptorSetAllocateInfo.descriptorSetCount = 1;
+    descriptorSetAllocateInfo.pSetLayouts = rawDescriptorSetLayouts.data();
+
+    std::vector<VkDescriptorSet> rawDescriptorSets(1);
+    vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data());
+
+    return {rawDescriptorSets[0]};
+  }
+  
   void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites, std::vector<VulkanCopyDescriptorSet> descriptorSetCopies) {
     std::vector<VkWriteDescriptorSet> rawDescriptorWrites = this->toRawDescriptorWrites(descriptorSetWrites);
     std::vector<VkCopyDescriptorSet> rawDescriptorCopies = this->toRawDescriptorCopies(descriptorSetCopies);

@@ -53,7 +53,7 @@ namespace Radiant {
 
 
     TextureAtlas& textureAtlas = this->fontManager->getTextureAtlas();
-    this->fontAtlasGpu = std::make_unique<VulkanImage>(this->renderer->loadTexture(
+    this->fontAtlasGpu = std::make_unique<Texture>(this->renderer->loadTexture(
           textureAtlas.getBuffer(), textureAtlas.getWidth(), textureAtlas.getHeight(), textureAtlas.getPixelSize()));
   }
   

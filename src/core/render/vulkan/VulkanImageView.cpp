@@ -1,12 +1,17 @@
 #include "radiant/core/render/vulkan/VulkanImageView.h"
 
 namespace Radiant {
-    VulkanImageView::VulkanImageView(VulkanDevice& device, VulkanImage& image, VkComponentMapping componentMapping, VkImageSubresourceRange subresourceRange, VkImageViewCreateFlags flags) : device(device.get()) {
+  VulkanImageView::VulkanImageView(VulkanDevice& device, VulkanImage& image, VkFormat format, VkImageSubresourceRange subresourceRange) : 
+    VulkanImageView(device, image, format, {}, subresourceRange, 0) {
+
+  }
+
+  VulkanImageView::VulkanImageView(VulkanDevice& device, VulkanImage& image, VkFormat format, VkComponentMapping componentMapping, VkImageSubresourceRange subresourceRange, VkImageViewCreateFlags flags) : device(device.get()) {
     VkImageViewCreateInfo imageViewInfo{};
     imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     imageViewInfo.image = image.get();
     imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    imageViewInfo.format = VK_FORMAT_B8G8R8A8_SRGB;
+    imageViewInfo.format = format;
     imageViewInfo.components = componentMapping;
     imageViewInfo.subresourceRange = subresourceRange;
     imageViewInfo.flags = flags;

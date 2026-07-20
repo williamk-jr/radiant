@@ -86,7 +86,7 @@ namespace Radiant {
 
     for (int i = 0; i < swapchainImageCount; i++) {
       this->images.emplace_back(rawImages[i], surfaceCapabilities.surfaceCapabilities.currentExtent);
-      this->imageViews.emplace_back(device, this->images[i], componentMapping, subresourceRange, 0);
+      this->imageViews.emplace_back(device, this->images[i], VK_FORMAT_B8G8R8A8_SRGB, componentMapping, subresourceRange, 0);
     }
   }
   

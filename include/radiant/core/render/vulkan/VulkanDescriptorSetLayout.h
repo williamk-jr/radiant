@@ -16,7 +16,7 @@ namespace Radiant {
        * @param VulkanDevice& A reference to a valid vulkan device.
        * @param std::vector<VkDescriptorSetLayoutBinding> A vector of layout bindings for each descriptor in the descriptor set.
        */
-      VulkanDescriptorSetLayout(VulkanDevice& device, std::vector<VkDescriptorSetLayoutBinding> descriptorBindings);
+      VulkanDescriptorSetLayout(VulkanDevice& device, std::vector<VkDescriptorSetLayoutBinding> descriptorBindings, VkDescriptorSetLayoutCreateFlags flags);
       VulkanDescriptorSetLayout(const VulkanDescriptorSetLayout&) = delete;
       VulkanDescriptorSetLayout& operator=(const VulkanDescriptorSetLayout&) = delete;
 

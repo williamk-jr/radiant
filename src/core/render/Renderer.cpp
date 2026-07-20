@@ -1,14 +1,18 @@
 #include "radiant/core/render/Renderer.h"
 #include "radiant/core/render/Instance.h"
 #include "radiant/core/render/Rect2D.h"
+#include "radiant/core/render/Texture.h"
 #include "radiant/core/render/Vertex.h"
 #include "radiant/core/render/vulkan/VulkanBuffer.h"
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
+#include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
 #include "radiant/core/render/vulkan/VulkanFence.h"
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
 #include "radiant/core/render/vulkan/VulkanImage.h"
+#include "radiant/core/render/vulkan/VulkanImageView.h"
+#include "radiant/core/render/vulkan/VulkanSampler.h"
 #include <algorithm>
 #include <cstddef>
 #include <glm/ext/matrix_float4x4.hpp>
@@ -44,91 +48,11 @@ namespace Radiant {
     return std::make_unique<InstanceBuffer>(*this->memoryAllocator, size);
   }
   
-  VulkanImage Renderer::loadTexture(void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize) {
-    uint32_t size = width*height*pixelSize;
-
-    // CPU staging buffer.
-    VulkanBuffer stagingBuffer(
-        *this->memoryAllocator, 
-        size, 
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
-        VK_SHARING_MODE_EXCLUSIVE, 
-        {}
-    );
-
-    stagingBuffer.append(buffer, size);
-
-    VulkanCommandBuffer commandBuffer = this->commandPool->allocateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-
-    // GPU image.
-    VulkanImage image(*this->memoryAllocator, {width, height, 1}, VK_FORMAT_A8_UNORM, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
-    VkImageSubresourceLayers subresource{};
-    subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    subresource.baseArrayLayer = 0;
-    subresource.layerCount = 1;
-    subresource.mipLevel = 0;
-
-    // Region to copy from buffer to image.
-    VkBufferImageCopy copyRegion{};
-    copyRegion.bufferRowLength = width;
-    copyRegion.bufferImageHeight = height;
-    copyRegion.bufferOffset = 0;
-
-    copyRegion.imageExtent = {width, height, 1};
-    copyRegion.imageOffset = {0,0,0};
-    copyRegion.imageSubresource = subresource;
-
-    // Preform the copy.
-    commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-
-    VkImageSubresourceRange subresourceRange{};
-    subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    subresourceRange.levelCount = 1;
-    subresourceRange.layerCount = 1;
-
-    // Transfer image layout to transfer dst optimal.
-    VkImageMemoryBarrier2 toDstOptimal{};
-    toDstOptimal.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
-    toDstOptimal.image = image.get();
-    toDstOptimal.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    toDstOptimal.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    toDstOptimal.srcAccessMask = 0;
-    toDstOptimal.dstAccessMask = VK_ACCESS_2_TRANSFER_READ_BIT | VK_ACCESS_2_TRANSFER_WRITE_BIT;
-    toDstOptimal.srcStageMask = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
-    toDstOptimal.dstStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
-    toDstOptimal.subresourceRange = subresourceRange;
-
-    std::vector<VkImageMemoryBarrier2> transferImageMemoryBarriers{toDstOptimal};
-    commandBuffer.pipelineImageMemoryBarrier(transferImageMemoryBarriers, 0);
-
-    std::vector<VkBufferImageCopy> copyRegions{copyRegion};
-    commandBuffer.copyBufferToImage(
-        stagingBuffer, image, 
-        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
-        copyRegions
-    );
-
-    // Transfer image layout to shader read-only optimal.
-    VkImageMemoryBarrier2 toShaderReadOnlyOptimal{};
-    toShaderReadOnlyOptimal.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
-    toShaderReadOnlyOptimal.image = image.get();
-    toShaderReadOnlyOptimal.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    toShaderReadOnlyOptimal.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-    toShaderReadOnlyOptimal.srcAccessMask = VK_ACCESS_2_TRANSFER_READ_BIT | VK_ACCESS_2_TRANSFER_WRITE_BIT;
-    toShaderReadOnlyOptimal.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
-    toShaderReadOnlyOptimal.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
-    toShaderReadOnlyOptimal.dstStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
-    toShaderReadOnlyOptimal.subresourceRange = subresourceRange;
-
-    std::vector<VkImageMemoryBarrier2> shaderImageMemoryBarriers{toDstOptimal};
-    commandBuffer.pipelineImageMemoryBarrier(shaderImageMemoryBarriers, 0);
-
-    // End and submit.
-    commandBuffer.end();
-    this->graphicsQueue->submit(commandBuffer, {}, {}, nullptr);
-    this->graphicsQueue->waitIdle();
-    return image;
+  Texture Renderer::loadTexture(void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize) {
+    return {
+      *this->device, *this->memoryAllocator, *this->descriptorPool, *this->commandPool, *this->graphicsQueue,
+      buffer, width, height, pixelSize
+    };
   }
 
   void Renderer::beginFrame(Window& window) {
@@ -412,13 +336,16 @@ namespace Radiant {
     for (int i = 0; i < this->swapchain->getImageCount(); i++) {
       this->descriptorSetLayouts.emplace_back(*this->device, std::vector<VkDescriptorSetLayoutBinding>{
         VkDescriptorSetLayoutBinding{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr}
-      });
+      }, VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT);
     }
+
     //VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT
 
     this->descriptorPool = std::make_unique<VulkanDescriptorPool>(*this->device, std::vector<VkDescriptorPoolSize>{
-      {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3}
-    }, 10);
+      {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3},
+      {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}
+    }, 1024);
+
     this->descriptorSets = this->descriptorPool->allocateDescriptorSets(this->descriptorSetLayouts);
 
 

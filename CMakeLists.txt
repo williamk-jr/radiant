@@ -74,6 +74,7 @@ add_executable(Radiant
   src/core/render/vulkan/VulkanSwapchain.cpp
   src/core/render/vulkan/VulkanImage.cpp
   src/core/render/vulkan/VulkanImageView.cpp
+  src/core/render/vulkan/VulkanSampler.cpp
   src/core/render/vulkan/VulkanGraphicsPipelineBuilder.cpp
   src/core/render/vulkan/VulkanPipeline.cpp
   src/core/render/vulkan/VulkanDescriptorSetLayout.cpp
@@ -86,6 +87,7 @@ add_executable(Radiant
   src/core/render/Renderer.cpp
   src/core/render/Window.cpp
   src/core/render/TextureAtlas.cpp
+  src/core/render/Texture.cpp
   src/core/render/models/Model.cpp
   src/core/render/models/Quad2D.cpp
   src/core/render/buffers/VertexBuffer.cpp

@@ -7,7 +7,9 @@
 namespace Radiant {
   class VulkanImageView {
     public:
-      VulkanImageView(VulkanDevice& device, VulkanImage& image, VkComponentMapping componentMapping, VkImageSubresourceRange subresourceRange, VkImageViewCreateFlags flags);
+      VulkanImageView(VulkanDevice& device, VulkanImage& image, VkFormat format, VkImageSubresourceRange subresourceRange);
+      VulkanImageView(VulkanDevice& device, VulkanImage& image, VkFormat format, VkComponentMapping componentMapping, VkImageSubresourceRange subresourceRange, VkImageViewCreateFlags flags);
+
       VulkanImageView(const VulkanImageView&) = delete;
       VulkanImageView& operator=(const VulkanImageView&) = delete;
 
