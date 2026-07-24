@@ -67,6 +67,7 @@ namespace Radiant {
       }
 
       void bindDescriptorSets();
+      void bindTexture(Texture& texture);
 
       void drawIndexed(uint32_t indexCount, uint32_t instanceCount);
       void clear(Color color);
@@ -100,8 +101,13 @@ namespace Radiant {
 
       std::unique_ptr<VulkanBuffer> descriptorBuffer;
       std::unique_ptr<VulkanDescriptorPool> descriptorPool;
-      std::vector<VulkanDescriptorSetLayout> descriptorSetLayouts;
+
+      std::unique_ptr<VulkanDescriptorSetLayout> frameDescriptorSetLayout;
+      std::unique_ptr<VulkanDescriptorSetLayout> textureDescriptorSetLayout;
+
       std::vector<VulkanDescriptorSet> descriptorSets;
+
+
       std::unique_ptr<VulkanPipeline> graphicsPipeline;
 
       RenderContext context;
@@ -114,6 +120,7 @@ namespace Radiant {
       Rect2D frameBufferSize;
       
       void initVulkan(Window& window, bool debug);
+      void initGraphicsPipeline();
       bool isSwapchainOutOfDate(Window& window, VulkanResult<uint32_t> imageIndex);
 
       std::vector<const char*> getInstanceExtensions(Window& window, bool debug);

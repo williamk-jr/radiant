@@ -143,6 +143,15 @@ namespace Radiant {
        * @param std::vector<VulkanDescriptorSet>& A reference to a vector of descriptor sets.
        */
       void bindDescriptorSets(VulkanPipeline& pipeline, uint32_t firstSet, std::vector<VulkanDescriptorSet>& descriptorSets);
+      
+      /*
+       * Binds a descriptor set to a pipepline.
+       *
+       * @param VulkanPipeline& A reference to a valid vulkan pipeline.
+       * @param uint32_t Index of the first descriptor set to bind.
+       * @param std::vector<VulkanDescriptorSet>& A reference to a descriptor set.
+       */
+      void bindDescriptorSet(VulkanPipeline& pipeline, uint32_t firstSet, VulkanDescriptorSet& descriptorSet);
 
       /*
        * Draws `instanceCount` number of instances with `indexCount` number of indicies.

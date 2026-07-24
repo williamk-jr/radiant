@@ -65,6 +65,15 @@ namespace Radiant {
        * @return A vector of descriptor sets.
        */
       std::vector<VulkanDescriptorSet> allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts);
+
+      /*
+       * Allocates descriptor sets.
+       *
+       * @param VulkanDescriptorSetLayout& A reference to a descriptor set layout.
+       * @param uint32_t The number o descriptor sets to allocate with the descriptor set layout.
+       * @return A vector of descriptor sets.
+       */
+      std::vector<VulkanDescriptorSet> allocateDescriptorSets(VulkanDescriptorSetLayout& descriptorSetLayout, uint32_t count);
       
       /*
        * Allocates a single descriptor set.

@@ -28,6 +28,19 @@ namespace Radiant {
     return *this;
   }
 
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withLayout(std::vector<VkDescriptorSetLayout> descriptorSetLayouts) {
+    this->descriptorSetLayouts = descriptorSetLayouts;
+
+    VkPipelineLayoutCreateInfo pipelineLayoutinfo{};
+    pipelineLayoutinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutinfo.setLayoutCount = this->descriptorSetLayouts.size();
+    pipelineLayoutinfo.pSetLayouts = this->descriptorSetLayouts.data();
+    pipelineLayoutinfo.flags = 0;
+
+    vkCreatePipelineLayout(this->device, &pipelineLayoutinfo, nullptr, &this->layout);
+    return *this;
+  }
+
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withRenderingInfo(std::vector<VkFormat> colorAttachmentFormats, VkFormat depthAttachmentFormat, VkFormat stencilAttachmentFormat) {
     this->renderingInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
     this->renderingInfo.colorAttachmentCount = colorAttachmentFormats.size();

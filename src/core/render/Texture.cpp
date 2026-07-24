@@ -1,12 +1,14 @@
 #include "radiant/core/render/Texture.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
+#include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
 #include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
+#include <iostream>
 #include <memory>
 #include <vector>
 
 namespace Radiant {
-  Texture::Texture(VulkanDevice& device, VulkanMemoryAllocator& memoryAllocator, VulkanDescriptorPool& descriptorPool, VulkanCommandPool& commandPool, VulkanQueue& queue, void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize) {
+  Texture::Texture(VulkanDevice& device, VulkanMemoryAllocator& memoryAllocator, VulkanDescriptorPool& descriptorPool, VulkanDescriptorSetLayout& descriptorSetLayout, VulkanCommandPool& commandPool, VulkanQueue& queue, void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize) {
     uint32_t size = width*height*pixelSize;
 
     // CPU staging buffer.
@@ -92,12 +94,8 @@ namespace Radiant {
     queue.waitIdle();
 
     // Init descriptor set
-    this->descriptorSetLayout = std::make_unique<VulkanDescriptorSetLayout>(device, std::vector<VkDescriptorSetLayoutBinding>{
-        VkDescriptorSetLayoutBinding{0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
-    }, 0);
-
     this->descriptorSet = std::make_unique<VulkanDescriptorSet>(
-      descriptorPool.allocateDescriptorSet(*this->descriptorSetLayout)
+      descriptorPool.allocateDescriptorSet(descriptorSetLayout)
     );
 
     descriptorPool.updateDescriptorSets({
@@ -111,13 +109,11 @@ namespace Radiant {
     image(std::move(other.image)), 
     imageView(std::move(other.imageView)), 
     sampler(std::move(other.sampler)), 
-    descriptorSetLayout(std::move(other.descriptorSetLayout)),
     descriptorSet(std::move(other.descriptorSet)) {
 
-    this->image = nullptr;
-    this->imageView = nullptr;
-    this->sampler = nullptr;
-    this->descriptorSetLayout = nullptr;
-    this->descriptorSet = nullptr;
+  }
+
+  VulkanDescriptorSet& Texture::getDescriptorSet() {
+    return *this->descriptorSet;
   }
 }

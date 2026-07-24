@@ -4,6 +4,7 @@
 #include "radiant/core/engine/font/Bitmap.h"
 #include "radiant/core/engine/font/Font.h"
 #include "radiant/core/engine/layout/WidgetManager.h"
+#include "radiant/core/render/Texture.h"
 #include "radiant/core/render/TextureAtlas.h"
 #include "radiant/core/render/models/Quad2D.h"
 #include "radiant/core/render/Window.h"
@@ -53,8 +54,11 @@ namespace Radiant {
 
 
     TextureAtlas& textureAtlas = this->fontManager->getTextureAtlas();
-    this->fontAtlasGpu = std::make_unique<Texture>(this->renderer->loadTexture(
-          textureAtlas.getBuffer(), textureAtlas.getWidth(), textureAtlas.getHeight(), textureAtlas.getPixelSize()));
+    Texture texture = this->renderer->loadTexture(
+          textureAtlas.getBuffer(), textureAtlas.getWidth(), textureAtlas.getHeight(), textureAtlas.getPixelSize());
+
+    this->fontAtlasGpu = std::make_unique<Texture>(std::move(texture));
+    this->fontAtlasGpu->getDescriptorSet();
   }
   
   void RadiantEngine::registerProperties() {
@@ -103,6 +107,9 @@ namespace Radiant {
     glm::mat4 orthoMatrix = glm::ortho(0.0f, (float)frameBufferSize.width, 0.0f, (float)frameBufferSize.height, -1.0f, 1.0f);
     renderer->updateUniformBuffer(orthoMatrix);
     renderer->bindDescriptorSets();
+
+    // Bind textures
+    renderer->bindTexture(*this->fontAtlasGpu);
 
     // Bind buffers
     renderer->bindVertexBuffer(*this->vertexBuffer);

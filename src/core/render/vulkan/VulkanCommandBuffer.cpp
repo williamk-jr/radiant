@@ -125,6 +125,17 @@ namespace Radiant {
         0, nullptr
     ); 
   }
+  
+  void VulkanCommandBuffer::bindDescriptorSet(VulkanPipeline& pipeline, uint32_t firstSet, VulkanDescriptorSet& descriptorSet) {
+    VkDescriptorSet rawDescriptorSet = descriptorSet.get();
+
+    vkCmdBindDescriptorSets(
+        this->commandBuffer, 
+        pipeline.getBindPoint(), pipeline.getLayout(), 
+        firstSet, 1, &rawDescriptorSet, 
+        0, nullptr
+    );
+  }
 
   void VulkanCommandBuffer::setViewport(float width, float height, float minDepth, float maxDepth) {
     VkViewport viewport{};

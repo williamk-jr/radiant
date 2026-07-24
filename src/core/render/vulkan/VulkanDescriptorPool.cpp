@@ -1,6 +1,7 @@
 #include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
 #include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 #include "radiant/util/logger/Logger.h"
 #include <algorithm>
 #include <string>
@@ -66,6 +67,27 @@ namespace Radiant {
     return wrappedDescriptorSets;
   }
   
+  std::vector<VulkanDescriptorSet> VulkanDescriptorPool::allocateDescriptorSets(VulkanDescriptorSetLayout& descriptorSetLayout, uint32_t count) {
+    std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts(count, descriptorSetLayout.get());
+    std::vector<VkDescriptorSet> rawDescriptorSets(rawDescriptorSetLayouts.size());
+
+    VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
+    descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    descriptorSetAllocateInfo.descriptorPool = this->descriptorPool;
+    descriptorSetAllocateInfo.descriptorSetCount = rawDescriptorSetLayouts.size();
+    descriptorSetAllocateInfo.pSetLayouts = rawDescriptorSetLayouts.data();
+
+    vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data());
+
+    std::vector<VulkanDescriptorSet> wrappedDescriptorSets;
+    wrappedDescriptorSets.reserve(rawDescriptorSetLayouts.size());
+
+    for (VkDescriptorSet& descriptorSet : rawDescriptorSets) {
+      wrappedDescriptorSets.emplace_back(descriptorSet);
+    }
+    return wrappedDescriptorSets;
+  }
+  
   VulkanDescriptorSet VulkanDescriptorPool::allocateDescriptorSet(VulkanDescriptorSetLayout& descriptorSetLayout) {
     std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts{descriptorSetLayout.get()};
 
@@ -76,8 +98,8 @@ namespace Radiant {
     descriptorSetAllocateInfo.pSetLayouts = rawDescriptorSetLayouts.data();
 
     std::vector<VkDescriptorSet> rawDescriptorSets(1);
-    vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data());
-
+    Validation::verify(vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data()));
+    
     return {rawDescriptorSets[0]};
   }
   

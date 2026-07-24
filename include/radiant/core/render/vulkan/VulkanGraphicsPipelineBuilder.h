@@ -54,6 +54,10 @@ namespace Radiant {
           std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts
       );
 
+      VulkanGraphicsPipelineBuilder& withLayout(
+          std::vector<VkDescriptorSetLayout> descriptorSetLayouts
+      );
+
       VulkanGraphicsPipelineBuilder& withRenderingInfo(
           std::vector<VkFormat> colorAttachmentFormats, 
           VkFormat depthAttachmentFormat, 

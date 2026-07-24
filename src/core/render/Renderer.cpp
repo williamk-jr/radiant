@@ -50,12 +50,18 @@ namespace Radiant {
   
   Texture Renderer::loadTexture(void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize) {
     return {
-      *this->device, *this->memoryAllocator, *this->descriptorPool, *this->commandPool, *this->graphicsQueue,
+      *this->device, *this->memoryAllocator, 
+      *this->descriptorPool, *this->textureDescriptorSetLayout, 
+      *this->commandPool, *this->graphicsQueue,
       buffer, width, height, pixelSize
     };
   }
 
   void Renderer::beginFrame(Window& window) {
+    if (this->graphicsPipeline.get() == nullptr) {
+      this->initGraphicsPipeline();
+    }
+
     this->fences[currentFrame].wait(UINT32_MAX);
     this->fences[currentFrame].reset();
 
@@ -128,7 +134,6 @@ namespace Radiant {
   }
 
   void Renderer::bindDescriptorSets() {
-    //std::cout << descriptorBufferWrites[0].offset << "\n";
     this->descriptorPool->updateDescriptorSets({
       VulkanWriteDescriptorSet{
         this->descriptorSets[currentFrame].get(), 
@@ -139,7 +144,12 @@ namespace Radiant {
       }
     });
 
-    this->commandBuffers[currentFrame].bindDescriptorSets(*this->graphicsPipeline, 0, this->descriptorSets);
+    //this->commandBuffers[currentFrame].bindDescriptorSets(*this->graphicsPipeline, 0, this->descriptorSets);
+    this->commandBuffers[currentFrame].bindDescriptorSet(*this->graphicsPipeline, 0, this->descriptorSets[currentFrame]);
+  }
+  
+  void Renderer::bindTexture(Texture& texture) {
+    this->commandBuffers[currentFrame].bindDescriptorSet(*this->graphicsPipeline, 1, texture.getDescriptorSet());
   }
 
   void Renderer::setViewport(float width, float height, float minDepth, float maxDepth) {
@@ -332,23 +342,29 @@ namespace Radiant {
         VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 
         VK_SHARING_MODE_EXCLUSIVE, std::vector<uint32_t>{}
     );
-    
-    for (int i = 0; i < this->swapchain->getImageCount(); i++) {
-      this->descriptorSetLayouts.emplace_back(*this->device, std::vector<VkDescriptorSetLayoutBinding>{
-        VkDescriptorSetLayoutBinding{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr}
-      }, VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT);
-    }
-
-    //VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT
 
     this->descriptorPool = std::make_unique<VulkanDescriptorPool>(*this->device, std::vector<VkDescriptorPoolSize>{
       {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3},
       {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}
     }, 1024);
 
-    this->descriptorSets = this->descriptorPool->allocateDescriptorSets(this->descriptorSetLayouts);
+    this->frameDescriptorSetLayout = std::make_unique<VulkanDescriptorSetLayout>(
+      *this->device, std::vector<VkDescriptorSetLayoutBinding>{
+        {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr}
+      }, VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT
+    );
+    
+    this->textureDescriptorSetLayout = std::make_unique<VulkanDescriptorSetLayout>(
+      *this->device, std::vector<VkDescriptorSetLayoutBinding>{
+        {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
+      }, 0);
+  }
+  
+  void Renderer::initGraphicsPipeline() {
+    // Init descriptor sets
+    this->descriptorSets = this->descriptorPool->allocateDescriptorSets(*this->frameDescriptorSetLayout, this->swapchain->getImageCount());
 
-
+    // Init graphics pipeline.
     VkPipelineColorBlendAttachmentState attachmentState{};
     attachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
     attachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
@@ -359,8 +375,13 @@ namespace Radiant {
     attachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
     attachmentState.blendEnable = VK_TRUE;
 
+    std::vector<VkDescriptorSetLayout> layouts = {
+      this->frameDescriptorSetLayout->get(),
+      this->textureDescriptorSetLayout->get() 
+    };
+
     this->graphicsPipeline = std::make_unique<VulkanPipeline>(VulkanGraphicsPipelineBuilder(*this->device)
-      .withLayout(this->descriptorSetLayouts)
+      .withLayout(layouts)
       .withRenderingInfo({VK_FORMAT_B8G8R8A8_SRGB}, VK_FORMAT_UNDEFINED, VK_FORMAT_UNDEFINED)
       .withVertexBindingDescription(sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX, {
         {VK_FORMAT_R32G32_SFLOAT, 0},
