@@ -26,7 +26,9 @@ namespace Radiant {
     //Logger::info(std::to_string(this->cursorX));
     for (int y = 0; y < height; y++) {
       uint8_t* src = buffer + (width * y * pixelSize);
-      uint8_t* dst = this->buffer.data() + (this->cursorX * (this->cursorY + y) * pixelSize);
+      uint8_t* dst = this->buffer.data() + this->cursorX + (this->width * (this->cursorY + y)) * pixelSize;
+
+      // pos = dst + x + (width*y);
 
       std::copy(src, src+(width*pixelSize), dst);
 
