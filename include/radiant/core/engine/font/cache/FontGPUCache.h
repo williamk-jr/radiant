@@ -2,6 +2,7 @@
 
 #include "radiant/core/engine/font/cache/FontCacheIdentifier.h"
 #include "radiant/core/render/TextureAtlas.h"
+#include "radiant/util/Box.h"
 #include <cstdint>
 #include <freetype/ftglyph.h>
 #include <memory>
@@ -18,11 +19,6 @@ namespace Radiant {
     bool operator==(const GlyphIdentifier& other) const {
       return this->fontId == other.fontId && this->charCode == other.charCode && this->size == other.size;
     }
-  };
-
-  struct GlyphAtlasLocation {
-    float uMin, vMin;
-    float uMax, vMax;
   };
 
   struct GlyphIdentifierHasher {
@@ -60,7 +56,7 @@ namespace Radiant {
       TextureAtlas& getTextureAtlas();
 
     private:
-      std::unordered_map<GlyphIdentifier, GlyphAtlasLocation, GlyphIdentifierHasher> cache;
+      std::unordered_map<GlyphIdentifier, Box, GlyphIdentifierHasher> cache;
       std::unique_ptr<TextureAtlas> textureAtlas;
       bool cacheDirty;
 

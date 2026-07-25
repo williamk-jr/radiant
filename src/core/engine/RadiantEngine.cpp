@@ -22,7 +22,7 @@ namespace Radiant {
     this->fontManager = std::make_unique<FontManager>();
     Font notoSans = this->fontManager->loadFont("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf");
     
-    for (int i = 1; i <= 64; i++) {
+    for (int i = 8; i <= 16; i++) {
       notoSans.setPointSize(i);
       this->fontManager->compileStringGeometry(notoSans, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.?,");
     }

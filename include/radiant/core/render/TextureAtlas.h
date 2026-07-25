@@ -1,5 +1,6 @@
 #pragma once
 
+#include "radiant/util/Box.h"
 #include <cstdint>
 #include <vector>
 namespace Radiant {
@@ -16,6 +17,8 @@ namespace Radiant {
       uint32_t getWidth() const;
       uint32_t getHeight() const;
       uint32_t getPixelSize() const;
+      
+      Box getUVBoundsAtCursor(uint32_t width, uint32_t height);
 
     private:
       std::vector<uint8_t> buffer;

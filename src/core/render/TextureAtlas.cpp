@@ -1,4 +1,5 @@
 #include "radiant/core/render/TextureAtlas.h"
+#include "radiant/util/Box.h"
 #include "radiant/util/logger/Logger.h"
 #include <algorithm>
 #include <cstdint>
@@ -20,14 +21,12 @@ namespace Radiant {
 
       this->cursorX = 0;
       this->cursorY += rowOffset;
-      //this->rowOffset = height;
     }
 
     if (height > this->rowOffset) {
       this->rowOffset = height;
     }
 
-    //Logger::info(std::to_string(this->cursorX));
     for (int y = 0; y < height; y++) {
       uint8_t* src = buffer + (width * y * pixelSize);
       uint8_t* dst = this->buffer.data() + this->cursorX + (this->width * (this->cursorY + y)) * pixelSize;
@@ -58,6 +57,15 @@ namespace Radiant {
 
   uint32_t TextureAtlas::getHeight() const {
     return this->height;
+  }
+
+  Box TextureAtlas::getUVBoundsAtCursor(uint32_t width, uint32_t height) {
+    return {
+      this->cursorX/(float)this->width, 
+      this->cursorY/(float)this->height,
+      (this->cursorX+width)/(float)this->width,
+      (this->cursorY+height)/(float)this->height
+    };
   }
   
   uint32_t TextureAtlas::getPixelSize() const {

@@ -1,7 +1,10 @@
 #include "radiant/core/engine/font/cache/FontGPUCache.h"
 #include "radiant/core/render/TextureAtlas.h"
+#include "radiant/util/Box.h"
+#include "radiant/util/logger/Logger.h"
 #include <freetype/ftglyph.h>
 #include <memory>
+#include <string>
 #include <utility>
 
 namespace Radiant {
@@ -14,25 +17,14 @@ namespace Radiant {
     size_t width = bitmap.width;
     size_t height = bitmap.rows;
 
-    std::pair<float, float> uvMin = this->calculateUV(
-        this->textureAtlas->getCursorX(), 
-        this->textureAtlas->getCursorY(), 
-        this->textureAtlas->getWidth(), 
-        this->textureAtlas->getHeight()
-    );
-
+    Box uvBounds = this->textureAtlas->getUVBoundsAtCursor(width, height);
     this->textureAtlas->addTexture(bitmap.buffer, bufferSize, width, height);
 
-    // TODO fix uv
-    std::pair<float, float> uvMax = this->calculateUV(
-        this->textureAtlas->getCursorX(), 
-        this->textureAtlas->getCursorY(), 
-        this->textureAtlas->getWidth(), 
-        this->textureAtlas->getHeight()
-    );
+    Logger::info("Char: "+std::to_string((char)identifier.charCode)+
+                  "\nMin: ("+std::to_string(uvBounds.minX)+", "+std::to_string(uvBounds.minY)+
+                  "\nMax: ("+std::to_string(uvBounds.maxX)+", "+std::to_string(uvBounds.maxY) +"\n");
 
-    // Stores default value, actual value is not generated until retrieval of texture atlas.
-    this->cache[identifier] = {uvMin.first, uvMin.second, uvMax.first, uvMax.second};
+    this->cache[identifier] = uvBounds;
     this->cacheDirty = true;
   }
 
