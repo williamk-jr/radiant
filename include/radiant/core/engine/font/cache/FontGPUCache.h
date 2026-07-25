@@ -13,9 +13,10 @@ namespace Radiant {
   struct GlyphIdentifier {
     FontCacheIdentifier fontId;
     unsigned long charCode;
+    uint32_t size;
     
     bool operator==(const GlyphIdentifier& other) const {
-      return this->fontId == other.fontId && this->charCode == other.charCode;
+      return this->fontId == other.fontId && this->charCode == other.charCode && this->size == other.size;
     }
   };
 
@@ -28,6 +29,7 @@ namespace Radiant {
     std::size_t operator()(const GlyphIdentifier& id) const noexcept {
       std::size_t hash = FontCacheIdentifierHasher{}(id.fontId);
       hash_util::combineHash<uint32_t>(hash, id.charCode);
+      hash_util::combineHash<uint32_t>(hash, id.size);
       return hash;
     }
   };

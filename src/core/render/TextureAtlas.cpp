@@ -20,6 +20,10 @@ namespace Radiant {
 
       this->cursorX = 0;
       this->cursorY += rowOffset;
+      //this->rowOffset = height;
+    }
+
+    if (height > this->rowOffset) {
       this->rowOffset = height;
     }
 
