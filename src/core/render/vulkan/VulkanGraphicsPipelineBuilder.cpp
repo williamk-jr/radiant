@@ -1,6 +1,7 @@
 #include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
 #include "radiant/util/logger/Logger.h"
 #include <filesystem>
+#include <memory>
 #include <slang/slang-com-ptr.h>
 #include <slang/slang.h>
 #include <string>
@@ -11,6 +12,29 @@ namespace Radiant {
   VulkanGraphicsPipelineBuilder::VulkanGraphicsPipelineBuilder(VulkanDevice& device) {
     createInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     this->device = device.get();
+  }
+  
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::allowDerivatives() {
+    this->flags |= VK_PIPELINE_CREATE_2_ALLOW_DERIVATIVES_BIT;
+    return *this;
+  }
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::derivativeOf(VulkanPipeline& basePipeline) {
+    this->flags |= VK_PIPELINE_CREATE_2_DERIVATIVE_BIT;
+    this->basePipeline = basePipeline.get();
+    return *this;
+  }
+  
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::enableCaching() {
+    VkPipelineCacheCreateInfo cacheInfo{};
+    cacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+
+    vkCreatePipelineCache(this->device, &cacheInfo, nullptr, &this->cache); 
+    return *this;
+  }
+  
+  VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::cacheOf(VulkanPipeline& basePipeline) {
+    this->cache = basePipeline.getCache();
+    return *this;
   }
   
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withLayout(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts) {
@@ -42,11 +66,13 @@ namespace Radiant {
   }
 
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withRenderingInfo(std::vector<VkFormat> colorAttachmentFormats, VkFormat depthAttachmentFormat, VkFormat stencilAttachmentFormat) {
-    this->renderingInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
-    this->renderingInfo.colorAttachmentCount = colorAttachmentFormats.size();
-    this->renderingInfo.pColorAttachmentFormats = colorAttachmentFormats.data();
-    this->renderingInfo.depthAttachmentFormat = depthAttachmentFormat;
-    this->renderingInfo.stencilAttachmentFormat = stencilAttachmentFormat;
+
+    this->renderingInfo = std::make_unique<VkPipelineRenderingCreateInfo>();
+    this->renderingInfo->sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
+    this->renderingInfo->colorAttachmentCount = colorAttachmentFormats.size();
+    this->renderingInfo->pColorAttachmentFormats = colorAttachmentFormats.data();
+    this->renderingInfo->depthAttachmentFormat = depthAttachmentFormat;
+    this->renderingInfo->stencilAttachmentFormat = stencilAttachmentFormat;
     return *this;
   }
 
@@ -70,48 +96,52 @@ namespace Radiant {
   }
 
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withInputAssemblyState(VkPrimitiveTopology topology, VkBool32 primitiveRestartEnable) {
-    this->inputAssemblyStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    this->inputAssemblyStateInfo.primitiveRestartEnable = primitiveRestartEnable;
-    this->inputAssemblyStateInfo.topology = topology;
-    this->inputAssemblyStateInfo.flags = 0;
+    this->inputAssemblyStateInfo = std::make_unique<VkPipelineInputAssemblyStateCreateInfo>();
+    this->inputAssemblyStateInfo->sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    this->inputAssemblyStateInfo->primitiveRestartEnable = primitiveRestartEnable;
+    this->inputAssemblyStateInfo->topology = topology;
+    this->inputAssemblyStateInfo->flags = 0;
     return *this;
   }
 
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withRasterizationState(VkPolygonMode polygonMode, VkCullModeFlagBits cullMode, VkFrontFace frontFace, VulkanDepthBias depthBias, float lineWidth, VkBool32 rasterizerDiscardEnable) {
-    this->rasterizationStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    this->rasterizationStateInfo.cullMode = cullMode;
-    this->rasterizationStateInfo.polygonMode = polygonMode;
-    this->rasterizationStateInfo.lineWidth = lineWidth;
-    this->rasterizationStateInfo.frontFace = frontFace;
-    this->rasterizationStateInfo.depthBiasEnable = depthBias.enabled;
-    this->rasterizationStateInfo.depthClampEnable = depthBias.clampEnabled;
-    this->rasterizationStateInfo.depthBiasClamp = depthBias.clamp;
-    this->rasterizationStateInfo.depthBiasConstantFactor = depthBias.constantfactor;
-    this->rasterizationStateInfo.depthBiasSlopeFactor = depthBias.slopefactor;
-    this->rasterizationStateInfo.rasterizerDiscardEnable = rasterizerDiscardEnable;
-    this->rasterizationStateInfo.flags = 0;
+    this->rasterizationStateInfo = std::make_unique<VkPipelineRasterizationStateCreateInfo>();
+    this->rasterizationStateInfo->sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    this->rasterizationStateInfo->cullMode = cullMode;
+    this->rasterizationStateInfo->polygonMode = polygonMode;
+    this->rasterizationStateInfo->lineWidth = lineWidth;
+    this->rasterizationStateInfo->frontFace = frontFace;
+    this->rasterizationStateInfo->depthBiasEnable = depthBias.enabled;
+    this->rasterizationStateInfo->depthClampEnable = depthBias.clampEnabled;
+    this->rasterizationStateInfo->depthBiasClamp = depthBias.clamp;
+    this->rasterizationStateInfo->depthBiasConstantFactor = depthBias.constantfactor;
+    this->rasterizationStateInfo->depthBiasSlopeFactor = depthBias.slopefactor;
+    this->rasterizationStateInfo->rasterizerDiscardEnable = rasterizerDiscardEnable;
+    this->rasterizationStateInfo->flags = 0;
     return *this;
   }
   
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withMultisampleState(VkSampleCountFlagBits rasterizationSampleCount, VulkanSampleShading sampleShading, VkBool32 alphaToCoverageEnable, VkBool32 alphaToOneEnable) {
-    this->multisampleStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    this->multisampleStateInfo.rasterizationSamples = rasterizationSampleCount;
-    this->multisampleStateInfo.pSampleMask = nullptr; // TODO implement sample masks
-    this->multisampleStateInfo.sampleShadingEnable = sampleShading.enabled;
-    this->multisampleStateInfo.minSampleShading = sampleShading.min;
-    this->multisampleStateInfo.alphaToCoverageEnable = alphaToCoverageEnable;
-    this->multisampleStateInfo.alphaToOneEnable = alphaToOneEnable;
-    this->multisampleStateInfo.flags = 0;
+    this->multisampleStateInfo = std::make_unique<VkPipelineMultisampleStateCreateInfo>();
+    this->multisampleStateInfo->sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    this->multisampleStateInfo->rasterizationSamples = rasterizationSampleCount;
+    this->multisampleStateInfo->pSampleMask = nullptr; // TODO implement sample masks
+    this->multisampleStateInfo->sampleShadingEnable = sampleShading.enabled;
+    this->multisampleStateInfo->minSampleShading = sampleShading.min;
+    this->multisampleStateInfo->alphaToCoverageEnable = alphaToCoverageEnable;
+    this->multisampleStateInfo->alphaToOneEnable = alphaToOneEnable;
+    this->multisampleStateInfo->flags = 0;
     return *this;
   }
 
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withDynamicState(std::vector<VkDynamicState> dynamicStates) {
     this->dynamicStates = dynamicStates;
 
-    this->dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-    this->dynamicStateInfo.dynamicStateCount = this->dynamicStates.size();
-    this->dynamicStateInfo.pDynamicStates = this->dynamicStates.data();
-    this->dynamicStateInfo.flags = 0;
+    this->dynamicStateInfo = std::make_unique<VkPipelineDynamicStateCreateInfo>();
+    this->dynamicStateInfo->sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    this->dynamicStateInfo->dynamicStateCount = this->dynamicStates.size();
+    this->dynamicStateInfo->pDynamicStates = this->dynamicStates.data();
+    this->dynamicStateInfo->flags = 0;
     return *this;
   }
   
@@ -119,75 +149,80 @@ namespace Radiant {
     this->viewports = viewports;
     this->scissors = scissors;
 
-    this->viewportStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    this->viewportStateInfo.viewportCount = this->viewports.size();
-    this->viewportStateInfo.pViewports = this->viewports.data();
-    this->viewportStateInfo.scissorCount = this->scissors.size();
-    this->viewportStateInfo.pScissors = this->scissors.data();
-    this->viewportStateInfo.flags = 0;
+    this->viewportStateInfo = std::make_unique<VkPipelineViewportStateCreateInfo>();
+    this->viewportStateInfo->sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    this->viewportStateInfo->viewportCount = this->viewports.size();
+    this->viewportStateInfo->pViewports = this->viewports.data();
+    this->viewportStateInfo->scissorCount = this->scissors.size();
+    this->viewportStateInfo->pScissors = this->scissors.data();
+    this->viewportStateInfo->flags = 0;
     return *this;
   }
 
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withViewportState(uint32_t viewportCount, uint32_t scissorCount) {
-    this->viewportStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    this->viewportStateInfo.viewportCount = viewportCount;
-    this->viewportStateInfo.scissorCount = scissorCount;
-    this->viewportStateInfo.flags = 0;
+    this->viewportStateInfo = std::make_unique<VkPipelineViewportStateCreateInfo>();
+    this->viewportStateInfo->sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    this->viewportStateInfo->viewportCount = viewportCount;
+    this->viewportStateInfo->scissorCount = scissorCount;
+    this->viewportStateInfo->flags = 0;
     return *this;
   }
   
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withColorBlendState(std::vector<VkPipelineColorBlendAttachmentState> attachmentStates, float* blendConstants) {
     this->colorBlendAttachmentStates = attachmentStates;
 
-    this->colorBlendStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    this->colorBlendStateInfo.attachmentCount = this->colorBlendAttachmentStates.size();
-    this->colorBlendStateInfo.pAttachments = this->colorBlendAttachmentStates.data();
+    this->colorBlendStateInfo = std::make_unique<VkPipelineColorBlendStateCreateInfo>();
+    this->colorBlendStateInfo->sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    this->colorBlendStateInfo->attachmentCount = this->colorBlendAttachmentStates.size();
+    this->colorBlendStateInfo->pAttachments = this->colorBlendAttachmentStates.data();
     if (blendConstants != nullptr) {
-      this->colorBlendStateInfo.blendConstants[0] = blendConstants[0];
-      this->colorBlendStateInfo.blendConstants[1] = blendConstants[1];
-      this->colorBlendStateInfo.blendConstants[2] = blendConstants[2];
-      this->colorBlendStateInfo.blendConstants[3] = blendConstants[3];
+      this->colorBlendStateInfo->blendConstants[0] = blendConstants[0];
+      this->colorBlendStateInfo->blendConstants[1] = blendConstants[1];
+      this->colorBlendStateInfo->blendConstants[2] = blendConstants[2];
+      this->colorBlendStateInfo->blendConstants[3] = blendConstants[3];
     } else {
-      this->colorBlendStateInfo.blendConstants[0] = 0;
-      this->colorBlendStateInfo.blendConstants[1] = 0;
-      this->colorBlendStateInfo.blendConstants[2] = 0;
-      this->colorBlendStateInfo.blendConstants[3] = 0;
+      this->colorBlendStateInfo->blendConstants[0] = 0;
+      this->colorBlendStateInfo->blendConstants[1] = 0;
+      this->colorBlendStateInfo->blendConstants[2] = 0;
+      this->colorBlendStateInfo->blendConstants[3] = 0;
     }
-    this->colorBlendStateInfo.logicOpEnable = VK_FALSE;
-    this->colorBlendStateInfo.flags = 0;
+    this->colorBlendStateInfo->logicOpEnable = VK_FALSE;
+    this->colorBlendStateInfo->flags = 0;
     return *this;
   }
   
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withColorBlendState(VkLogicOp logicOperation, float* blendConstants) {
-    this->colorBlendStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    this->colorBlendStateInfo = std::make_unique<VkPipelineColorBlendStateCreateInfo>();
+    this->colorBlendStateInfo->sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     if (blendConstants != nullptr) {
-      this->colorBlendStateInfo.blendConstants[0] = blendConstants[0];
-      this->colorBlendStateInfo.blendConstants[1] = blendConstants[1];
-      this->colorBlendStateInfo.blendConstants[2] = blendConstants[2];
-      this->colorBlendStateInfo.blendConstants[3] = blendConstants[3];
+      this->colorBlendStateInfo->blendConstants[0] = blendConstants[0];
+      this->colorBlendStateInfo->blendConstants[1] = blendConstants[1];
+      this->colorBlendStateInfo->blendConstants[2] = blendConstants[2];
+      this->colorBlendStateInfo->blendConstants[3] = blendConstants[3];
     } else {
-      this->colorBlendStateInfo.blendConstants[0] = 0;
-      this->colorBlendStateInfo.blendConstants[1] = 0;
-      this->colorBlendStateInfo.blendConstants[2] = 0;
-      this->colorBlendStateInfo.blendConstants[3] = 0;
+      this->colorBlendStateInfo->blendConstants[0] = 0;
+      this->colorBlendStateInfo->blendConstants[1] = 0;
+      this->colorBlendStateInfo->blendConstants[2] = 0;
+      this->colorBlendStateInfo->blendConstants[3] = 0;
     }
-    this->colorBlendStateInfo.logicOpEnable = VK_TRUE;
-    this->colorBlendStateInfo.logicOp = logicOperation;
-    this->colorBlendStateInfo.flags = 0;
+    this->colorBlendStateInfo->logicOpEnable = VK_TRUE;
+    this->colorBlendStateInfo->logicOp = logicOperation;
+    this->colorBlendStateInfo->flags = 0;
     return *this;
   }
 
   VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::withDepthStencilState(VulkanDepthTest depthTest, VulkanDepthBoundsTest depthBoundsTest, VulkanStencilTest stencilTest) {
-    this->depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    this->depthStencilInfo.depthTestEnable = depthTest.enabled;
-    this->depthStencilInfo.depthWriteEnable = depthTest.depthWriteEnabled;
-    this->depthStencilInfo.depthCompareOp = depthTest.compare;
-    this->depthStencilInfo.depthBoundsTestEnable = depthBoundsTest.enabled;
-    this->depthStencilInfo.minDepthBounds = depthBoundsTest.minDepthBounds;
-    this->depthStencilInfo.maxDepthBounds = depthBoundsTest.maxDepthBounds;
-    this->depthStencilInfo.front = stencilTest.front;
-    this->depthStencilInfo.back = stencilTest.back;
-    this->depthStencilInfo.flags = 0;
+    this->depthStencilInfo = std::make_unique<VkPipelineDepthStencilStateCreateInfo>();
+    this->depthStencilInfo->sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    this->depthStencilInfo->depthTestEnable = depthTest.enabled;
+    this->depthStencilInfo->depthWriteEnable = depthTest.depthWriteEnabled;
+    this->depthStencilInfo->depthCompareOp = depthTest.compare;
+    this->depthStencilInfo->depthBoundsTestEnable = depthBoundsTest.enabled;
+    this->depthStencilInfo->minDepthBounds = depthBoundsTest.minDepthBounds;
+    this->depthStencilInfo->maxDepthBounds = depthBoundsTest.maxDepthBounds;
+    this->depthStencilInfo->front = stencilTest.front;
+    this->depthStencilInfo->back = stencilTest.back;
+    this->depthStencilInfo->flags = 0;
     return *this;
   }
 
@@ -258,34 +293,41 @@ namespace Radiant {
     this->createInfo.stageCount = this->shaderStages.size();
     this->createInfo.pStages = this->shaderStages.data();
 
-    this->vertextInputStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    this->vertextInputStateInfo.vertexBindingDescriptionCount = this->vertexBindingDescriptors.size();
-    this->vertextInputStateInfo.pVertexBindingDescriptions = this->vertexBindingDescriptors.data();
-    this->vertextInputStateInfo.vertexAttributeDescriptionCount = this->vertexAttributeDescriptors.size();
-    this->vertextInputStateInfo.pVertexAttributeDescriptions = this->vertexAttributeDescriptors.data();
-    this->vertextInputStateInfo.flags = 0;
+    this->vertextInputStateInfo = std::make_unique<VkPipelineVertexInputStateCreateInfo>();
+    this->vertextInputStateInfo->sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    this->vertextInputStateInfo->vertexBindingDescriptionCount = this->vertexBindingDescriptors.size();
+    this->vertextInputStateInfo->pVertexBindingDescriptions = this->vertexBindingDescriptors.data();
+    this->vertextInputStateInfo->vertexAttributeDescriptionCount = this->vertexAttributeDescriptors.size();
+    this->vertextInputStateInfo->pVertexAttributeDescriptions = this->vertexAttributeDescriptors.data();
+    this->vertextInputStateInfo->flags = 0;
+
+    this->createFlags = std::make_unique<VkPipelineCreateFlags2CreateInfo>();
+    this->createFlags->sType = VK_STRUCTURE_TYPE_PIPELINE_CREATE_FLAGS_2_CREATE_INFO;
+    this->createFlags->pNext = this->renderingInfo.get();
+    this->createFlags->flags = this->flags;
 
     this->createInfo.layout = this->layout;
-    this->createInfo.pVertexInputState = &this->vertextInputStateInfo;
-    this->createInfo.pInputAssemblyState = &this->inputAssemblyStateInfo;
-    this->createInfo.pRasterizationState = &this->rasterizationStateInfo;
-    this->createInfo.pColorBlendState = &this->colorBlendStateInfo;
-    this->createInfo.pDepthStencilState = &this->depthStencilInfo;
-    this->createInfo.pMultisampleState = &this->multisampleStateInfo;
-    this->createInfo.pDynamicState = &this->dynamicStateInfo;
-    this->createInfo.pViewportState = &this->viewportStateInfo;
-    this->createInfo.pNext = &this->renderingInfo; 
-
+    this->createInfo.pVertexInputState = this->vertextInputStateInfo.get();
+    this->createInfo.pInputAssemblyState = this->inputAssemblyStateInfo.get();
+    this->createInfo.pRasterizationState = this->rasterizationStateInfo.get();
+    this->createInfo.pColorBlendState = this->colorBlendStateInfo.get();
+    this->createInfo.pDepthStencilState = this->depthStencilInfo.get();
+    this->createInfo.pMultisampleState = this->multisampleStateInfo.get();
+    this->createInfo.pDynamicState = this->dynamicStateInfo.get();
+    this->createInfo.pViewportState = this->viewportStateInfo.get();
+    this->createInfo.basePipelineHandle = this->basePipeline;
+    this->createInfo.basePipelineIndex = -1;
+    this->createInfo.pNext = this->createFlags.get(); 
 
     VkPipeline graphicsPipeline;
     vkCreateGraphicsPipelines(
         this->device,
-        nullptr, 
+        this->cache, 
         1, &this->createInfo, 
         nullptr, 
         &graphicsPipeline
     );
 
-    return {this->device, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline, this->layout, this->shaderModules};
+    return {this->device, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline, this->layout, this->cache, this->shaderModules};
   }
 }

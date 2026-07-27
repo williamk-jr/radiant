@@ -4,7 +4,7 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-  VulkanPipeline::VulkanPipeline(VkDevice device, VkPipelineBindPoint bindPoint, VkPipeline pipeline, VkPipelineLayout layout, std::vector<VkShaderModule> shaderModules) : device(device), bindPoint(bindPoint), pipeline(pipeline), layout(layout), shaderModules(shaderModules) {
+  VulkanPipeline::VulkanPipeline(VkDevice device, VkPipelineBindPoint bindPoint, VkPipeline pipeline, VkPipelineLayout layout, VkPipelineCache cache, std::vector<VkShaderModule> shaderModules) : device(device), bindPoint(bindPoint), pipeline(pipeline), layout(layout), shaderModules(shaderModules) {
   }
 
   VulkanPipeline::VulkanPipeline(VulkanPipeline&& other) noexcept :
@@ -32,5 +32,9 @@ namespace Radiant {
 
   VkPipelineBindPoint VulkanPipeline::getBindPoint() {
     return this->bindPoint;
+  }
+  
+  VkPipelineCache VulkanPipeline::getCache() {
+    return this->cache;
   }
 }

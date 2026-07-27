@@ -4,6 +4,7 @@
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanPipeline.h"
 #include <filesystem>
+#include <optional>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 #include <slang/slang-com-ptr.h>
@@ -49,6 +50,11 @@ namespace Radiant {
   class VulkanGraphicsPipelineBuilder {
     public:
       VulkanGraphicsPipelineBuilder(VulkanDevice& device);
+
+      VulkanGraphicsPipelineBuilder& allowDerivatives();
+      VulkanGraphicsPipelineBuilder& enableCaching();
+      VulkanGraphicsPipelineBuilder& derivativeOf(VulkanPipeline& basePipeline);
+      VulkanGraphicsPipelineBuilder& cacheOf(VulkanPipeline& basePipeline);
 
       VulkanGraphicsPipelineBuilder& withLayout(
           std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts
@@ -147,15 +153,20 @@ namespace Radiant {
       std::vector<VkRect2D> scissors;
 
       VkPipelineLayout layout;
-      VkPipelineRenderingCreateInfo renderingInfo{};
-      VkPipelineVertexInputStateCreateInfo vertextInputStateInfo{};
-      VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo{};
-      VkPipelineRasterizationStateCreateInfo rasterizationStateInfo{};
-      VkPipelineColorBlendStateCreateInfo colorBlendStateInfo{};
-      VkPipelineDepthStencilStateCreateInfo depthStencilInfo{};
-      VkPipelineMultisampleStateCreateInfo multisampleStateInfo{};
-      VkPipelineDynamicStateCreateInfo dynamicStateInfo{};
-      VkPipelineViewportStateCreateInfo viewportStateInfo{};
+      VkPipelineCreateFlags2 flags = 0;
+      std::unique_ptr<VkPipelineCreateFlags2CreateInfo> createFlags;
+      std::unique_ptr<VkPipelineRenderingCreateInfo> renderingInfo;
+      std::unique_ptr<VkPipelineVertexInputStateCreateInfo> vertextInputStateInfo;
+      std::unique_ptr<VkPipelineInputAssemblyStateCreateInfo> inputAssemblyStateInfo;
+      std::unique_ptr<VkPipelineRasterizationStateCreateInfo> rasterizationStateInfo;
+      std::unique_ptr<VkPipelineColorBlendStateCreateInfo> colorBlendStateInfo;
+      std::unique_ptr<VkPipelineDepthStencilStateCreateInfo> depthStencilInfo;
+      std::unique_ptr<VkPipelineMultisampleStateCreateInfo> multisampleStateInfo;
+      std::unique_ptr<VkPipelineDynamicStateCreateInfo> dynamicStateInfo;
+      std::unique_ptr<VkPipelineViewportStateCreateInfo> viewportStateInfo;
+
+      VkPipeline basePipeline = VK_NULL_HANDLE;
+      VkPipelineCache cache;
 
   };
 }

@@ -13,6 +13,7 @@
 #include "radiant/core/render/vulkan/VulkanImage.h"
 #include "radiant/core/render/vulkan/VulkanImageView.h"
 #include "radiant/core/render/vulkan/VulkanSampler.h"
+#include "radiant/util/logger/Logger.h"
 #include <algorithm>
 #include <cstddef>
 #include <glm/ext/matrix_float4x4.hpp>
@@ -58,7 +59,7 @@ namespace Radiant {
   }
 
   void Renderer::beginFrame(Window& window) {
-    if (this->graphicsPipeline.get() == nullptr) {
+    if (this->solidColorGraphicsPipeline.get() == nullptr) {
       this->initGraphicsPipeline();
     }
 
@@ -126,7 +127,7 @@ namespace Radiant {
     };
 
     this->commandBuffers[currentFrame].beginRendering(&colorAttachment, nullptr, nullptr, renderArea, 0);
-    this->commandBuffers[currentFrame].bindPipeline(*this->graphicsPipeline);
+    this->commandBuffers[currentFrame].bindPipeline(*this->solidColorGraphicsPipeline);
 
     // Clear uniform buffer and buffer writes from previous frame.
     this->descriptorBuffer->resetOffset();
@@ -145,11 +146,11 @@ namespace Radiant {
     });
 
     //this->commandBuffers[currentFrame].bindDescriptorSets(*this->graphicsPipeline, 0, this->descriptorSets);
-    this->commandBuffers[currentFrame].bindDescriptorSet(*this->graphicsPipeline, 0, this->descriptorSets[currentFrame]);
+    this->commandBuffers[currentFrame].bindDescriptorSet(*this->solidColorGraphicsPipeline, 0, this->descriptorSets[currentFrame]);
   }
   
   void Renderer::bindTexture(Texture& texture) {
-    this->commandBuffers[currentFrame].bindDescriptorSet(*this->graphicsPipeline, 1, texture.getDescriptorSet());
+    this->commandBuffers[currentFrame].bindDescriptorSet(*this->solidColorGraphicsPipeline, 1, texture.getDescriptorSet());
   }
 
   void Renderer::setViewport(float width, float height, float minDepth, float maxDepth) {
@@ -380,7 +381,7 @@ namespace Radiant {
       this->textureDescriptorSetLayout->get() 
     };
 
-    this->graphicsPipeline = std::make_unique<VulkanPipeline>(VulkanGraphicsPipelineBuilder(*this->device)
+    this->solidColorGraphicsPipeline = std::make_unique<VulkanPipeline>(VulkanGraphicsPipelineBuilder(*this->device)
       .withLayout(layouts)
       .withRenderingInfo({VK_FORMAT_B8G8R8A8_SRGB}, VK_FORMAT_UNDEFINED, VK_FORMAT_UNDEFINED)
       .withVertexBindingDescription(sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX, {

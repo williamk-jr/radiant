@@ -9,7 +9,7 @@
 
 namespace Radiant {
   FontGPUCache::FontGPUCache() {
-    this->textureAtlas = std::make_unique<TextureAtlas>(2048, 2048, 1);
+    this->textureAtlas = std::make_unique<TextureAtlas>(2048, 2048, 1, 1);
   }
 
   void FontGPUCache::addEntry(FT_Bitmap& bitmap, GlyphIdentifier identifier) {
@@ -20,9 +20,9 @@ namespace Radiant {
     Box uvBounds = this->textureAtlas->getUVBoundsAtCursor(width, height);
     this->textureAtlas->addTexture(bitmap.buffer, bufferSize, width, height);
 
-    Logger::info("Char: "+std::to_string((char)identifier.charCode)+
-                  "\nMin: ("+std::to_string(uvBounds.minX)+", "+std::to_string(uvBounds.minY)+
-                  "\nMax: ("+std::to_string(uvBounds.maxX)+", "+std::to_string(uvBounds.maxY) +"\n");
+    //Logger::info("Char: "+std::to_string((char)identifier.charCode)+
+    //              "\nMin: ("+std::to_string(uvBounds.minX)+", "+std::to_string(uvBounds.minY)+
+    //              "\nMax: ("+std::to_string(uvBounds.maxX)+", "+std::to_string(uvBounds.maxY) +"\n");
 
     this->cache[identifier] = uvBounds;
     this->cacheDirty = true;
@@ -38,9 +38,5 @@ namespace Radiant {
 
   TextureAtlas& FontGPUCache::getTextureAtlas() {
     return *this->textureAtlas;
-  }
-  
-  std::pair<float, float> FontGPUCache::calculateUV(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
-    return {x/width, y/height};
   }
 }

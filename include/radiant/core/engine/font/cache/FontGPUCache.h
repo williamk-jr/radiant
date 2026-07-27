@@ -59,7 +59,5 @@ namespace Radiant {
       std::unordered_map<GlyphIdentifier, Box, GlyphIdentifierHasher> cache;
       std::unique_ptr<TextureAtlas> textureAtlas;
       bool cacheDirty;
-
-      std::pair<float, float> calculateUV(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
   };
 }

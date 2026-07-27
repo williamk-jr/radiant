@@ -7,8 +7,8 @@
 #include <vector>
 
 namespace Radiant {
-  TextureAtlas::TextureAtlas(uint32_t width, uint32_t height, uint32_t pixelSize) : 
-    width(width), height(height), pixelSize(pixelSize) {
+  TextureAtlas::TextureAtlas(uint32_t width, uint32_t height, uint32_t pixelSize, uint32_t padding) : 
+      width(width), height(height), pixelSize(pixelSize), padding(padding) {
       this->buffer = std::vector<uint8_t>();
       this->buffer.reserve(width*height*pixelSize);
   }
@@ -20,7 +20,7 @@ namespace Radiant {
       }
 
       this->cursorX = 0;
-      this->cursorY += rowOffset;
+      this->cursorY += rowOffset + this->padding;
     }
 
     if (height > this->rowOffset) {
@@ -33,10 +33,10 @@ namespace Radiant {
 
       // pos = dst + x + (width*y);
 
-      std::copy(src, src+(width*pixelSize), dst);
+      std::copy(src, src+(width*this->pixelSize), dst);
 
     }
-    cursorX += width*pixelSize;
+    cursorX += (width+this->padding)*this->pixelSize;
   }
   
   uint8_t* TextureAtlas::getBuffer() {

@@ -108,7 +108,7 @@ namespace Radiant {
       std::vector<VulkanDescriptorSet> descriptorSets;
 
 
-      std::unique_ptr<VulkanPipeline> graphicsPipeline;
+      std::unique_ptr<VulkanPipeline> solidColorGraphicsPipeline;
 
       RenderContext context;
       

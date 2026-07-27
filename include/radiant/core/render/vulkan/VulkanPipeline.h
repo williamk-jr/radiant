@@ -5,7 +5,7 @@
 namespace Radiant {
   class VulkanPipeline {
     public:
-      VulkanPipeline(VkDevice device, VkPipelineBindPoint bindPoint, VkPipeline pipeline, VkPipelineLayout layout, std::vector<VkShaderModule> shaderModules);
+      VulkanPipeline(VkDevice device, VkPipelineBindPoint bindPoint, VkPipeline pipeline, VkPipelineLayout layout, VkPipelineCache cache, std::vector<VkShaderModule> shaderModules);
       VulkanPipeline(const VulkanPipeline&) = delete;
       VulkanPipeline& operator=(const VulkanPipeline&) = delete;
 
@@ -16,10 +16,13 @@ namespace Radiant {
       VkPipeline get();
       VkPipelineLayout getLayout();
       VkPipelineBindPoint getBindPoint();
+      VkPipelineCache getCache();
+
     private:
       VkPipeline pipeline;
       VkPipelineBindPoint bindPoint;
       VkPipelineLayout layout;
+      VkPipelineCache cache;
       std::vector<VkShaderModule> shaderModules;
       VkDevice device;
   };
