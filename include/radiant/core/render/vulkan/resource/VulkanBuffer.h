@@ -1,8 +1,8 @@
 #pragma once
 
-#include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
 #include <vulkan/vulkan_core.h>
+
 namespace Radiant {
   /* Vulkan Buffer
    *

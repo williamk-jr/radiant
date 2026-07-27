@@ -1,4 +1,4 @@
-#include "radiant/core/render/vulkan/VulkanBuffer.h"
+#include "radiant/core/render/vulkan/resource/VulkanBuffer.h"
 #include <cstring>
 
 namespace Radiant {

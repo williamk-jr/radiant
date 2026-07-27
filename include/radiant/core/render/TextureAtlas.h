@@ -3,6 +3,7 @@
 #include "radiant/util/Box.h"
 #include <cstdint>
 #include <vector>
+
 namespace Radiant {
   class TextureAtlas {
     public:

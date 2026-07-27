@@ -2,6 +2,7 @@
 
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include <vulkan/vulkan_core.h>
+
 namespace Radiant {
   /* VulkanFence
    * 

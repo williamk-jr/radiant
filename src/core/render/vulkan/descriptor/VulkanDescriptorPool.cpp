@@ -1,10 +1,8 @@
-#include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
-#include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
+#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorPool.h"
+#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
-#include "radiant/util/logger/Logger.h"
 #include <algorithm>
-#include <string>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 

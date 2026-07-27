@@ -1,7 +1,7 @@
 #pragma once
 
-#include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
-#include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
+#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
+#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSetLayout.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include <vector>
 #include <vulkan/vulkan_core.h>

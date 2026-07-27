@@ -1,4 +1,4 @@
-#include "radiant/core/render/vulkan/VulkanSemaphore.h"
+#include "radiant/core/render/vulkan/syncronization/VulkanSemaphore.h"
 
 namespace Radiant {
   VulkanSemaphore::VulkanSemaphore(VulkanDevice& device, VkSemaphoreTypeCreateInfo type, VkSemaphoreCreateFlags flags) : device(device.get()) {

@@ -1,4 +1,5 @@
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 
 namespace Radiant { 
   VulkanPhysicalDevice::VulkanPhysicalDevice(VulkanInstance& instance, VulkanPhysicalDeviceRequirements physicalDeviceRequirements) {

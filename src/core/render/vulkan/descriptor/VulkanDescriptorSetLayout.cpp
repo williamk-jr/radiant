@@ -1,4 +1,4 @@
-#include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
+#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSetLayout.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <vector>

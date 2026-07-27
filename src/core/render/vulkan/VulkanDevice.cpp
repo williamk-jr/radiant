@@ -1,4 +1,5 @@
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {

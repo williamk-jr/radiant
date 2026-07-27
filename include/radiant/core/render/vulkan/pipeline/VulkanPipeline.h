@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <vulkan/vulkan_core.h>
+
 namespace Radiant {
   class VulkanPipeline {
     public:

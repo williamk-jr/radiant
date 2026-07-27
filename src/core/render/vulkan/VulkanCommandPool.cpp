@@ -1,4 +1,3 @@
-
 #include "radiant/core/render/vulkan/VulkanCommandPool.h"
 
 namespace Radiant {

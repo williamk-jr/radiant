@@ -1,5 +1,4 @@
-
-#include "radiant/core/render/vulkan/VulkanTimelineSemaphore.h"
+#include "radiant/core/render/vulkan/syncronization/VulkanTimelineSemaphore.h"
 
 namespace Radiant {
   VulkanTimelineSemaphore::VulkanTimelineSemaphore(VulkanDevice& device, VkSemaphoreCreateFlags flags, uint64_t initialValue) :

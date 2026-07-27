@@ -1,26 +1,14 @@
 #include "radiant/core/render/Renderer.h"
-#include "radiant/core/render/Instance.h"
-#include "radiant/core/render/Rect2D.h"
-#include "radiant/core/render/Texture.h"
-#include "radiant/core/render/Vertex.h"
-#include "radiant/core/render/vulkan/VulkanBuffer.h"
+#include "radiant/core/render/vulkan/resource/VulkanBuffer.h"
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
-#include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
-#include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
-#include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
-#include "radiant/core/render/vulkan/VulkanFence.h"
-#include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
-#include "radiant/core/render/vulkan/VulkanImage.h"
-#include "radiant/core/render/vulkan/VulkanImageView.h"
-#include "radiant/core/render/vulkan/VulkanSampler.h"
-#include "radiant/util/logger/Logger.h"
+#include "radiant/core/render/vulkan/pipeline/VulkanGraphicsPipelineBuilder.h"
+
 #include <algorithm>
 #include <cstddef>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
-#include <string>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 

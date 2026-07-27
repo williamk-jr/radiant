@@ -1,9 +1,9 @@
 #pragma once
 #include "radiant/core/render/vulkan/VulkanDevice.h"
-#include "radiant/core/render/vulkan/VulkanImage.h"
-#include "radiant/core/render/vulkan/VulkanImageView.h"
+#include "radiant/core/render/vulkan/resource/VulkanImage.h"
+#include "radiant/core/render/vulkan/resource/VulkanImageView.h"
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
-#include "radiant/core/render/vulkan/VulkanSemaphore.h"
+#include "radiant/core/render/vulkan/syncronization/VulkanSemaphore.h"
 #include "radiant/core/render/vulkan/VulkanSurface.h"
 #include "radiant/core/render/vulkan/VulkanResult.h"
 

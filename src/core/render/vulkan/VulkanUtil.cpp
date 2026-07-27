@@ -1,4 +1,5 @@
 #include "radiant/core/render/vulkan/VulkanUtil.h"
+#include "radiant/util/logger/Logger.h"
 
 namespace Radiant {
   namespace Validation {

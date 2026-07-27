@@ -1,6 +1,6 @@
 #pragma once
 #include "radiant/core/render/vulkan/VulkanDevice.h"
-#include "radiant/core/render/vulkan/VulkanImage.h"
+#include "radiant/core/render/vulkan/resource/VulkanImage.h"
 #include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
 #include <vulkan/vulkan_core.h>
 

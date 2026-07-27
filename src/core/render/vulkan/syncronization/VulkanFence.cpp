@@ -1,4 +1,4 @@
-#include "radiant/core/render/vulkan/VulkanFence.h"
+#include "radiant/core/render/vulkan/syncronization/VulkanFence.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <cstdint>

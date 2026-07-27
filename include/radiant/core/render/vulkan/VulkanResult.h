@@ -6,12 +6,5 @@ namespace Radiant {
   struct VulkanResult {
     VkResult result;
     T value;
-    
-    //operator T() const {
-    //  return value;
-    //}
-    //operator VkResult() const {
-    //  return result;
-    //}
   };
 }

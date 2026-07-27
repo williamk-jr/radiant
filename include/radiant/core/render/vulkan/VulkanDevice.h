@@ -1,12 +1,11 @@
 #pragma once
-#include <memory>
+
 #include <set>
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
 #include "radiant/core/render/vulkan/VulkanSurface.h"
-#include "radiant/core/render/vulkan/VulkanUtil.h"
 
 
 namespace Radiant {

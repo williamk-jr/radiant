@@ -67,21 +67,26 @@ add_executable(Radiant
   src/core/render/vulkan/VulkanCommandBuffer.cpp
   src/core/render/vulkan/VulkanMemoryAllocator.cpp
   src/core/render/vulkan/VulkanQueue.cpp
-  src/core/render/vulkan/VulkanFence.cpp
-  src/core/render/vulkan/VulkanSemaphore.cpp
-  src/core/render/vulkan/VulkanBinarySemaphore.cpp
-  src/core/render/vulkan/VulkanTimelineSemaphore.cpp
   src/core/render/vulkan/VulkanSwapchain.cpp
-  src/core/render/vulkan/VulkanImage.cpp
-  src/core/render/vulkan/VulkanImageView.cpp
   src/core/render/vulkan/VulkanSampler.cpp
-  src/core/render/vulkan/VulkanGraphicsPipelineBuilder.cpp
-  src/core/render/vulkan/VulkanPipeline.cpp
-  src/core/render/vulkan/VulkanDescriptorSetLayout.cpp
-  src/core/render/vulkan/VulkanDescriptorPool.cpp
-  src/core/render/vulkan/VulkanDescriptorSet.cpp
-  src/core/render/vulkan/VulkanBuffer.cpp
   src/core/render/vulkan/VulkanUtil.cpp
+
+  src/core/render/vulkan/syncronization/VulkanFence.cpp
+  src/core/render/vulkan/syncronization/VulkanSemaphore.cpp
+  src/core/render/vulkan/syncronization/VulkanBinarySemaphore.cpp
+  src/core/render/vulkan/syncronization/VulkanTimelineSemaphore.cpp
+
+  src/core/render/vulkan/resource/VulkanImage.cpp
+  src/core/render/vulkan/resource/VulkanImageView.cpp
+  src/core/render/vulkan/resource/VulkanBuffer.cpp
+
+  src/core/render/vulkan/descriptor/VulkanDescriptorSetLayout.cpp
+  src/core/render/vulkan/descriptor/VulkanDescriptorPool.cpp
+  src/core/render/vulkan/descriptor/VulkanDescriptorSet.cpp
+
+  src/core/render/vulkan/pipeline/VulkanGraphicsPipelineBuilder.cpp
+  src/core/render/vulkan/pipeline/VulkanPipeline.cpp
+
 
   src/core/render/Color.cpp
   src/core/render/Renderer.cpp

@@ -1,4 +1,4 @@
-#include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
+#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {

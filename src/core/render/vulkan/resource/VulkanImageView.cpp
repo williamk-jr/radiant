@@ -1,4 +1,4 @@
-#include "radiant/core/render/vulkan/VulkanImageView.h"
+#include "radiant/core/render/vulkan/resource/VulkanImageView.h"
 
 namespace Radiant {
   VulkanImageView::VulkanImageView(VulkanDevice& device, VulkanImage& image, VkFormat format, VkImageSubresourceRange subresourceRange) : 

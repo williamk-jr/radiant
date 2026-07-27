@@ -4,6 +4,7 @@
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <vector>
 #include <vulkan/vulkan_core.h>
+
 namespace Radiant {
   class VulkanSemaphore {
     public:

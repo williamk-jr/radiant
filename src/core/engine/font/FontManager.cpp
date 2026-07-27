@@ -3,6 +3,7 @@
 #include "radiant/core/engine/font/cache/FontCacheNode.h"
 #include "radiant/core/engine/font/cache/FontGPUCache.h"
 #include "radiant/core/render/TextureAtlas.h"
+#include "radiant/core/render/batch/RenderBatch.h"
 #include "radiant/util/logger/Logger.h"
 #include <freetype/freetype.h>
 #include <freetype/ftglyph.h>
@@ -36,6 +37,7 @@ namespace Radiant {
         FT_BitmapGlyph bitmapGlyph = this->toBitmapGlyph(glyphNode.getValue(), FT_RENDER_MODE_NORMAL);
         fontGpuCache->addEntry(bitmapGlyph->bitmap, glyphId);
       }
+
     }
   }
 

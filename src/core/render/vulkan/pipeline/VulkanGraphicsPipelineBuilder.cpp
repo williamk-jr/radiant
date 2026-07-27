@@ -1,4 +1,4 @@
-#include "radiant/core/render/vulkan/VulkanGraphicsPipelineBuilder.h"
+#include "radiant/core/render/vulkan/pipeline/VulkanGraphicsPipelineBuilder.h"
 #include "radiant/util/logger/Logger.h"
 #include <filesystem>
 #include <memory>

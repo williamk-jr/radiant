@@ -1,9 +1,9 @@
 #include "radiant/core/render/Texture.h"
-#include "radiant/core/render/vulkan/VulkanDescriptorPool.h"
-#include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
-#include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
+#include "radiant/core/render/vulkan/VulkanCommandPool.h"
+#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorPool.h"
+#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
+#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSetLayout.h"
 #include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
-#include <iostream>
 #include <memory>
 #include <vector>
 

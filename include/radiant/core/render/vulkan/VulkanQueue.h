@@ -1,10 +1,10 @@
 #pragma once
+
 #include <cstdint>
-#include "radiant/core/render/vulkan/VulkanCommandPool.h"
-#include "radiant/core/render/vulkan/VulkanFence.h"
-#include "radiant/core/render/vulkan/VulkanSemaphore.h"
+#include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
+#include "radiant/core/render/vulkan/syncronization/VulkanFence.h"
+#include "radiant/core/render/vulkan/syncronization/VulkanSemaphore.h"
 #include "radiant/core/render/vulkan/VulkanSwapchain.h"
-#include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "radiant/core/render/vulkan/VulkanDescriptorSetLayout.h"
+#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSetLayout.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
-#include "radiant/core/render/vulkan/VulkanPipeline.h"
+#include "radiant/core/render/vulkan/pipeline/VulkanPipeline.h"
 #include <filesystem>
 #include <optional>
 #include <vector>
@@ -166,7 +166,7 @@ namespace Radiant {
       std::unique_ptr<VkPipelineViewportStateCreateInfo> viewportStateInfo;
 
       VkPipeline basePipeline = VK_NULL_HANDLE;
-      VkPipelineCache cache;
+      VkPipelineCache cache = VK_NULL_HANDLE;
 
   };
 }

@@ -1,5 +1,4 @@
 #include "radiant/core/render/vulkan/VulkanSampler.h"
-#include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <vulkan/vulkan_core.h>
 

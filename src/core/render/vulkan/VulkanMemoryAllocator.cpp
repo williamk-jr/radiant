@@ -1,3 +1,4 @@
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 #define VMA_IMPLEMENTATION // Very required, read vma docs.
 #include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
 

@@ -1,10 +1,10 @@
 
 #pragma once
-#include "radiant/core/render/vulkan/VulkanBuffer.h"
-#include "radiant/core/render/vulkan/VulkanDescriptorSet.h"
+#include "radiant/core/render/vulkan/resource/VulkanBuffer.h"
+#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
-#include "radiant/core/render/vulkan/VulkanImage.h"
-#include "radiant/core/render/vulkan/VulkanPipeline.h"
+#include "radiant/core/render/vulkan/resource/VulkanImage.h"
+#include "radiant/core/render/vulkan/pipeline/VulkanPipeline.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include <vulkan/vulkan_core.h>
 

@@ -1,5 +1,4 @@
-#include "radiant/core/render/vulkan/VulkanPipeline.h"
-#include "radiant/util/logger/Logger.h"
+#include "radiant/core/render/vulkan/pipeline/VulkanPipeline.h"
 #include <vector>
 #include <vulkan/vulkan_core.h>
 

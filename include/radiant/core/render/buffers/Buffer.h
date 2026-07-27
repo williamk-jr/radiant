@@ -1,9 +1,9 @@
 #pragma once
 
-#include "radiant/core/render/vulkan/VulkanBuffer.h"
-#include <cstddef>
+#include "radiant/core/render/vulkan/resource/VulkanBuffer.h"
 #include <memory>
 #include <vulkan/vulkan_core.h>
+
 namespace Radiant {
   template<typename T>
   class Buffer {

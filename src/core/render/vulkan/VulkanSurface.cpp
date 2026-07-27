@@ -1,4 +1,5 @@
 #include "radiant/core/render/vulkan/VulkanSurface.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 
 namespace Radiant {
 #ifdef HAS_GLFW

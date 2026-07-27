@@ -1,6 +1,7 @@
 #pragma once
 
-#include "radiant/core/render/vulkan/VulkanSemaphore.h"
+#include "radiant/core/render/vulkan/syncronization/VulkanSemaphore.h"
+
 namespace Radiant {
   /* VulkanBinarySemaphore
    *

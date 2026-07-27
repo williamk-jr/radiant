@@ -1,4 +1,4 @@
-#include "radiant/core/render/vulkan/VulkanBinarySemaphore.h"
+#include "radiant/core/render/vulkan/syncronization/VulkanBinarySemaphore.h"
 
 namespace Radiant {
   VulkanBinarySemaphore::VulkanBinarySemaphore(VulkanDevice& device, VkSemaphoreCreateFlags flags) :
