@@ -9,7 +9,7 @@
 namespace Radiant {
 	struct FontCacheIdentifier {
 			std::filesystem::path path;
-			uint32_t faceId;
+			uint32_t              faceId;
 
 			bool operator==(const FontCacheIdentifier& other) const {
 				return this->path == other.path && this->faceId == other.faceId;

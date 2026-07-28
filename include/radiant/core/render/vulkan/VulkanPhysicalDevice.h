@@ -24,7 +24,8 @@ namespace Radiant {
 			 * device.
 			 */
 			VulkanPhysicalDevice(VulkanInstance& instance, VulkanPhysicalDeviceRequirements physicalDeviceRequirements);
-			VulkanPhysicalDevice(const VulkanPhysicalDevice&) = delete;
+
+			VulkanPhysicalDevice(const VulkanPhysicalDevice&)            = delete;
 			VulkanPhysicalDevice& operator=(const VulkanPhysicalDevice&) = delete;
 
 			VulkanPhysicalDevice(VulkanPhysicalDevice&&) noexcept;

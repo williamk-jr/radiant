@@ -16,22 +16,22 @@ namespace Radiant {
 			~RadiantEngine();
 
 			std::shared_ptr<Widget> getRootWidget();
-			void loadStylesheet(std::filesystem::path path);
-			bool isRunning();
-			void update();
+			void                    loadStylesheet(std::filesystem::path path);
+			bool                    isRunning();
+			void                    update();
 
 		private:
-			std::unique_ptr<Window> window;
+			std::unique_ptr<Window>        window;
 			std::unique_ptr<WidgetManager> widgetManager;
-			std::unique_ptr<FontManager> fontManager;
+			std::unique_ptr<FontManager>   fontManager;
 
-			std::unique_ptr<Renderer> renderer;
-			std::unique_ptr<VertexBuffer> vertexBuffer;
+			std::unique_ptr<Renderer>       renderer;
+			std::unique_ptr<VertexBuffer>   vertexBuffer;
 			std::unique_ptr<InstanceBuffer> instanceBuffer;
-			std::unique_ptr<IndexBuffer> indexBuffer;
+			std::unique_ptr<IndexBuffer>    indexBuffer;
 
 			std::unique_ptr<StyleSheetParser::Parser> stylesheetParser;
-			std::unique_ptr<Texture> fontAtlasGpu;
+			std::unique_ptr<Texture>                  fontAtlasGpu;
 
 			void registerProperties();
 			void registerFunctions();

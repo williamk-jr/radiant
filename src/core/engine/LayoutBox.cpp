@@ -4,15 +4,15 @@ namespace Radiant {
 
 	LayoutBox::LayoutBox() {
 		this->padding = {10, 10, 10, 10};
-		this->border = {10, 10, 10, 10};
-		this->margin = {10, 10, 10, 10};
+		this->border  = {10, 10, 10, 10};
+		this->margin  = {10, 10, 10, 10};
 	}
 
 	LayoutBox::LayoutBox(int32_t positionX, int32_t positionY, uint32_t width, uint32_t height)
 	    : positionX(positionX), positionY(positionY), width(width), height(height) {
 		this->padding = {10, 10, 10, 10};
-		this->border = {10, 10, 10, 10};
-		this->margin = {10, 10, 10, 10};
+		this->border  = {10, 10, 10, 10};
+		this->margin  = {10, 10, 10, 10};
 	}
 
 	int32_t LayoutBox::getMarginBoxX() const {

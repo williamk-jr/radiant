@@ -12,10 +12,14 @@
 namespace Radiant {
 	class VulkanSwapchain {
 		public:
-			VulkanSwapchain(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface,
-			                VkImageUsageFlags imageUsageFlags, VkPresentModeKHR presentMode,
+			VulkanSwapchain(VulkanPhysicalDevice&     physicalDevice,
+			                VulkanDevice&             device,
+			                VulkanSurface&            surface,
+			                VkImageUsageFlags         imageUsageFlags,
+			                VkPresentModeKHR          presentMode,
 			                VkSwapchainCreateFlagsKHR swapchainFlags);
-			VulkanSwapchain(const VulkanSwapchain&) = delete;
+
+			VulkanSwapchain(const VulkanSwapchain&)            = delete;
 			VulkanSwapchain& operator=(const VulkanSwapchain&) = delete;
 
 			VulkanSwapchain(VulkanSwapchain&&) noexcept;
@@ -25,25 +29,37 @@ namespace Radiant {
 			VkSwapchainKHR get();
 
 			VkExtent2D getExtent(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface);
+
 			VulkanResult<uint32_t> acquireNextImage(VulkanSemaphore* semaphore, uint64_t timeout);
+
 			VulkanImage& getImage(uint32_t index);
+
 			VulkanImageView& getImageView(uint32_t index);
+
 			uint32_t getImageCount();
 
-			void recreate(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface,
-			              VkImageUsageFlags imageUsageFlags, VkPresentModeKHR presentMode,
+			void recreate(VulkanPhysicalDevice&     physicalDevice,
+			              VulkanDevice&             device,
+			              VulkanSurface&            surface,
+			              VkImageUsageFlags         imageUsageFlags,
+			              VkPresentModeKHR          presentMode,
 			              VkSwapchainCreateFlagsKHR swapchainFlags);
 
 		private:
-			VkSwapchainKHR swapchain;
-			std::vector<VulkanImage> images;
+			VkSwapchainKHR               swapchain;
+			std::vector<VulkanImage>     images;
 			std::vector<VulkanImageView> imageViews;
-			VkDevice device;
+			VkDevice                     device;
 
-			void create(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface,
-			            VkImageUsageFlags imageUsageFlags, VkPresentModeKHR presentMode,
+			void create(VulkanPhysicalDevice&     physicalDevice,
+			            VulkanDevice&             device,
+			            VulkanSurface&            surface,
+			            VkImageUsageFlags         imageUsageFlags,
+			            VkPresentModeKHR          presentMode,
 			            VkSwapchainCreateFlagsKHR swapchainFlags);
+
 			void destroy();
+
 			VkSurfaceFormat2KHR findSurfaceFormat(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface);
 	};
 } // namespace Radiant

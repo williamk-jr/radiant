@@ -9,16 +9,17 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-	VulkanDescriptorPool::VulkanDescriptorPool(VulkanDevice& device, std::vector<VkDescriptorPoolSize> poolSizes,
-	                                           uint32_t maxDescriptorSets)
+	VulkanDescriptorPool::VulkanDescriptorPool(VulkanDevice&                     device,
+	                                           std::vector<VkDescriptorPoolSize> poolSizes,
+	                                           uint32_t                          maxDescriptorSets)
 	    : device(device.get()) {
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo{};
-		descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		descriptorPoolInfo.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		descriptorPoolInfo.poolSizeCount = poolSizes.size();
-		descriptorPoolInfo.pPoolSizes = poolSizes.data();
-		descriptorPoolInfo.maxSets = maxDescriptorSets;
-		descriptorPoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
+		descriptorPoolInfo.pPoolSizes    = poolSizes.data();
+		descriptorPoolInfo.maxSets       = maxDescriptorSets;
+		descriptorPoolInfo.flags         = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
 
 		vkCreateDescriptorPool(device.get(), &descriptorPoolInfo, nullptr, &this->descriptorPool);
 	}
@@ -53,10 +54,10 @@ namespace Radiant {
 		// rawDescriptorSets.reserve(descriptorSetLayouts.size());
 
 		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
-		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		descriptorSetAllocateInfo.descriptorPool = this->descriptorPool;
+		descriptorSetAllocateInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		descriptorSetAllocateInfo.descriptorPool     = this->descriptorPool;
 		descriptorSetAllocateInfo.descriptorSetCount = rawDescriptorSetLayouts.size();
-		descriptorSetAllocateInfo.pSetLayouts = rawDescriptorSetLayouts.data();
+		descriptorSetAllocateInfo.pSetLayouts        = rawDescriptorSetLayouts.data();
 
 		vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data());
 
@@ -72,13 +73,13 @@ namespace Radiant {
 	std::vector<VulkanDescriptorSet>
 	VulkanDescriptorPool::allocateDescriptorSets(VulkanDescriptorSetLayout& descriptorSetLayout, uint32_t count) {
 		std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts(count, descriptorSetLayout.get());
-		std::vector<VkDescriptorSet> rawDescriptorSets(rawDescriptorSetLayouts.size());
+		std::vector<VkDescriptorSet>       rawDescriptorSets(rawDescriptorSetLayouts.size());
 
 		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
-		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		descriptorSetAllocateInfo.descriptorPool = this->descriptorPool;
+		descriptorSetAllocateInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		descriptorSetAllocateInfo.descriptorPool     = this->descriptorPool;
 		descriptorSetAllocateInfo.descriptorSetCount = rawDescriptorSetLayouts.size();
-		descriptorSetAllocateInfo.pSetLayouts = rawDescriptorSetLayouts.data();
+		descriptorSetAllocateInfo.pSetLayouts        = rawDescriptorSetLayouts.data();
 
 		vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data());
 
@@ -95,10 +96,10 @@ namespace Radiant {
 		std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts{descriptorSetLayout.get()};
 
 		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
-		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		descriptorSetAllocateInfo.descriptorPool = this->descriptorPool;
+		descriptorSetAllocateInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		descriptorSetAllocateInfo.descriptorPool     = this->descriptorPool;
 		descriptorSetAllocateInfo.descriptorSetCount = 1;
-		descriptorSetAllocateInfo.pSetLayouts = rawDescriptorSetLayouts.data();
+		descriptorSetAllocateInfo.pSetLayouts        = rawDescriptorSetLayouts.data();
 
 		std::vector<VkDescriptorSet> rawDescriptorSets(1);
 		Validation::verify(
@@ -108,9 +109,9 @@ namespace Radiant {
 	}
 
 	void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites,
-	                                                std::vector<VulkanCopyDescriptorSet> descriptorSetCopies) {
+	                                                std::vector<VulkanCopyDescriptorSet>  descriptorSetCopies) {
 		std::vector<VkWriteDescriptorSet> rawDescriptorWrites = this->toRawDescriptorWrites(descriptorSetWrites);
-		std::vector<VkCopyDescriptorSet> rawDescriptorCopies = this->toRawDescriptorCopies(descriptorSetCopies);
+		std::vector<VkCopyDescriptorSet>  rawDescriptorCopies = this->toRawDescriptorCopies(descriptorSetCopies);
 
 		vkUpdateDescriptorSets(this->device, rawDescriptorWrites.size(),
 		                       descriptorSetWrites.size() != 0 ? rawDescriptorWrites.data() : nullptr,

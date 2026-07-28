@@ -4,10 +4,10 @@
 
 namespace Radiant {
 	struct LayoutExtrusion {
-			int32_t top = 0;
+			int32_t top    = 0;
 			int32_t bottom = 0;
-			int32_t left = 0;
-			int32_t right = 0;
+			int32_t left   = 0;
+			int32_t right  = 0;
 	};
 
 	class LayoutBox {
@@ -54,16 +54,16 @@ namespace Radiant {
 			uint32_t positionX = 0;
 			uint32_t positionY = 0;
 
-			uint32_t width = 0;
+			uint32_t width  = 0;
 			uint32_t height = 0;
 
 			LayoutExtrusion padding;
 			LayoutExtrusion border;
 			LayoutExtrusion margin;
 
-			uint32_t offsetTop = 0;
+			uint32_t offsetTop    = 0;
 			uint32_t offsetBottom = 0;
-			uint32_t offsetLeft = 0;
-			uint32_t offsetRight = 0;
+			uint32_t offsetLeft   = 0;
+			uint32_t offsetRight  = 0;
 	};
 } // namespace Radiant

@@ -12,7 +12,7 @@ namespace Radiant::StyleSheetParser {
 		public:
 			Unit(float value, UnitType unit);
 
-			float getValue();
+			float    getValue();
 			UnitType getUnit();
 
 			Unit resolve(float referenceLength) override;
@@ -20,7 +20,7 @@ namespace Radiant::StyleSheetParser {
 			static Unit fromString(std::string str);
 
 		private:
-			float value;
+			float    value;
 			UnitType unit;
 
 			static std::unordered_map<std::string, UnitType> UNIT_MAP;

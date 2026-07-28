@@ -15,14 +15,12 @@
 
 namespace Radiant {
 	FontManager::FontManager() {
-		this->fontCache = std::make_unique<FontCache>(1024 * 4, FONT_CACHE_GLYPH | FONT_CACHE_SMALL_BITMAP);
+		this->fontCache    = std::make_unique<FontCache>(1024 * 4, FONT_CACHE_GLYPH | FONT_CACHE_SMALL_BITMAP);
 		this->fontGpuCache = std::make_unique<FontGPUCache>();
 	}
 
 	Font FontManager::loadFont(std::filesystem::path path) {
-		return {
-		    *this->fontCache, {path, 0}
-        };
+		return {*this->fontCache, {path, 0}};
 	}
 
 	void FontManager::compileStringGeometry(Font& font, std::string str) {

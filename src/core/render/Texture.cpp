@@ -10,9 +10,16 @@
 #include <vector>
 
 namespace Radiant {
-	Texture::Texture(VulkanDevice& device, VulkanMemoryAllocator& memoryAllocator, VulkanDescriptorPool& descriptorPool,
-	                 VulkanDescriptorSetLayout& descriptorSetLayout, VulkanCommandPool& commandPool, VulkanQueue& queue,
-	                 void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize) {
+	Texture::Texture(VulkanDevice&              device,
+	                 VulkanMemoryAllocator&     memoryAllocator,
+	                 VulkanDescriptorPool&      descriptorPool,
+	                 VulkanDescriptorSetLayout& descriptorSetLayout,
+	                 VulkanCommandPool&         commandPool,
+	                 VulkanQueue&               queue,
+	                 void*                      buffer,
+	                 uint32_t                   width,
+	                 uint32_t                   height,
+	                 uint32_t                   pixelSize) {
 		uint32_t size = width * height * pixelSize;
 
 		// CPU staging buffer.
@@ -30,22 +37,22 @@ namespace Radiant {
 		                                            VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 
 		this->imageView = std::make_unique<VulkanImageView>(device, *image, VK_FORMAT_A8_UNORM, subresourceRange);
-		this->sampler = std::make_unique<VulkanSampler>(device, 0);
+		this->sampler   = std::make_unique<VulkanSampler>(device, 0);
 
 		VkImageSubresourceLayers subresource{};
-		subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		subresource.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
 		subresource.baseArrayLayer = 0;
-		subresource.layerCount = 1;
-		subresource.mipLevel = 0;
+		subresource.layerCount     = 1;
+		subresource.mipLevel       = 0;
 
 		// Region to copy from buffer to image.
 		VkBufferImageCopy copyRegion{};
-		copyRegion.bufferRowLength = width;
+		copyRegion.bufferRowLength   = width;
 		copyRegion.bufferImageHeight = height;
-		copyRegion.bufferOffset = 0;
+		copyRegion.bufferOffset      = 0;
 
-		copyRegion.imageExtent = {width, height, 1};
-		copyRegion.imageOffset = {0, 0, 0};
+		copyRegion.imageExtent      = {width, height, 1};
+		copyRegion.imageOffset      = {0, 0, 0};
 		copyRegion.imageSubresource = subresource;
 
 		// Preform the copy.
@@ -54,14 +61,14 @@ namespace Radiant {
 
 		// Transfer image layout to transfer dst optimal.
 		VkImageMemoryBarrier2 toDstOptimal{};
-		toDstOptimal.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
-		toDstOptimal.image = image->get();
-		toDstOptimal.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		toDstOptimal.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-		toDstOptimal.srcAccessMask = 0;
-		toDstOptimal.dstAccessMask = VK_ACCESS_2_TRANSFER_READ_BIT | VK_ACCESS_2_TRANSFER_WRITE_BIT;
-		toDstOptimal.srcStageMask = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
-		toDstOptimal.dstStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
+		toDstOptimal.sType            = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+		toDstOptimal.image            = image->get();
+		toDstOptimal.oldLayout        = VK_IMAGE_LAYOUT_UNDEFINED;
+		toDstOptimal.newLayout        = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+		toDstOptimal.srcAccessMask    = 0;
+		toDstOptimal.dstAccessMask    = VK_ACCESS_2_TRANSFER_READ_BIT | VK_ACCESS_2_TRANSFER_WRITE_BIT;
+		toDstOptimal.srcStageMask     = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
+		toDstOptimal.dstStageMask     = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
 		toDstOptimal.subresourceRange = subresourceRange;
 
 		std::vector<VkImageMemoryBarrier2> transferImageMemoryBarriers{toDstOptimal};
@@ -72,15 +79,15 @@ namespace Radiant {
 
 		// Transfer image layout to shader read-only optimal.
 		VkImageMemoryBarrier2 toShaderReadOnlyOptimal{};
-		toShaderReadOnlyOptimal.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
-		toShaderReadOnlyOptimal.image = image->get();
+		toShaderReadOnlyOptimal.sType     = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+		toShaderReadOnlyOptimal.image     = image->get();
 		toShaderReadOnlyOptimal.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 		toShaderReadOnlyOptimal.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-		toShaderReadOnlyOptimal.srcAccessMask = VK_ACCESS_2_TRANSFER_READ_BIT | VK_ACCESS_2_TRANSFER_WRITE_BIT;
-		toShaderReadOnlyOptimal.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
-		toShaderReadOnlyOptimal.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
-		toShaderReadOnlyOptimal.dstStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
+		toShaderReadOnlyOptimal.srcAccessMask    = VK_ACCESS_2_TRANSFER_READ_BIT | VK_ACCESS_2_TRANSFER_WRITE_BIT;
+		toShaderReadOnlyOptimal.dstAccessMask    = VK_ACCESS_2_SHADER_READ_BIT;
+		toShaderReadOnlyOptimal.srcStageMask     = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
+		toShaderReadOnlyOptimal.dstStageMask     = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
 		toShaderReadOnlyOptimal.subresourceRange = subresourceRange;
 
 		std::vector<VkImageMemoryBarrier2> shaderImageMemoryBarriers{toDstOptimal};
@@ -95,14 +102,15 @@ namespace Radiant {
 		this->descriptorSet =
 		    std::make_unique<VulkanDescriptorSet>(descriptorPool.allocateDescriptorSet(descriptorSetLayout));
 
-		descriptorPool.updateDescriptorSets({
-		    VulkanWriteDescriptorSet{this->descriptorSet->get(),
-		                             0, 0,
-		                             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, {},
-		                             {VkDescriptorImageInfo{this->sampler->get(), this->imageView->get(),
-		                                                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL}},
-		                             {}}
-        });
+		descriptorPool.updateDescriptorSets(
+		    {VulkanWriteDescriptorSet{this->descriptorSet->get(),
+		                              0,
+		                              0,
+		                              VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		                              {},
+		                              {VkDescriptorImageInfo{this->sampler->get(), this->imageView->get(),
+		                                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL}},
+		                              {}}});
 	}
 
 	Texture::Texture(Texture&& other) noexcept

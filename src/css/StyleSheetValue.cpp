@@ -19,13 +19,13 @@ namespace Radiant::StyleSheetParser {
 				return {Color::fromString(strValue)};
 			}
 			case ValueTypes::INTEGER: {
-				int32_t integer = 0;
+				int32_t                integer = 0;
 				std::from_chars_result result =
 				    std::from_chars(strValue.data(), strValue.data() + strValue.size(), integer);
 				return {Integer(integer)};
 			}
 			case ValueTypes::FLOAT: {
-				float floatingPoint = 0.0;
+				float                  floatingPoint = 0.0;
 				std::from_chars_result result =
 				    std::from_chars(strValue.data(), strValue.data() + strValue.size(), floatingPoint);
 				return {Float(floatingPoint)};

@@ -19,12 +19,12 @@
 
 namespace Radiant::StyleSheetParser {
 	using PropertyResolver = StyleSheetEntry (*)(StyleSheetEntry, float);
-	using RuntimeFunction = std::function<StyleSheetValue(std::vector<StyleSheetValue>)>;
+	using RuntimeFunction  = std::function<StyleSheetValue(std::vector<StyleSheetValue>)>;
 
 	struct PropertyEntry {
 			std::vector<ValueTypes> signature;
-			StyleSheetEntry defaultValue;
-			PropertyResolver resolver;
+			StyleSheetEntry         defaultValue;
+			PropertyResolver        resolver;
 	};
 
 	struct RegisteredFunction {
@@ -32,12 +32,13 @@ namespace Radiant::StyleSheetParser {
 	};
 
 	template <typename R, typename... Args, std::size_t... Is>
-	static R invokeHelper(R (*fn)(Args...), std::vector<StyleSheetValue> params,
-	                      std::index_sequence<Is...> indexSequence) {
+	static R
+	invokeHelper(R (*fn)(Args...), std::vector<StyleSheetValue> params, std::index_sequence<Is...> indexSequence) {
 		return fn(params[Is].get<MapValue<Args>::value>().value()...);
 	}
 
-	template <typename R, typename... Args> static RuntimeFunction wrapper(R (*fn)(Args...)) {
+	template <typename R, typename... Args>
+	static RuntimeFunction wrapper(R (*fn)(Args...)) {
 		return [fn](std::vector<StyleSheetValue> params) {
 			return StyleSheetValue{invokeHelper(fn, params, std::index_sequence_for<Args...>{})};
 		};
@@ -45,27 +46,30 @@ namespace Radiant::StyleSheetParser {
 
 	class Parser {
 		public:
-			void registerProperty(std::string name, std::vector<ValueTypes> signature, StyleSheetEntry defaultValue,
-			                      PropertyResolver resolver);
+			void          registerProperty(std::string             name,
+			                               std::vector<ValueTypes> signature,
+			                               StyleSheetEntry         defaultValue,
+			                               PropertyResolver        resolver);
 			PropertyEntry getPropertyEntry(std::string name);
 
-			template <typename Fn> void registerFunction(std::string name, Fn function) {
+			template <typename Fn>
+			void registerFunction(std::string name, Fn function) {
 				this->functionRegistry[name] = {wrapper(function)};
 			}
 
-			RegisteredFunction getFunction(std::string name);
+			RegisteredFunction                          getFunction(std::string name);
 			std::unordered_map<std::string, StyleSheet> getStyleSheets(std::filesystem::path path);
 
 			std::vector<Token> tokenize(std::filesystem::path file);
 			static std::string tokenTypeToString(TokenType tokenType);
 
 		private:
-			std::unordered_map<std::string, PropertyEntry> propertyRegistry;
+			std::unordered_map<std::string, PropertyEntry>      propertyRegistry;
 			std::unordered_map<std::string, RegisteredFunction> functionRegistry;
 
-			TokenType identifyToken(std::string token);
+			TokenType       identifyToken(std::string token);
 			StyleSheetValue getValue(AstNode* value);
-			void addToken(std::vector<Token>& tokenList, std::string token);
+			void            addToken(std::vector<Token>& tokenList, std::string token);
 
 			bool isString(const std::string& token);
 			bool isUnit(const std::string& token);

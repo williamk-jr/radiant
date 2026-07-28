@@ -13,7 +13,7 @@ namespace Radiant {
 	VulkanSemaphore::VulkanSemaphore(VulkanSemaphore&& other) noexcept
 	    : semaphore(other.semaphore), device(other.device) {
 		other.semaphore = nullptr;
-		other.device = nullptr;
+		other.device    = nullptr;
 	}
 
 	VulkanSemaphore::~VulkanSemaphore() {

@@ -6,9 +6,9 @@
 
 namespace Radiant::StyleSheetParser {
 	enum class Colors : uint32_t {
-		RED = 0xFF0000FF,
+		RED   = 0xFF0000FF,
 		GREEN = 0x00FF00FF,
-		BLUE = 0x0000FFFF,
+		BLUE  = 0x0000FFFF,
 		BLACK = 0x000000FF,
 		WHITE = 0xFFFFFFFF
 	};
@@ -24,11 +24,11 @@ namespace Radiant::StyleSheetParser {
 			uint8_t getBlue();
 			uint8_t getAlpha();
 
-			static bool isColor(const std::string& str);
+			static bool  isColor(const std::string& str);
 			static Color fromString(std::string color);
 
 		private:
-			uint32_t rgba;
+			uint32_t                                       rgba;
 			static std::unordered_map<std::string, Colors> COLOR_KEYWORDS;
 	};
 } // namespace Radiant::StyleSheetParser

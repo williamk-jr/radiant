@@ -11,7 +11,7 @@ namespace Radiant::StyleSheetParser {
 	AbstractSyntaxTree::AbstractSyntaxTree(std::vector<Token> tokens) : AstNode(Token(TokenType::IDENTFIER, "")) {
 		AstNode* parent = this;
 		for (int i = 0; i < tokens.size(); i++) {
-			Token* token = &tokens.at(i);
+			Token* token     = &tokens.at(i);
 			Token* lookahead = i + 1 < tokens.size() ? &tokens.at(i + 1) : nullptr;
 
 			switch (token->getType()) {

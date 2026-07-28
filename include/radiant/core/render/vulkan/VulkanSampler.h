@@ -8,7 +8,7 @@ namespace Radiant {
 		public:
 			VulkanSampler(VulkanDevice& device, VkSamplerCreateFlags flags);
 
-			VulkanSampler(const VulkanSampler&) = delete;
+			VulkanSampler(const VulkanSampler&)            = delete;
 			VulkanSampler& operator=(const VulkanSampler&) = delete;
 
 			VulkanSampler(VulkanSampler&&) noexcept;
@@ -19,6 +19,6 @@ namespace Radiant {
 
 		private:
 			VkSampler sampler;
-			VkDevice device;
+			VkDevice  device;
 	};
 } // namespace Radiant

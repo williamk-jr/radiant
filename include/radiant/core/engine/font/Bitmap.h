@@ -11,7 +11,7 @@ namespace Radiant {
 
 		private:
 			std::vector<unsigned char> buffer;
-			size_t width;
-			size_t height;
+			size_t                     width;
+			size_t                     height;
 	};
 } // namespace Radiant

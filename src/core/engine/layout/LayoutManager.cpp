@@ -37,10 +37,10 @@
 
 namespace Radiant {
 	void LayoutManager::updateLayout(Widget* widget) {
-		std::shared_ptr<Widget> parent = widget->getParent();
-		std::vector<Widget*> children = widget->getChildren();
+		std::shared_ptr<Widget> parent   = widget->getParent();
+		std::vector<Widget*>    children = widget->getChildren();
 
-		uint32_t refWidth = parent != nullptr ? parent->getWidth() : 0;
+		uint32_t refWidth  = parent != nullptr ? parent->getWidth() : 0;
 		uint32_t refHeight = parent != nullptr ? parent->getHeight() : 0;
 
 		StyleSheetParser::StyleSheetEntry top =
@@ -72,8 +72,8 @@ namespace Radiant {
 
 		const LayoutBox& widgetLayoutBox = widget->getLayoutBox();
 
-		uint32_t offsetX = 0;
-		uint32_t offsetY = 0;
+		uint32_t offsetX       = 0;
+		uint32_t offsetY       = 0;
 		uint32_t largestHeight = 0;
 
 		for (Widget* child : children) {
@@ -83,7 +83,7 @@ namespace Radiant {
 			if ((offsetX + childLayoutBox.getMarginBoxWidth()) >
 			    (widgetLayoutBox.getContentBoxX() + widgetLayoutBox.getContentBoxWidth())) {
 				offsetY += largestHeight;
-				offsetX = 0;
+				offsetX       = 0;
 				largestHeight = 0;
 			}
 

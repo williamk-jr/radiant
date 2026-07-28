@@ -3,7 +3,7 @@
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 
 namespace Radiant {
-	VulkanPhysicalDevice::VulkanPhysicalDevice(VulkanInstance& instance,
+	VulkanPhysicalDevice::VulkanPhysicalDevice(VulkanInstance&                  instance,
 	                                           VulkanPhysicalDeviceRequirements physicalDeviceRequirements) {
 		uint32_t physicalDeviceCount = 0;
 		vkEnumeratePhysicalDevices(instance.get(), &physicalDeviceCount, nullptr);
@@ -49,7 +49,7 @@ namespace Radiant {
 
 	std::vector<VkSurfaceFormat2KHR> VulkanPhysicalDevice::getSurfaceFormats(VulkanSurface& surface) {
 		VkPhysicalDeviceSurfaceInfo2KHR surfaceInfo{};
-		surfaceInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR;
+		surfaceInfo.sType   = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR;
 		surfaceInfo.surface = surface.get();
 
 		uint32_t surfaceFormatCount = 0;

@@ -14,7 +14,7 @@ namespace Radiant {
 			 * @param VkDescriptorSet A raw descriptor set.
 			 */
 			VulkanDescriptorSet(VkDescriptorSet descriptorSet);
-			VulkanDescriptorSet(const VulkanDescriptorSet&) = delete;
+			VulkanDescriptorSet(const VulkanDescriptorSet&)            = delete;
 			VulkanDescriptorSet& operator=(const VulkanDescriptorSet&) = delete;
 
 			VulkanDescriptorSet(VulkanDescriptorSet&&) noexcept;

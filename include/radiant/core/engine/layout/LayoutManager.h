@@ -9,7 +9,7 @@ namespace Radiant {
 		public:
 			LayoutManager() = default;
 
-			void updateLayout(Widget* widget);
+			void  updateLayout(Widget* widget);
 			float resolveRelativeStyle();
 
 		private:

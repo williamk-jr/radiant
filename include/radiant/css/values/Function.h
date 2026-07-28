@@ -11,7 +11,7 @@ namespace Radiant::StyleSheetParser {
 			Function(std::string name, std::vector<StyleSheetValue> parameters);
 
 		private:
-			std::string name;
+			std::string                  name;
 			std::vector<StyleSheetValue> parameters;
 	};
 } // namespace Radiant::StyleSheetParser

@@ -15,9 +15,11 @@ namespace Radiant {
 	 */
 	class VulkanDevice {
 		public:
-			VulkanDevice(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface,
+			VulkanDevice(VulkanPhysicalDevice&     physicalDevice,
+			             VulkanSurface&            surface,
 			             std::vector<const char*>& extensions);
-			VulkanDevice(const VulkanDevice&) = delete;
+
+			VulkanDevice(const VulkanDevice&)            = delete;
 			VulkanDevice& operator=(const VulkanDevice&) = delete;
 
 			VulkanDevice(VulkanDevice&&) noexcept;
@@ -50,7 +52,8 @@ namespace Radiant {
 			uint32_t graphicsQueueFamily;
 			uint32_t presentQueueFamily;
 
-			void createDevice(VulkanPhysicalDevice& physicalDevice, std::set<uint32_t>& queueFamilyIndicies,
+			void createDevice(VulkanPhysicalDevice&    physicalDevice,
+			                  std::set<uint32_t>&      queueFamilyIndicies,
 			                  std::vector<const char*> extensions);
 	};
 } // namespace Radiant

@@ -19,7 +19,7 @@ namespace Radiant {
 #ifdef HAS_GLFW
 			VulkanSurface(VulkanInstance& instance, GLFWwindow* window);
 #endif
-			VulkanSurface(const VulkanSurface&) = delete;
+			VulkanSurface(const VulkanSurface&)            = delete;
 			VulkanSurface& operator=(const VulkanSurface&) = delete;
 
 			VulkanSurface(VulkanSurface&&) noexcept;
@@ -30,6 +30,6 @@ namespace Radiant {
 
 		private:
 			VkSurfaceKHR surface;
-			VkInstance instance;
+			VkInstance   instance;
 	};
 } // namespace Radiant

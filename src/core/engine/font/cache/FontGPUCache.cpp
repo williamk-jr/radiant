@@ -16,8 +16,8 @@ namespace Radiant {
 
 	void FontGPUCache::addEntry(FT_Bitmap& bitmap, GlyphIdentifier identifier) {
 		size_t bufferSize = bitmap.rows * bitmap.pitch;
-		size_t width = bitmap.width;
-		size_t height = bitmap.rows;
+		size_t width      = bitmap.width;
+		size_t height     = bitmap.rows;
 
 		Box uvBounds = this->textureAtlas->getUVBoundsAtCursor(width, height);
 		this->textureAtlas->addTexture(bitmap.buffer, bufferSize, width, height);
@@ -29,7 +29,7 @@ namespace Radiant {
 		//               "+std::to_string(uvBounds.maxY) +"\n");
 
 		this->cache[identifier] = uvBounds;
-		this->cacheDirty = true;
+		this->cacheDirty        = true;
 	}
 
 	bool FontGPUCache::hasEntry(GlyphIdentifier identifier) {

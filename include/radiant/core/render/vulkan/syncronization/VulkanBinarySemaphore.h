@@ -14,7 +14,8 @@ namespace Radiant {
 			 * @param VkSemaphoreCreateFlags Create flags.
 			 */
 			VulkanBinarySemaphore(VulkanDevice& device, VkSemaphoreCreateFlags flags);
-			VulkanBinarySemaphore(const VulkanBinarySemaphore&) = delete;
+
+			VulkanBinarySemaphore(const VulkanBinarySemaphore&)            = delete;
 			VulkanBinarySemaphore& operator=(const VulkanBinarySemaphore&) = delete;
 
 			VulkanBinarySemaphore(VulkanBinarySemaphore&&) noexcept;

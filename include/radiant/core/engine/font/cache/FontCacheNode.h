@@ -4,7 +4,8 @@
 
 namespace Radiant {
 
-	template <typename T> class FontCacheNode {
+	template <typename T>
+	class FontCacheNode {
 		public:
 			FontCacheNode(FTC_Manager manager, T value, FTC_Node node) : manager(manager), value(value), node(node) {}
 
@@ -26,7 +27,7 @@ namespace Radiant {
 
 		private:
 			FTC_Manager manager;
-			FTC_Node node;
-			T value;
+			FTC_Node    node;
+			T           value;
 	};
 } // namespace Radiant

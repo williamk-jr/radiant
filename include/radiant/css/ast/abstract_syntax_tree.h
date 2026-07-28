@@ -14,7 +14,7 @@
 namespace Radiant::StyleSheetParser {
 	struct AstLocation {
 			AstNode* parent = nullptr;
-			int index = 0;
+			int      index  = 0;
 	};
 
 	class AbstractSyntaxTree : public AstNode {
@@ -22,7 +22,7 @@ namespace Radiant::StyleSheetParser {
 			AbstractSyntaxTree(std::vector<Token> tokens);
 
 			std::unordered_map<std::string, StyleSheet> toStyleSheets();
-			void display();
+			void                                        display();
 
 		private:
 			StyleSheetValue valueOfNode(AstNode* node);

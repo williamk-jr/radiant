@@ -3,18 +3,19 @@
 #include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
 
 namespace Radiant {
-	VulkanMemoryAllocator::VulkanMemoryAllocator(VulkanInstance& instance, VulkanPhysicalDevice& physicalDevice,
-	                                             VulkanDevice& device) {
+	VulkanMemoryAllocator::VulkanMemoryAllocator(VulkanInstance&       instance,
+	                                             VulkanPhysicalDevice& physicalDevice,
+	                                             VulkanDevice&         device) {
 		VmaVulkanFunctions vulkanFunctions{};
 		vulkanFunctions.vkGetInstanceProcAddr = &vkGetInstanceProcAddr;
-		vulkanFunctions.vkGetDeviceProcAddr = &vkGetDeviceProcAddr;
+		vulkanFunctions.vkGetDeviceProcAddr   = &vkGetDeviceProcAddr;
 
 		VmaAllocatorCreateInfo allocatorInfo{};
 		allocatorInfo.vulkanApiVersion = VK_API_VERSION_1_4;
-		allocatorInfo.instance = instance.get();
-		allocatorInfo.physicalDevice = physicalDevice.get();
-		allocatorInfo.device = device.get();
-		allocatorInfo.flags = 0;
+		allocatorInfo.instance         = instance.get();
+		allocatorInfo.physicalDevice   = physicalDevice.get();
+		allocatorInfo.device           = device.get();
+		allocatorInfo.flags            = 0;
 		allocatorInfo.pVulkanFunctions = &vulkanFunctions;
 
 		Validation::verify(vmaCreateAllocator(&allocatorInfo, &this->memoryAllocator));

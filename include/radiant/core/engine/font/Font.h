@@ -25,10 +25,10 @@ namespace Radiant {
 			~Font();
 
 			uint32_t getPixelSize();
-			void setPointSize(uint32_t pointSize);
-			void setPixelSize(uint32_t pixelSize);
+			void     setPointSize(uint32_t pointSize);
+			void     setPixelSize(uint32_t pixelSize);
 
-			int getNumCharmaps();
+			int         getNumCharmaps();
 			std::string getFamilyName();
 			std::string getStyleName();
 
@@ -37,9 +37,9 @@ namespace Radiant {
 		private:
 			Font(FontCache& fontCache, FontCacheIdentifier fontFaceIdentifier);
 			FontCacheIdentifier fontFaceIdentifier;
-			FT_Face fontFace;
+			FT_Face             fontFace;
 
 			uint32_t size = 0;
-			uint32_t dpi = 72; // TODO get actual dpi.
+			uint32_t dpi  = 72; // TODO get actual dpi.
 	};
 } // namespace Radiant

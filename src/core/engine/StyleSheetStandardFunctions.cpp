@@ -4,8 +4,10 @@
 
 namespace Radiant::StyleSheetStandardFunctions {
 
-	StyleSheetParser::Color rgb(StyleSheetParser::Integer red, StyleSheetParser::Integer green,
-	                            StyleSheetParser::Integer blue, StyleSheetParser::Integer alpha) {
+	StyleSheetParser::Color rgb(StyleSheetParser::Integer red,
+	                            StyleSheetParser::Integer green,
+	                            StyleSheetParser::Integer blue,
+	                            StyleSheetParser::Integer alpha) {
 		return StyleSheetParser::Color(red, green, blue, alpha);
 	}
 } // namespace Radiant::StyleSheetStandardFunctions

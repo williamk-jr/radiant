@@ -7,10 +7,7 @@ namespace Radiant {
 		void verify(VkResult result) {
 			if (result != VK_SUCCESS) {
 				Logger::fatal("Something went wrong. Vulkan Error Code: " + std::to_string(result),
-				              {
-				                  {"VULKAN", MessageStyle::WHITE},
-                                  LogPrefixes::time(MessageStyle::WHITE)
-                });
+				              {{"VULKAN", MessageStyle::WHITE}, LogPrefixes::time(MessageStyle::WHITE)});
 			}
 		}
 	} // namespace Validation

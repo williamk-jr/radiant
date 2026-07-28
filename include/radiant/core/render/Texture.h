@@ -16,21 +16,28 @@ namespace Radiant {
 			friend Renderer;
 
 		public:
-			Texture(const Texture&) = delete;
+			Texture(const Texture&)            = delete;
 			Texture& operator=(const Texture&) = delete;
 
 			Texture(Texture&&) noexcept;
-			Texture& operator=(Texture&&) noexcept = default;
+			Texture&             operator=(Texture&&) noexcept = default;
 			VulkanDescriptorSet& getDescriptorSet();
 
 		private:
-			Texture(VulkanDevice& device, VulkanMemoryAllocator& memoryAllocator, VulkanDescriptorPool& descriptorPool,
-			        VulkanDescriptorSetLayout& descriptorSetLayout, VulkanCommandPool& commandPool, VulkanQueue& queue,
-			        void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize);
+			Texture(VulkanDevice&              device,
+			        VulkanMemoryAllocator&     memoryAllocator,
+			        VulkanDescriptorPool&      descriptorPool,
+			        VulkanDescriptorSetLayout& descriptorSetLayout,
+			        VulkanCommandPool&         commandPool,
+			        VulkanQueue&               queue,
+			        void*                      buffer,
+			        uint32_t                   width,
+			        uint32_t                   height,
+			        uint32_t                   pixelSize);
 
-			std::unique_ptr<VulkanImage> image;
-			std::unique_ptr<VulkanImageView> imageView;
-			std::unique_ptr<VulkanSampler> sampler;
+			std::unique_ptr<VulkanImage>         image;
+			std::unique_ptr<VulkanImageView>     imageView;
+			std::unique_ptr<VulkanSampler>       sampler;
 			std::unique_ptr<VulkanDescriptorSet> descriptorSet;
 	};
 } // namespace Radiant

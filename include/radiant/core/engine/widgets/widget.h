@@ -18,11 +18,14 @@ namespace Radiant {
 
 		public:
 			Widget(std::shared_ptr<Widget> parent, uint32_t width, uint32_t height);
-			Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, uint32_t width,
-			       uint32_t height);
+			Widget(std::shared_ptr<Widget> parent,
+			       uint32_t                positionX,
+			       uint32_t                positionY,
+			       uint32_t                width,
+			       uint32_t                height);
 
-			void addStyle(std::string name, StyleSheetParser::StyleSheetEntry entry);
-			StyleSheetParser::StyleSheetEntry getStyle(std::string name,
+			void                              addStyle(std::string name, StyleSheetParser::StyleSheetEntry entry);
+			StyleSheetParser::StyleSheetEntry getStyle(std::string                       name,
 			                                           StyleSheetParser::StyleSheetEntry defaultEntry);
 
 			uint32_t getPositionX();
@@ -31,7 +34,7 @@ namespace Radiant {
 			uint32_t getWidth();
 			uint32_t getHeight();
 
-			LayoutManager& getLayoutManager();
+			LayoutManager&   getLayoutManager();
 			const LayoutBox& getLayoutBox();
 
 			void setPositionX(uint32_t x);
@@ -45,20 +48,20 @@ namespace Radiant {
 			void setLeftOffset(uint32_t offset);
 			void setRightOffset(uint32_t offset);
 
-			void updateLayout();
-			std::vector<Widget*> getChildren();
+			void                    updateLayout();
+			std::vector<Widget*>    getChildren();
 			std::shared_ptr<Widget> getParent();
-			void addChild(Widget* child);
+			void                    addChild(Widget* child);
 
 			void render() override;
 
 		private:
 			std::shared_ptr<Widget> parent;
-			std::vector<Widget*> children;
+			std::vector<Widget*>    children;
 
-			WidgetManager& manager;
-			LayoutManager layoutManager;
-			LayoutBox layoutBox;
+			WidgetManager&               manager;
+			LayoutManager                layoutManager;
+			LayoutBox                    layoutBox;
 			StyleSheetParser::StyleSheet styleSheet;
 
 			Widget(WidgetManager& manager, uint32_t width, uint32_t height);

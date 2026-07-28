@@ -7,7 +7,7 @@
 
 namespace Radiant {
 	struct RenderBatch {
-			Model model;
+			Model                 model;
 			std::vector<Instance> instances;
 	};
 } // namespace Radiant

@@ -6,11 +6,8 @@
 
 namespace Radiant::StyleSheetParser {
 	std::unordered_map<std::string, Colors> Color::COLOR_KEYWORDS{
-	    {  "red",   Colors::RED},
-        {"green", Colors::GREEN},
-        { "blue",  Colors::BLUE},
-	    {"black", Colors::BLACK},
-        {"white", Colors::WHITE},
+	    {"red", Colors::RED},     {"green", Colors::GREEN}, {"blue", Colors::BLUE},
+	    {"black", Colors::BLACK}, {"white", Colors::WHITE},
 	};
 
 	Color::Color(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {

@@ -17,13 +17,13 @@ namespace Radiant {
 		public:
 			FontManager();
 
-			Font loadFont(std::filesystem::path path);
+			Font          loadFont(std::filesystem::path path);
 			TextureAtlas& getTextureAtlas();
-			void compileStringGeometry(Font& font, std::string str);
+			void          compileStringGeometry(Font& font, std::string str);
 
 		private:
-			std::unique_ptr<FontCache> fontCache;
+			std::unique_ptr<FontCache>    fontCache;
 			std::unique_ptr<FontGPUCache> fontGpuCache;
-			FT_BitmapGlyph toBitmapGlyph(FT_Glyph glyph, FT_Render_Mode renderMode);
+			FT_BitmapGlyph                toBitmapGlyph(FT_Glyph glyph, FT_Render_Mode renderMode);
 	};
 } // namespace Radiant

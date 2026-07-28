@@ -19,10 +19,11 @@ namespace Radiant {
 			 * @param std::vector<VkDescriptorSetLayoutBinding> A vector of layout bindings for each descriptor in the
 			 * descriptor set.
 			 */
-			VulkanDescriptorSetLayout(VulkanDevice& device,
+			VulkanDescriptorSetLayout(VulkanDevice&                             device,
 			                          std::vector<VkDescriptorSetLayoutBinding> descriptorBindings,
-			                          VkDescriptorSetLayoutCreateFlags flags);
-			VulkanDescriptorSetLayout(const VulkanDescriptorSetLayout&) = delete;
+			                          VkDescriptorSetLayoutCreateFlags          flags);
+
+			VulkanDescriptorSetLayout(const VulkanDescriptorSetLayout&)            = delete;
 			VulkanDescriptorSetLayout& operator=(const VulkanDescriptorSetLayout&) = delete;
 
 			VulkanDescriptorSetLayout(VulkanDescriptorSetLayout&&) noexcept;
@@ -36,6 +37,6 @@ namespace Radiant {
 
 		private:
 			VkDescriptorSetLayout layout;
-			VkDevice device;
+			VkDevice              device;
 	};
 } // namespace Radiant

@@ -20,9 +20,13 @@ namespace Radiant {
 			 * families.
 			 * @param std::vector<uint32_t> Queue families to share buffer with if allowed by VkSharingMode.
 			 */
-			VulkanBuffer(VulkanMemoryAllocator& memoryAllocator, VkDeviceSize size, VkBufferUsageFlagBits usage,
-			             VkSharingMode sharingMode, std::vector<uint32_t> queueFamilyIndicies);
-			VulkanBuffer(const VulkanBuffer&) = delete;
+			VulkanBuffer(VulkanMemoryAllocator& memoryAllocator,
+			             VkDeviceSize           size,
+			             VkBufferUsageFlagBits  usage,
+			             VkSharingMode          sharingMode,
+			             std::vector<uint32_t>  queueFamilyIndicies);
+
+			VulkanBuffer(const VulkanBuffer&)            = delete;
 			VulkanBuffer& operator=(const VulkanBuffer&) = delete;
 
 			VulkanBuffer(VulkanBuffer&&) noexcept;
@@ -59,12 +63,12 @@ namespace Radiant {
 			VkBuffer get();
 
 		private:
-			VkBuffer buffer;
-			VmaAllocation allocation;
+			VkBuffer          buffer;
+			VmaAllocation     allocation;
 			VmaAllocationInfo allocationInfo{};
-			VmaAllocator memoryAllocator;
+			VmaAllocator      memoryAllocator;
 
-			VkDeviceSize size = 0;
+			VkDeviceSize size   = 0;
 			VkDeviceSize offset = 0;
 	};
 } // namespace Radiant

@@ -1,22 +1,27 @@
 #include "radiant/core/render/vulkan/resource/VulkanImageView.h"
 
 namespace Radiant {
-	VulkanImageView::VulkanImageView(VulkanDevice& device, VulkanImage& image, VkFormat format,
+	VulkanImageView::VulkanImageView(VulkanDevice&           device,
+	                                 VulkanImage&            image,
+	                                 VkFormat                format,
 	                                 VkImageSubresourceRange subresourceRange)
 	    : VulkanImageView(device, image, format, {}, subresourceRange, 0) {}
 
-	VulkanImageView::VulkanImageView(VulkanDevice& device, VulkanImage& image, VkFormat format,
-	                                 VkComponentMapping componentMapping, VkImageSubresourceRange subresourceRange,
-	                                 VkImageViewCreateFlags flags)
+	VulkanImageView::VulkanImageView(VulkanDevice&           device,
+	                                 VulkanImage&            image,
+	                                 VkFormat                format,
+	                                 VkComponentMapping      componentMapping,
+	                                 VkImageSubresourceRange subresourceRange,
+	                                 VkImageViewCreateFlags  flags)
 	    : device(device.get()) {
 		VkImageViewCreateInfo imageViewInfo{};
-		imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		imageViewInfo.image = image.get();
-		imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		imageViewInfo.format = format;
-		imageViewInfo.components = componentMapping;
+		imageViewInfo.sType            = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		imageViewInfo.image            = image.get();
+		imageViewInfo.viewType         = VK_IMAGE_VIEW_TYPE_2D;
+		imageViewInfo.format           = format;
+		imageViewInfo.components       = componentMapping;
 		imageViewInfo.subresourceRange = subresourceRange;
-		imageViewInfo.flags = flags;
+		imageViewInfo.flags            = flags;
 
 		vkCreateImageView(device.get(), &imageViewInfo, nullptr, &this->imageView);
 

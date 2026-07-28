@@ -15,7 +15,8 @@ namespace Radiant::StyleSheetParser {
 
 			void add(StyleSheetValue value);
 
-			template <ValueTypes T> auto get(size_t index) {
+			template <ValueTypes T>
+			auto get(size_t index) {
 				return this->values[index].get<T>();
 			}
 

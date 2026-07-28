@@ -14,8 +14,8 @@
 namespace Radiant {
 	struct GlyphIdentifier {
 			FontCacheIdentifier fontId;
-			unsigned long charCode;
-			uint32_t size;
+			unsigned long       charCode;
+			uint32_t            size;
 
 			bool operator==(const GlyphIdentifier& other) const {
 				return this->fontId == other.fontId && this->charCode == other.charCode && this->size == other.size;
@@ -58,7 +58,7 @@ namespace Radiant {
 
 		private:
 			std::unordered_map<GlyphIdentifier, Box, GlyphIdentifierHasher> cache;
-			std::unique_ptr<TextureAtlas> textureAtlas;
-			bool cacheDirty;
+			std::unique_ptr<TextureAtlas>                                   textureAtlas;
+			bool                                                            cacheDirty;
 	};
 } // namespace Radiant

@@ -12,16 +12,21 @@ namespace Radiant {
 	class Window {
 		public:
 			Window(const std::string& title, int width, int height);
+
 			~Window();
 
 			const std::string& getTitle();
+
 			std::vector<const char*> getSurfaceExtensions();
 
 			Rect2D getWindowSize();
+
 			Rect2D getFrameBufferSize();
 
 			bool shouldClose();
+
 			void makeContextCurrent();
+
 			void pollEvents();
 
 #ifdef HAS_GLFW

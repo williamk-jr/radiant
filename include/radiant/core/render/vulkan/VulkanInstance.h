@@ -14,9 +14,11 @@ namespace Radiant {
 	 */
 	class VulkanInstance {
 		public:
-			VulkanInstance(const std::string& applicationName, const std::vector<const char*>& extensionNames,
+			VulkanInstance(const std::string&              applicationName,
+			               const std::vector<const char*>& extensionNames,
 			               const std::vector<const char*>& layerNames);
-			VulkanInstance(const VulkanInstance&) = delete;
+
+			VulkanInstance(const VulkanInstance&)            = delete;
 			VulkanInstance& operator=(const VulkanInstance&) = delete;
 
 			VulkanInstance(VulkanInstance&&) noexcept;
@@ -31,29 +33,24 @@ namespace Radiant {
 		private:
 			VkInstance instance;
 
-			static VkBool32 debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-			                              VkDebugUtilsMessageTypeFlagsEXT messageTypes,
-			                              const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+			static VkBool32 debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT      messageSeverity,
+			                              VkDebugUtilsMessageTypeFlagsEXT             messageTypes,
+			                              const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+			                              void*                                       pUserData) {
 				if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
 					Logger::info(pCallbackData->pMessage,
-					             {
-					                 {                     "VULKAN", MessageStyle::WHITE},
-					                 {pCallbackData->pMessageIdName, MessageStyle::WHITE},
-					                 LogPrefixes::time(MessageStyle::WHITE)
-                    },
+					             {{"VULKAN", MessageStyle::WHITE},
+					              {pCallbackData->pMessageIdName, MessageStyle::WHITE},
+					              LogPrefixes::time(MessageStyle::WHITE)},
 					             1);
 				} else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-					Logger::warn(pCallbackData->pMessage, {
-					                                          {                     "VULKAN", MessageStyle::WHITE},
-					                                          {pCallbackData->pMessageIdName, MessageStyle::WHITE},
-					                                          LogPrefixes::time(MessageStyle::WHITE)
-                    });
+					Logger::warn(pCallbackData->pMessage, {{"VULKAN", MessageStyle::WHITE},
+					                                       {pCallbackData->pMessageIdName, MessageStyle::WHITE},
+					                                       LogPrefixes::time(MessageStyle::WHITE)});
 				} else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-					Logger::error(pCallbackData->pMessage, {
-					                                           {                     "VULKAN", MessageStyle::WHITE},
-					                                           {pCallbackData->pMessageIdName, MessageStyle::WHITE},
-					                                           LogPrefixes::time(MessageStyle::WHITE)
-                    });
+					Logger::error(pCallbackData->pMessage, {{"VULKAN", MessageStyle::WHITE},
+					                                        {pCallbackData->pMessageIdName, MessageStyle::WHITE},
+					                                        LogPrefixes::time(MessageStyle::WHITE)});
 				}
 				return VK_FALSE;
 			}

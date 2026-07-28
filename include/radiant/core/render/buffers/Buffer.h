@@ -6,7 +6,8 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-	template <typename T> class Buffer {
+	template <typename T>
+	class Buffer {
 		public:
 			Buffer(VulkanMemoryAllocator& memoryAllocator, VkDeviceSize size, VkBufferUsageFlagBits usage) {
 				this->buffer = std::make_unique<VulkanBuffer>(memoryAllocator, size, usage, VK_SHARING_MODE_EXCLUSIVE,

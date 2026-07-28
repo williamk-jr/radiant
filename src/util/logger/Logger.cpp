@@ -6,7 +6,7 @@ namespace Radiant {
 
 	namespace LogPrefixes {
 		LogPrefix time(MessageStyle::MessageColor color) {
-			std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+			std::time_t       now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 			std::stringstream ss;
 			ss << std::put_time(std::localtime(&now), "%F %T");
 			return {ss.str(), color};
@@ -14,7 +14,7 @@ namespace Radiant {
 	} // namespace LogPrefixes
 
 	bool Logger::allowExceptions = false;
-	bool Logger::allowColor = false;
+	bool Logger::allowColor      = false;
 
 	unsigned short Logger::verbosity = 0;
 

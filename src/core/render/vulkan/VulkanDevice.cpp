@@ -5,12 +5,13 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-	VulkanDevice::VulkanDevice(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface,
+	VulkanDevice::VulkanDevice(VulkanPhysicalDevice&     physicalDevice,
+	                           VulkanSurface&            surface,
 	                           std::vector<const char*>& extensions) {
 		std::vector<VkQueueFamilyProperties2> queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
 
 		uint32_t graphicsQueueFamily = -1;
-		uint32_t presentQueueFamily = -1;
+		uint32_t presentQueueFamily  = -1;
 		// TODO Generalize queue creation.
 
 		for (int i = 0; i < queueFamilyProperties.size(); i++) {
@@ -29,7 +30,7 @@ namespace Radiant {
 		}
 
 		this->graphicsQueueFamily = graphicsQueueFamily;
-		this->presentQueueFamily = presentQueueFamily;
+		this->presentQueueFamily  = presentQueueFamily;
 
 		std::set<uint32_t> queueFamilies{graphicsQueueFamily, presentQueueFamily};
 		this->createDevice(physicalDevice, queueFamilies, extensions);
@@ -59,21 +60,22 @@ namespace Radiant {
 		vkDeviceWaitIdle(this->device);
 	}
 
-	void VulkanDevice::createDevice(VulkanPhysicalDevice& physicalDevice, std::set<uint32_t>& queueFamilyIndicies,
+	void VulkanDevice::createDevice(VulkanPhysicalDevice&    physicalDevice,
+	                                std::set<uint32_t>&      queueFamilyIndicies,
 	                                std::vector<const char*> extensions) {
-		float priority = 1.0;
+		float                                priority = 1.0;
 		std::vector<VkDeviceQueueCreateInfo> deviceQueueInfos;
 		for (uint32_t queueFamilyIndex : queueFamilyIndicies) {
 			VkDeviceQueueCreateInfo deviceQueueInfo{};
-			deviceQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-			deviceQueueInfo.queueCount = 1;
+			deviceQueueInfo.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			deviceQueueInfo.queueCount       = 1;
 			deviceQueueInfo.queueFamilyIndex = queueFamilyIndex;
 			deviceQueueInfo.pQueuePriorities = &priority;
 			deviceQueueInfos.push_back(deviceQueueInfo);
 		}
 
 		VkPhysicalDeviceVulkan11Features vulkan11Features{};
-		vulkan11Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+		vulkan11Features.sType                = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
 		vulkan11Features.shaderDrawParameters = VK_TRUE;
 
 		VkPhysicalDeviceDescriptorIndexingFeatures descriptorIndexingFeatures{};
@@ -81,18 +83,18 @@ namespace Radiant {
 		descriptorIndexingFeatures.descriptorBindingUniformBufferUpdateAfterBind = VK_TRUE;
 
 		VkPhysicalDeviceVulkan13Features vulkan13Features{};
-		vulkan13Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+		vulkan13Features.sType            = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
 		vulkan13Features.synchronization2 = VK_TRUE;
 		vulkan13Features.dynamicRendering = VK_TRUE;
-		vulkan13Features.pNext = &descriptorIndexingFeatures;
+		vulkan13Features.pNext            = &descriptorIndexingFeatures;
 
 		VkDeviceCreateInfo deviceInfo{};
-		deviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		deviceInfo.queueCreateInfoCount = deviceQueueInfos.size();
-		deviceInfo.pQueueCreateInfos = deviceQueueInfos.data();
-		deviceInfo.enabledExtensionCount = extensions.size();
+		deviceInfo.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		deviceInfo.queueCreateInfoCount    = deviceQueueInfos.size();
+		deviceInfo.pQueueCreateInfos       = deviceQueueInfos.data();
+		deviceInfo.enabledExtensionCount   = extensions.size();
 		deviceInfo.ppEnabledExtensionNames = extensions.data();
-		deviceInfo.pNext = &vulkan13Features;
+		deviceInfo.pNext                   = &vulkan13Features;
 
 		Validation::verify(vkCreateDevice(physicalDevice.get(), &deviceInfo, nullptr, &this->device));
 	}

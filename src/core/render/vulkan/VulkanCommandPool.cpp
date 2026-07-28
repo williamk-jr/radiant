@@ -3,9 +3,9 @@
 namespace Radiant {
 	VulkanCommandPool::VulkanCommandPool(VulkanDevice& device, uint32_t queueFamily) : device(device.get()) {
 		VkCommandPoolCreateInfo commandPoolInfo{};
-		commandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		commandPoolInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		commandPoolInfo.queueFamilyIndex = queueFamily;
-		commandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // TODO research flags more
+		commandPoolInfo.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // TODO research flags more
 
 		Validation::verify(vkCreateCommandPool(device.get(), &commandPoolInfo, nullptr, &this->commandPool));
 	}
@@ -28,10 +28,10 @@ namespace Radiant {
 		std::vector<VkCommandBuffer> commandBuffers(count);
 
 		VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
-		commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		commandBufferAllocateInfo.commandPool = this->commandPool;
+		commandBufferAllocateInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		commandBufferAllocateInfo.commandPool        = this->commandPool;
 		commandBufferAllocateInfo.commandBufferCount = count;
-		commandBufferAllocateInfo.level = level;
+		commandBufferAllocateInfo.level              = level;
 
 		Validation::verify(vkAllocateCommandBuffers(this->device, &commandBufferAllocateInfo, commandBuffers.data()));
 

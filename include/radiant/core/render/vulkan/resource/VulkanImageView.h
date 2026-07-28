@@ -8,13 +8,19 @@
 namespace Radiant {
 	class VulkanImageView {
 		public:
-			VulkanImageView(VulkanDevice& device, VulkanImage& image, VkFormat format,
+			VulkanImageView(VulkanDevice&           device,
+			                VulkanImage&            image,
+			                VkFormat                format,
 			                VkImageSubresourceRange subresourceRange);
-			VulkanImageView(VulkanDevice& device, VulkanImage& image, VkFormat format,
-			                VkComponentMapping componentMapping, VkImageSubresourceRange subresourceRange,
-			                VkImageViewCreateFlags flags);
 
-			VulkanImageView(const VulkanImageView&) = delete;
+			VulkanImageView(VulkanDevice&           device,
+			                VulkanImage&            image,
+			                VkFormat                format,
+			                VkComponentMapping      componentMapping,
+			                VkImageSubresourceRange subresourceRange,
+			                VkImageViewCreateFlags  flags);
+
+			VulkanImageView(const VulkanImageView&)            = delete;
 			VulkanImageView& operator=(const VulkanImageView&) = delete;
 
 			VulkanImageView(VulkanImageView&&) noexcept;
@@ -22,11 +28,11 @@ namespace Radiant {
 			~VulkanImageView();
 
 			VkImageView get();
-			VkExtent3D getExtent();
+			VkExtent3D  getExtent();
 
 		private:
 			VkImageView imageView;
-			VkExtent3D extent;
-			VkDevice device;
+			VkExtent3D  extent;
+			VkDevice    device;
 	};
 } // namespace Radiant

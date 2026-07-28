@@ -6,10 +6,7 @@
 #include <charconv>
 
 namespace Radiant::StyleSheetParser {
-	std::unordered_map<std::string, UnitType> Unit::UNIT_MAP{
-	    { "%", UnitType::PERCENTAGE},
-        {"px",      UnitType::PIXEL}
-    };
+	std::unordered_map<std::string, UnitType> Unit::UNIT_MAP{{"%", UnitType::PERCENTAGE}, {"px", UnitType::PIXEL}};
 
 	Unit::Unit(float value, UnitType unit) : value(value), unit(unit) {}
 
@@ -38,7 +35,7 @@ namespace Radiant::StyleSheetParser {
 		std::from_chars(str.data(), str.data() + valueEnd + 1, value);
 
 		std::string stringUnit(str.substr(valueEnd + 1, str.size()));
-		auto unitIterator = Unit::UNIT_MAP.find(stringUnit);
+		auto        unitIterator = Unit::UNIT_MAP.find(stringUnit);
 
 		if (unitIterator == Unit::UNIT_MAP.end()) {
 			Logger::error("Unit of type \"" + stringUnit + "\" could not be found.");

@@ -25,7 +25,9 @@ namespace Radiant {
 		return this->commandBuffer;
 	}
 
-	void VulkanCommandBuffer::copyBufferToImage(VulkanBuffer& buffer, VulkanImage& image, VkImageLayout imageLayout,
+	void VulkanCommandBuffer::copyBufferToImage(VulkanBuffer&                   buffer,
+	                                            VulkanImage&                    image,
+	                                            VkImageLayout                   imageLayout,
 	                                            std::vector<VkBufferImageCopy>& copyRegions) {
 		vkCmdCopyBufferToImage(this->commandBuffer, buffer.get(), image.get(), imageLayout, copyRegions.size(),
 		                       copyRegions.data());
@@ -35,42 +37,42 @@ namespace Radiant {
 		// VkCommandBufferInheritanceInfo commandBufferInheritanceInfo{};
 
 		VkCommandBufferBeginInfo commandBufferBeginInfo{};
-		commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		commandBufferBeginInfo.flags = flags;
+		commandBufferBeginInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		commandBufferBeginInfo.flags            = flags;
 		commandBufferBeginInfo.pInheritanceInfo = nullptr; // TODO research secondary vs. primary command buffers.
 
 		Validation::verify(vkBeginCommandBuffer(this->commandBuffer, &commandBufferBeginInfo));
 	}
 
 	void VulkanCommandBuffer::pipelineMemoryBarrier(std::vector<VkMemoryBarrier2>& memoryBarriers,
-	                                                VkDependencyFlags dependencyFlags) {
+	                                                VkDependencyFlags              dependencyFlags) {
 		VkDependencyInfo dependencyInfo{};
-		dependencyInfo.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+		dependencyInfo.sType              = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
 		dependencyInfo.memoryBarrierCount = memoryBarriers.size();
-		dependencyInfo.pMemoryBarriers = memoryBarriers.data();
-		dependencyInfo.dependencyFlags = dependencyFlags;
+		dependencyInfo.pMemoryBarriers    = memoryBarriers.data();
+		dependencyInfo.dependencyFlags    = dependencyFlags;
 
 		vkCmdPipelineBarrier2(this->commandBuffer, &dependencyInfo);
 	}
 
 	void VulkanCommandBuffer::pipelineImageMemoryBarrier(std::vector<VkImageMemoryBarrier2>& memoryBarriers,
-	                                                     VkDependencyFlags dependencyFlags) {
+	                                                     VkDependencyFlags                   dependencyFlags) {
 		VkDependencyInfo dependencyInfo{};
-		dependencyInfo.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+		dependencyInfo.sType                   = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
 		dependencyInfo.imageMemoryBarrierCount = memoryBarriers.size();
-		dependencyInfo.pImageMemoryBarriers = memoryBarriers.data();
-		dependencyInfo.dependencyFlags = dependencyFlags;
+		dependencyInfo.pImageMemoryBarriers    = memoryBarriers.data();
+		dependencyInfo.dependencyFlags         = dependencyFlags;
 
 		vkCmdPipelineBarrier2(this->commandBuffer, &dependencyInfo);
 	}
 
 	void VulkanCommandBuffer::pipelineBufferMemoryBarrier(std::vector<VkBufferMemoryBarrier2>& memoryBarriers,
-	                                                      VkDependencyFlags dependencyFlags) {
+	                                                      VkDependencyFlags                    dependencyFlags) {
 		VkDependencyInfo dependencyInfo{};
-		dependencyInfo.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+		dependencyInfo.sType                    = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
 		dependencyInfo.bufferMemoryBarrierCount = memoryBarriers.size();
-		dependencyInfo.pBufferMemoryBarriers = memoryBarriers.data();
-		dependencyInfo.dependencyFlags = dependencyFlags;
+		dependencyInfo.pBufferMemoryBarriers    = memoryBarriers.data();
+		dependencyInfo.dependencyFlags          = dependencyFlags;
 
 		vkCmdPipelineBarrier2(this->commandBuffer, &dependencyInfo);
 	}
@@ -80,25 +82,25 @@ namespace Radiant {
 		imageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		imageSubresourceRange.layerCount = 1;
 		imageSubresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
-		// vkTransitionImageLayout(VkDevice device, uint32_t transitionCount, const VkHostImageLayoutTransitionInfo
-		// *pTransitions)
+
 		vkCmdClearColorImage(this->commandBuffer, image.get(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &color, 1,
 		                     &imageSubresourceRange);
 	}
 
 	void VulkanCommandBuffer::beginRendering(std::vector<VkRenderingAttachmentInfo>* colorAttachments,
-	                                         VkRenderingAttachmentInfo* depthAttachment,
-	                                         VkRenderingAttachmentInfo* stencilAttachment, VkRect2D renderArea,
-	                                         VkRenderingFlags renderingFlags) {
+	                                         VkRenderingAttachmentInfo*              depthAttachment,
+	                                         VkRenderingAttachmentInfo*              stencilAttachment,
+	                                         VkRect2D                                renderArea,
+	                                         VkRenderingFlags                        renderingFlags) {
 		VkRenderingInfo renderingInfo{};
-		renderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
-		renderingInfo.flags = renderingFlags;
-		renderingInfo.layerCount = 1;
-		renderingInfo.renderArea = renderArea;
+		renderingInfo.sType                = VK_STRUCTURE_TYPE_RENDERING_INFO;
+		renderingInfo.flags                = renderingFlags;
+		renderingInfo.layerCount           = 1;
+		renderingInfo.renderArea           = renderArea;
 		renderingInfo.colorAttachmentCount = colorAttachments->size();
-		renderingInfo.pColorAttachments = colorAttachments->data();
-		renderingInfo.pDepthAttachment = depthAttachment;
-		renderingInfo.pStencilAttachment = stencilAttachment;
+		renderingInfo.pColorAttachments    = colorAttachments->data();
+		renderingInfo.pDepthAttachment     = depthAttachment;
+		renderingInfo.pStencilAttachment   = stencilAttachment;
 
 		vkCmdBeginRendering(this->commandBuffer, &renderingInfo);
 	}
@@ -112,8 +114,10 @@ namespace Radiant {
 		vkCmdBindVertexBuffers(this->commandBuffer, firstBinding, 1, buffers.data(), &offset);
 	}
 
-	void VulkanCommandBuffer::bindVertexBuffer(VulkanBuffer& buffer, uint32_t firstBinding, VkDeviceSize offset,
-	                                           VkDeviceSize size) {
+	void VulkanCommandBuffer::bindVertexBuffer(VulkanBuffer& buffer,
+	                                           uint32_t      firstBinding,
+	                                           VkDeviceSize  offset,
+	                                           VkDeviceSize  size) {
 		std::vector<VkBuffer> buffers{buffer.get()};
 		vkCmdBindVertexBuffers2(this->commandBuffer, firstBinding, 1, buffers.data(), &offset, &size, nullptr);
 	}
@@ -122,7 +126,8 @@ namespace Radiant {
 		vkCmdBindIndexBuffer(this->commandBuffer, buffer.get(), offset, indexType);
 	}
 
-	void VulkanCommandBuffer::bindDescriptorSets(VulkanPipeline& pipeline, uint32_t firstSet,
+	void VulkanCommandBuffer::bindDescriptorSets(VulkanPipeline&                   pipeline,
+	                                             uint32_t                          firstSet,
 	                                             std::vector<VulkanDescriptorSet>& descriptorSets) {
 		std::vector<VkDescriptorSet> rawDescriptorSets;
 		rawDescriptorSets.reserve(descriptorSets.size());
@@ -134,7 +139,8 @@ namespace Radiant {
 		                        rawDescriptorSets.size(), rawDescriptorSets.data(), 0, nullptr);
 	}
 
-	void VulkanCommandBuffer::bindDescriptorSet(VulkanPipeline& pipeline, uint32_t firstSet,
+	void VulkanCommandBuffer::bindDescriptorSet(VulkanPipeline&      pipeline,
+	                                            uint32_t             firstSet,
 	                                            VulkanDescriptorSet& descriptorSet) {
 		VkDescriptorSet rawDescriptorSet = descriptorSet.get();
 
@@ -144,22 +150,22 @@ namespace Radiant {
 
 	void VulkanCommandBuffer::setViewport(float width, float height, float minDepth, float maxDepth) {
 		VkViewport viewport{};
-		viewport.width = width;
-		viewport.height = height;
+		viewport.width    = width;
+		viewport.height   = height;
 		viewport.minDepth = minDepth;
 		viewport.maxDepth = maxDepth;
-		viewport.x = 0;
-		viewport.y = 0;
+		viewport.x        = 0;
+		viewport.y        = 0;
 
 		vkCmdSetViewport(this->commandBuffer, 0, 1, &viewport);
 	}
 
 	void VulkanCommandBuffer::setScissor(uint32_t width, uint32_t height) {
 		VkRect2D scissor{};
-		scissor.extent.width = width;
+		scissor.extent.width  = width;
 		scissor.extent.height = height;
-		scissor.offset.x = 0;
-		scissor.offset.y = 0;
+		scissor.offset.x      = 0;
+		scissor.offset.y      = 0;
 
 		vkCmdSetScissor(this->commandBuffer, 0, 1, &scissor);
 	}
@@ -169,7 +175,7 @@ namespace Radiant {
 	}
 
 	void VulkanCommandBuffer::clearAttachments(std::vector<VkClearAttachment> clearAttachments,
-	                                           std::vector<VkClearRect> clearAreas) {
+	                                           std::vector<VkClearRect>       clearAreas) {
 		vkCmdClearAttachments(this->commandBuffer, clearAttachments.size(), clearAttachments.data(), clearAreas.size(),
 		                      clearAreas.data());
 	}
@@ -192,31 +198,6 @@ namespace Radiant {
 	void VulkanCommandBuffer::endRendering() {
 		vkCmdEndRendering(this->commandBuffer);
 	}
-
-	// void VulkanCommandBuffer::beginRendering(VkRenderingFlags renderingFlags) {
-	//   VkImageView imageView;
-	//   VkImageViewCreateInfo imageViewInfo{};
-	//   imageViewInfo.image = nullptr;
-	//   vkCmdClearColorImage(VkCommandBuffer commandBuffer, VkImage image, VkImageLayout imageLayout, const
-	//   VkClearColorValue *pColor, uint32_t rangeCount, const VkImageSubresourceRange *pRanges)
-
-	//  vkCreateImageView(VkDevice device, const VkImageViewCreateInfo *pCreateInfo, const VkAllocationCallbacks
-	//  *pAllocator, VkImageView *pView)
-	//
-	//  VkRenderingAttachmentInfo renderingAttachmentInfo{};
-	//  renderingAttachmentInfo.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-	//  renderingAttachmentInfo.imageView = VK_IMAGE_VIEW_TYPE_2D;
-	//  renderingAttachmentInfo.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-	//  renderingAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	//  renderingAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-
-	//  VkRenderingInfo renderingInfo{};
-	//  renderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
-	//  renderingInfo.flags = renderingFlags;
-	//  renderingInfo.layerCount = 1;
-
-	//  vkCmdBeginRendering(this->commandBuffer, &renderingInfo);
-	//}
 
 	void VulkanCommandBuffer::end() {
 		Validation::verify(vkEndCommandBuffer(this->commandBuffer));

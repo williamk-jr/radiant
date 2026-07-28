@@ -16,7 +16,8 @@ namespace Radiant {
 			 * @param VkFenceCreateFlags Create flags.
 			 */
 			VulkanFence(VulkanDevice& device, VkFenceCreateFlags flags);
-			VulkanFence(const VulkanFence&) = delete;
+
+			VulkanFence(const VulkanFence&)            = delete;
 			VulkanFence& operator=(const VulkanFence&) = delete;
 
 			VulkanFence(VulkanFence&&) noexcept;
@@ -53,11 +54,11 @@ namespace Radiant {
 			 * @param bool Whether to wait until all fences are signaled.
 			 * @param uint32_t Maximum amount of time to wait on provided fences.
 			 */
-			static void waitForFences(VulkanDevice& device, std::vector<VulkanFence>& fences, bool waitAll,
-			                          uint64_t timeout);
+			static void
+			waitForFences(VulkanDevice& device, std::vector<VulkanFence>& fences, bool waitAll, uint64_t timeout);
 
 		private:
-			VkFence fence;
+			VkFence  fence;
 			VkDevice device;
 	};
 } // namespace Radiant

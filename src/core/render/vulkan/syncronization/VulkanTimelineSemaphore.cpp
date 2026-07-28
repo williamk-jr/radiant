@@ -1,10 +1,12 @@
 #include "radiant/core/render/vulkan/syncronization/VulkanTimelineSemaphore.h"
 
 namespace Radiant {
-	VulkanTimelineSemaphore::VulkanTimelineSemaphore(VulkanDevice& device, VkSemaphoreCreateFlags flags,
-	                                                 uint64_t initialValue)
+	VulkanTimelineSemaphore::VulkanTimelineSemaphore(VulkanDevice&          device,
+	                                                 VkSemaphoreCreateFlags flags,
+	                                                 uint64_t               initialValue)
 	    : VulkanSemaphore(
-	          device, {VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO, nullptr, VK_SEMAPHORE_TYPE_TIMELINE, initialValue},
+	          device,
+	          {VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO, nullptr, VK_SEMAPHORE_TYPE_TIMELINE, initialValue},
 	          flags) {}
 
 	VulkanTimelineSemaphore::VulkanTimelineSemaphore(VulkanTimelineSemaphore&& other) noexcept
@@ -18,16 +20,18 @@ namespace Radiant {
 
 	void VulkanTimelineSemaphore::signal(uint64_t value) {
 		VkSemaphoreSignalInfo signalInfo{};
-		signalInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_SIGNAL_INFO;
+		signalInfo.sType     = VK_STRUCTURE_TYPE_SEMAPHORE_SIGNAL_INFO;
 		signalInfo.semaphore = this->get();
-		signalInfo.value = value;
+		signalInfo.value     = value;
 
 		Validation::verify(vkSignalSemaphore(this->device, &signalInfo));
 	}
 
-	void VulkanTimelineSemaphore::waitSemaphores(VulkanDevice& device, std::vector<VulkanTimelineSemaphore>& semaphores,
-	                                             std::vector<uint64_t>& values, VkSemaphoreWaitFlags flags,
-	                                             uint64_t timeout) {
+	void VulkanTimelineSemaphore::waitSemaphores(VulkanDevice&                         device,
+	                                             std::vector<VulkanTimelineSemaphore>& semaphores,
+	                                             std::vector<uint64_t>&                values,
+	                                             VkSemaphoreWaitFlags                  flags,
+	                                             uint64_t                              timeout) {
 		std::vector<VkSemaphore> rawSemaphores(semaphores.size());
 
 		for (VulkanSemaphore& semaphore : semaphores) {
@@ -35,11 +39,11 @@ namespace Radiant {
 		}
 
 		VkSemaphoreWaitInfo waitInfo{};
-		waitInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO;
+		waitInfo.sType          = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO;
 		waitInfo.semaphoreCount = rawSemaphores.size();
-		waitInfo.pSemaphores = rawSemaphores.data();
-		waitInfo.pValues = values.data();
-		waitInfo.flags = flags;
+		waitInfo.pSemaphores    = rawSemaphores.data();
+		waitInfo.pValues        = values.data();
+		waitInfo.flags          = flags;
 
 		Validation::verify(vkWaitSemaphores(device.get(), &waitInfo, timeout));
 	}

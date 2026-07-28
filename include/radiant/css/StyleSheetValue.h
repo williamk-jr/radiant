@@ -16,29 +16,36 @@ namespace Radiant::StyleSheetParser {
 
 	typedef std::variant<std::string, Function, Integer, Float, Unit, Color> StyleSheetVariant;
 
-	template <typename T> struct MapValue;
+	template <typename T>
+	struct MapValue;
 
-	template <> struct MapValue<std::string> {
+	template <>
+	struct MapValue<std::string> {
 			static constexpr ValueTypes value = ValueTypes::STRING;
 	};
 
-	template <> struct MapValue<Integer> {
+	template <>
+	struct MapValue<Integer> {
 			static constexpr ValueTypes value = ValueTypes::INTEGER;
 	};
 
-	template <> struct MapValue<Float> {
+	template <>
+	struct MapValue<Float> {
 			static constexpr ValueTypes value = ValueTypes::FLOAT;
 	};
 
-	template <> struct MapValue<Unit> {
+	template <>
+	struct MapValue<Unit> {
 			static constexpr ValueTypes value = ValueTypes::UNIT;
 	};
 
-	template <> struct MapValue<Color> {
+	template <>
+	struct MapValue<Color> {
 			static constexpr ValueTypes value = ValueTypes::COLOR;
 	};
 
-	template <> struct MapValue<Function> {
+	template <>
+	struct MapValue<Function> {
 			static constexpr ValueTypes value = ValueTypes::FUNCTION;
 	};
 
@@ -46,7 +53,8 @@ namespace Radiant::StyleSheetParser {
 		public:
 			StyleSheetValue(StyleSheetVariant value);
 
-			template <ValueTypes T> auto get() {
+			template <ValueTypes T>
+			auto get() {
 				if constexpr (T == ValueTypes::UNIT) {
 					Unit* unit = std::get_if<Unit>(&this->value);
 					return unit == nullptr ? std::nullopt : std::optional<Unit>{*unit};

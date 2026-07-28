@@ -17,7 +17,8 @@ namespace Radiant {
 			 * @param uint32_t Index of queue family used to create command pool.
 			 */
 			VulkanCommandPool(VulkanDevice& device, uint32_t queueFamily);
-			VulkanCommandPool(const VulkanCommandPool&) = delete;
+
+			VulkanCommandPool(const VulkanCommandPool&)            = delete;
 			VulkanCommandPool& operator=(const VulkanCommandPool&) = delete;
 
 			VulkanCommandPool(VulkanCommandPool&&) noexcept;
@@ -55,6 +56,6 @@ namespace Radiant {
 
 		private:
 			VkCommandPool commandPool;
-			VkDevice device;
+			VkDevice      device;
 	};
 } // namespace Radiant

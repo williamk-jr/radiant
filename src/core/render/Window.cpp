@@ -18,7 +18,7 @@ namespace Radiant {
 	std::vector<const char*> Window::getSurfaceExtensions() {
 #ifdef HAS_GLFW
 		std::vector<const char*> extensionsVector;
-		uint32_t extensionCount = 0;
+		uint32_t                 extensionCount = 0;
 
 		const char** extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
 		for (int i = 0; i < extensionCount; i++) {
@@ -31,7 +31,7 @@ namespace Radiant {
 
 	Rect2D Window::getWindowSize() {
 #ifdef HAS_GLFW
-		int width = 0;
+		int width  = 0;
 		int height = 0;
 
 		glfwGetWindowSize(this->window, &width, &height);
@@ -41,7 +41,7 @@ namespace Radiant {
 
 	Rect2D Window::getFrameBufferSize() {
 #ifdef HAS_GLFW
-		int width = 0;
+		int width  = 0;
 		int height = 0;
 
 		glfwGetFramebufferSize(this->window, &width, &height);

@@ -5,8 +5,11 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-	VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface,
-	                                 VkImageUsageFlags imageUsageFlags, VkPresentModeKHR presentMode,
+	VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice&     physicalDevice,
+	                                 VulkanDevice&             device,
+	                                 VulkanSurface&            surface,
+	                                 VkImageUsageFlags         imageUsageFlags,
+	                                 VkPresentModeKHR          presentMode,
 	                                 VkSwapchainCreateFlagsKHR swapchainFlags) {
 		this->device = device.get();
 		this->create(physicalDevice, device, surface, imageUsageFlags, presentMode, swapchainFlags);
@@ -21,11 +24,14 @@ namespace Radiant {
 		this->destroy();
 	}
 
-	void VulkanSwapchain::create(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface,
-	                             VkImageUsageFlags imageUsageFlags, VkPresentModeKHR presentMode,
+	void VulkanSwapchain::create(VulkanPhysicalDevice&     physicalDevice,
+	                             VulkanDevice&             device,
+	                             VulkanSurface&            surface,
+	                             VkImageUsageFlags         imageUsageFlags,
+	                             VkPresentModeKHR          presentMode,
 	                             VkSwapchainCreateFlagsKHR swapchainFlags) {
 		VkPhysicalDeviceSurfaceInfo2KHR surfaceInfo{};
-		surfaceInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR;
+		surfaceInfo.sType   = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR;
 		surfaceInfo.surface = surface.get();
 
 		VkSurfaceCapabilities2KHR surfaceCapabilities{};
@@ -40,29 +46,29 @@ namespace Radiant {
 		//}
 
 		VkSwapchainCreateInfoKHR swapchainInfo{};
-		swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-		swapchainInfo.surface = surface.get();
-		swapchainInfo.minImageCount = surfaceCapabilities.surfaceCapabilities.minImageCount;
-		swapchainInfo.imageFormat = surfaceFormat.surfaceFormat.format;
-		swapchainInfo.imageColorSpace = surfaceFormat.surfaceFormat.colorSpace;
-		swapchainInfo.imageExtent = surfaceCapabilities.surfaceCapabilities.currentExtent;
+		swapchainInfo.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+		swapchainInfo.surface          = surface.get();
+		swapchainInfo.minImageCount    = surfaceCapabilities.surfaceCapabilities.minImageCount;
+		swapchainInfo.imageFormat      = surfaceFormat.surfaceFormat.format;
+		swapchainInfo.imageColorSpace  = surfaceFormat.surfaceFormat.colorSpace;
+		swapchainInfo.imageExtent      = surfaceCapabilities.surfaceCapabilities.currentExtent;
 		swapchainInfo.imageArrayLayers = 1;
-		swapchainInfo.imageUsage = imageUsageFlags;
-		swapchainInfo.flags = swapchainFlags;
-		swapchainInfo.presentMode = presentMode;                          // Possibly add present mode selection;
-		swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; // Alpha selection;
-		swapchainInfo.preTransform = surfaceCapabilities.surfaceCapabilities.currentTransform;
-		swapchainInfo.clipped = VK_TRUE;
+		swapchainInfo.imageUsage       = imageUsageFlags;
+		swapchainInfo.flags            = swapchainFlags;
+		swapchainInfo.presentMode      = presentMode;                       // Possibly add present mode selection;
+		swapchainInfo.compositeAlpha   = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; // Alpha selection;
+		swapchainInfo.preTransform     = surfaceCapabilities.surfaceCapabilities.currentTransform;
+		swapchainInfo.clipped          = VK_TRUE;
 
 		uint32_t queueFamilies[] = {device.getGraphicsQueueFamily(), device.getPresentQueueFamily()};
 		if (device.getGraphicsQueueFamily() != device.getPresentQueueFamily()) {
-			swapchainInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+			swapchainInfo.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
 			swapchainInfo.queueFamilyIndexCount = 2;
-			swapchainInfo.pQueueFamilyIndices = queueFamilies;
+			swapchainInfo.pQueueFamilyIndices   = queueFamilies;
 		} else {
-			swapchainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+			swapchainInfo.imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE;
 			swapchainInfo.queueFamilyIndexCount = 0;
-			swapchainInfo.pQueueFamilyIndices = nullptr;
+			swapchainInfo.pQueueFamilyIndices   = nullptr;
 		}
 
 		Validation::verify(vkCreateSwapchainKHR(device.get(), &swapchainInfo, nullptr, &this->swapchain));
@@ -100,7 +106,7 @@ namespace Radiant {
 
 	VkExtent2D VulkanSwapchain::getExtent(VulkanPhysicalDevice& physicalDevice, VulkanSurface& surface) {
 		VkPhysicalDeviceSurfaceInfo2KHR surfaceInfo{};
-		surfaceInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR;
+		surfaceInfo.sType   = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR;
 		surfaceInfo.surface = surface.get();
 
 		VkSurfaceCapabilities2KHR surfaceCapabilities{};
@@ -134,8 +140,11 @@ namespace Radiant {
 		return {result, imageIndex};
 	}
 
-	void VulkanSwapchain::recreate(VulkanPhysicalDevice& physicalDevice, VulkanDevice& device, VulkanSurface& surface,
-	                               VkImageUsageFlags imageUsageFlags, VkPresentModeKHR presentMode,
+	void VulkanSwapchain::recreate(VulkanPhysicalDevice&     physicalDevice,
+	                               VulkanDevice&             device,
+	                               VulkanSurface&            surface,
+	                               VkImageUsageFlags         imageUsageFlags,
+	                               VkPresentModeKHR          presentMode,
 	                               VkSwapchainCreateFlagsKHR swapchainFlags) {
 		vkDeviceWaitIdle(this->device);
 
@@ -147,7 +156,7 @@ namespace Radiant {
 	}
 
 	VkSurfaceFormat2KHR VulkanSwapchain::findSurfaceFormat(VulkanPhysicalDevice& physicalDevice,
-	                                                       VulkanSurface& surface) {
+	                                                       VulkanSurface&        surface) {
 		std::vector<VkSurfaceFormat2KHR> surfaceFormats = physicalDevice.getSurfaceFormats(surface);
 
 		for (VkSurfaceFormat2KHR& format : surfaceFormats) {

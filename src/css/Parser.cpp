@@ -20,8 +20,10 @@
 #include <vector>
 
 namespace Radiant::StyleSheetParser {
-	void Parser::registerProperty(std::string name, std::vector<ValueTypes> signature, StyleSheetEntry defaultValue,
-	                              PropertyResolver resolver) {
+	void Parser::registerProperty(std::string             name,
+	                              std::vector<ValueTypes> signature,
+	                              StyleSheetEntry         defaultValue,
+	                              PropertyResolver        resolver) {
 		this->propertyRegistry[name] = {signature, defaultValue, resolver};
 	}
 
@@ -45,7 +47,7 @@ namespace Radiant::StyleSheetParser {
 			std::cout << "Invalid Path: " << std::filesystem::absolute(file) << "\n";
 		}
 
-		std::ifstream stream(file);
+		std::ifstream      stream(file);
 		std::vector<Token> tokens;
 
 		std::string line;
@@ -55,7 +57,7 @@ namespace Radiant::StyleSheetParser {
 		}
 
 		std::string currentToken;
-		bool isString = false;
+		bool        isString = false;
 		for (int i = 0; i < fileContents.size(); i++) {
 			char currentChar = fileContents.at(i);
 
@@ -69,7 +71,7 @@ namespace Radiant::StyleSheetParser {
 				if (currentChar == '"') {
 					this->addToken(tokens, currentToken);
 					currentToken = "";
-					isString = false;
+					isString     = false;
 				}
 				continue;
 			}
@@ -226,7 +228,7 @@ namespace Radiant::StyleSheetParser {
 		}
 
 		std::string number = token.substr(0, lastDigitIndex + 1);
-		std::string unit = token.substr(lastDigitIndex + 1, token.size());
+		std::string unit   = token.substr(lastDigitIndex + 1, token.size());
 
 		return string_util::isNumeric(number) && string_util::isAlphabetic(unit);
 	}

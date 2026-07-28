@@ -29,20 +29,20 @@ namespace Radiant {
 			static void shouldAllowColor(bool value);
 			static void setVerbosity(unsigned short verbosity);
 
-			static bool canThrowExceptions();
-			static bool canShowColor();
+			static bool           canThrowExceptions();
+			static bool           canShowColor();
 			static unsigned short getVerbosity();
 
 		private:
-			static bool allowExceptions;
-			static bool allowColor;
+			static bool           allowExceptions;
+			static bool           allowColor;
 			static unsigned short verbosity;
 
 			static std::string formatAll(std::vector<LogPrefix> prefixes);
 	};
 
 	struct LogPrefix {
-			std::string message;
+			std::string                message;
 			MessageStyle::MessageColor color;
 
 			std::string format() {

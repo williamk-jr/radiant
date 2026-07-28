@@ -1,4 +1,6 @@
 BasedOnStyle: LLVM
+
+# Indentation
 UseTab: ForIndentation
 IndentWidth: 4
 TabWidth: 4
@@ -8,23 +10,41 @@ PointerAlignment: Left
 IndentAccessModifiers: true
 IndentCaseLabels: true
 
-
 SeparateDefinitionBlocks: Always
 MaxEmptyLinesToKeep: 1
 
+# Include sorting
 SortIncludes: CaseSensitive
 IncludeBlocks: Regroup
 
-Cpp11BracedListStyle: AlignFirstComment
+Cpp11BracedListStyle: true
+
+# Alignment
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossComments: true
+  AlignFunctionDeclarations: true
+
+AlignConsecutiveDeclarations:
+  Enabled: true
+  AlignFunctionDeclarations: true
+
+BinPackParameters: OnePerLine
+PackConstructorInitializers: BinPack
+
+BreakTemplateDeclarations: Yes
+BreakBeforeTemplateCloser: false
 
 AccessModifierOffset: 1
-AlignArrayOfStructures: Right
 AlignOperands: AlignAfterOperator
-AllowShortBlocksOnASingleLine: Empty
+AllowShortBlocksOnASingleLine: true
 AllowShortFunctionsOnASingleLine: Empty
 NamespaceIndentation: All
 
-#AlignAfterOpenBracket: DontAlign
 BreakAfterOpenBracketFunction: false
 BreakAfterOpenBracketBracedList: false
+BreakBeforeCloseBracketFunction: false
 BreakBeforeBraces: Attach
+
+# Line break penalties
+PenaltyBreakTemplateDeclaration: 1000

@@ -3,17 +3,20 @@
 #include <cstring>
 
 namespace Radiant {
-	VulkanBuffer::VulkanBuffer(VulkanMemoryAllocator& memoryAllocator, VkDeviceSize size, VkBufferUsageFlagBits usage,
-	                           VkSharingMode sharingMode, std::vector<uint32_t> queueFamilyIndicies)
+	VulkanBuffer::VulkanBuffer(VulkanMemoryAllocator& memoryAllocator,
+	                           VkDeviceSize           size,
+	                           VkBufferUsageFlagBits  usage,
+	                           VkSharingMode          sharingMode,
+	                           std::vector<uint32_t>  queueFamilyIndicies)
 	    : memoryAllocator(memoryAllocator.get()), size(size) {
 		VkBufferCreateInfo bufferInfo{};
-		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		bufferInfo.size = size;
-		bufferInfo.usage = usage;
-		bufferInfo.sharingMode = sharingMode;
+		bufferInfo.sType                 = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		bufferInfo.size                  = size;
+		bufferInfo.usage                 = usage;
+		bufferInfo.sharingMode           = sharingMode;
 		bufferInfo.queueFamilyIndexCount = queueFamilyIndicies.size();
-		bufferInfo.pQueueFamilyIndices = queueFamilyIndicies.data();
-		bufferInfo.flags = 0;
+		bufferInfo.pQueueFamilyIndices   = queueFamilyIndicies.data();
+		bufferInfo.flags                 = 0;
 
 		VmaAllocationCreateInfo allocationCreateInfo{};
 		allocationCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |
@@ -28,8 +31,8 @@ namespace Radiant {
 	VulkanBuffer::VulkanBuffer(VulkanBuffer&& other) noexcept
 	    : buffer(other.buffer), size(other.size), allocation(other.allocation), allocationInfo(other.allocationInfo),
 	      memoryAllocator(other.memoryAllocator) {
-		other.buffer = nullptr;
-		other.allocation = nullptr;
+		other.buffer         = nullptr;
+		other.allocation     = nullptr;
 		other.allocationInfo = {};
 	}
 

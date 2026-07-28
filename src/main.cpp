@@ -51,7 +51,7 @@ int main() {
 	Radiant::Logger::shouldAllowExceptions(false);
 	Radiant::Logger::setVerbosity(1);
 
-	const std::string applicationName = "Test";
+	const std::string      applicationName = "Test";
 	Radiant::RadiantEngine engine(applicationName, 500, 500);
 
 	std::vector<std::shared_ptr<Radiant::Widget>> widgets;

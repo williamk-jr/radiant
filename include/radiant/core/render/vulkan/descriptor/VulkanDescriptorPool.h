@@ -9,25 +9,25 @@
 
 namespace Radiant {
 	struct VulkanWriteDescriptorSet {
-			VkDescriptorSet descriptorSet;
-			uint32_t descriptorBindingIndex;
-			uint32_t descriptorArrayElement;
+			VkDescriptorSet  descriptorSet;
+			uint32_t         descriptorBindingIndex;
+			uint32_t         descriptorArrayElement;
 			VkDescriptorType descriptorType;
 
 			std::vector<VkDescriptorBufferInfo> bufferInfo;
-			std::vector<VkDescriptorImageInfo> imageInfo;
-			std::vector<VkBufferView> texelBufferViews;
+			std::vector<VkDescriptorImageInfo>  imageInfo;
+			std::vector<VkBufferView>           texelBufferViews;
 	};
 
 	struct VulkanCopyDescriptorSet {
 			VkDescriptorSet srcDescriptorSet;
-			uint32_t srcDecriptorBindingIndex;
-			uint32_t srcDescriptorArrayElement;
+			uint32_t        srcDecriptorBindingIndex;
+			uint32_t        srcDescriptorArrayElement;
 
 			VkDescriptorSet dstDescriptorSet;
-			uint32_t dstDecriptorBindingIndex;
-			uint32_t dstDescriptorArrayElement;
-			uint32_t descriptorCount;
+			uint32_t        dstDecriptorBindingIndex;
+			uint32_t        dstDescriptorArrayElement;
+			uint32_t        descriptorCount;
 	};
 
 	/* VulkanDescriptorPool
@@ -42,9 +42,10 @@ namespace Radiant {
 			 * @param std::vector<VkDescriptorPoolSize> A vector of sizes for each descriptor pool.
 			 * @param uint32_t The maximum number of descriptor sets that can be allocated.
 			 */
-			VulkanDescriptorPool(VulkanDevice& device, std::vector<VkDescriptorPoolSize> poolSizes,
-			                     uint32_t maxDescriptorSets);
-			VulkanDescriptorPool(const VulkanDescriptorPool&) = delete;
+			VulkanDescriptorPool(VulkanDevice&                     device,
+			                     std::vector<VkDescriptorPoolSize> poolSizes,
+			                     uint32_t                          maxDescriptorSets);
+			VulkanDescriptorPool(const VulkanDescriptorPool&)            = delete;
 			VulkanDescriptorPool& operator=(const VulkanDescriptorPool&) = delete;
 
 			VulkanDescriptorPool(VulkanDescriptorPool&&) noexcept;
@@ -78,7 +79,7 @@ namespace Radiant {
 			 * @return A vector of descriptor sets.
 			 */
 			std::vector<VulkanDescriptorSet> allocateDescriptorSets(VulkanDescriptorSetLayout& descriptorSetLayout,
-			                                                        uint32_t count);
+			                                                        uint32_t                   count);
 
 			/*
 			 * Allocates a single descriptor set.
@@ -97,7 +98,7 @@ namespace Radiant {
 			 * updated.
 			 */
 			void updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites,
-			                          std::vector<VulkanCopyDescriptorSet> descriptorSetCopies);
+			                          std::vector<VulkanCopyDescriptorSet>  descriptorSetCopies);
 
 			/*
 			 * Updates descriptor sets.
@@ -117,7 +118,7 @@ namespace Radiant {
 
 		private:
 			VkDescriptorPool descriptorPool;
-			VkDevice device;
+			VkDevice         device;
 
 			std::vector<VkWriteDescriptorSet>
 			toRawDescriptorWrites(std::vector<VulkanWriteDescriptorSet>& descriptorSetWrites);

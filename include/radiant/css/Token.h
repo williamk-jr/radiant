@@ -23,11 +23,11 @@ namespace Radiant::StyleSheetParser {
 		public:
 			Token(TokenType type, std::string value);
 
-			TokenType getType();
+			TokenType   getType();
 			std::string getValue();
 
 		private:
-			TokenType type;
+			TokenType   type;
 			std::string value;
 	};
 } // namespace Radiant::StyleSheetParser

@@ -38,8 +38,8 @@ namespace Radiant {
 		return vkGetFenceStatus(this->device, this->fence) == VK_SUCCESS;
 	}
 
-	void VulkanFence::waitForFences(VulkanDevice& device, std::vector<VulkanFence>& fences, bool waitAll,
-	                                uint64_t timeout) {
+	void
+	VulkanFence::waitForFences(VulkanDevice& device, std::vector<VulkanFence>& fences, bool waitAll, uint64_t timeout) {
 		std::vector<VkFence> rawFences(fences.size());
 		for (int i = 0; i < fences.size(); i++) {
 			rawFences[i] = fences[i].get();

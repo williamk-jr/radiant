@@ -24,7 +24,8 @@ namespace Radiant {
 			 * @param a valid VkCommandBuffer.
 			 */
 			VulkanCommandBuffer(VkDevice device, VkCommandBuffer commandBuffer, VkCommandPool commandPool);
-			VulkanCommandBuffer(const VulkanCommandBuffer&) = delete;
+
+			VulkanCommandBuffer(const VulkanCommandBuffer&)            = delete;
 			VulkanCommandBuffer& operator=(const VulkanCommandBuffer&) = delete;
 
 			VulkanCommandBuffer(VulkanCommandBuffer&&) noexcept;
@@ -40,7 +41,9 @@ namespace Radiant {
 			 *
 			 *
 			 */
-			void copyBufferToImage(VulkanBuffer& buffer, VulkanImage& image, VkImageLayout imageLayout,
+			void copyBufferToImage(VulkanBuffer&                   buffer,
+			                       VulkanImage&                    image,
+			                       VkImageLayout                   imageLayout,
 			                       std::vector<VkBufferImageCopy>& copyRegions);
 
 			/*
@@ -57,7 +60,7 @@ namespace Radiant {
 			 * @param VkDependencyFlags Dependency flags.
 			 */
 			void pipelineMemoryBarrier(std::vector<VkMemoryBarrier2>& memoryBarriers,
-			                           VkDependencyFlags dependencyFlags);
+			                           VkDependencyFlags              dependencyFlags);
 
 			/*
 			 * Inserts image memory barriers.
@@ -66,7 +69,7 @@ namespace Radiant {
 			 * @param VkDependencyFlags Dependency flags.
 			 */
 			void pipelineImageMemoryBarrier(std::vector<VkImageMemoryBarrier2>& memoryBarriers,
-			                                VkDependencyFlags dependencyFlags);
+			                                VkDependencyFlags                   dependencyFlags);
 
 			/*
 			 * Inserts buffer memory barriers.
@@ -75,7 +78,7 @@ namespace Radiant {
 			 * @param VkDependencyFlags Dependency flags.
 			 */
 			void pipelineBufferMemoryBarrier(std::vector<VkBufferMemoryBarrier2>& memoryBarriers,
-			                                 VkDependencyFlags dependencyFlags);
+			                                 VkDependencyFlags                    dependencyFlags);
 
 			/*
 			 * Clears the provided image to a color.
@@ -95,9 +98,10 @@ namespace Radiant {
 			 * @param VkRenderingFlags Rendering flags.
 			 */
 			void beginRendering(std::vector<VkRenderingAttachmentInfo>* colorAttachments,
-			                    VkRenderingAttachmentInfo* depthAttachment,
-			                    VkRenderingAttachmentInfo* stencilAttachment, VkRect2D renderArea,
-			                    VkRenderingFlags renderingFlags);
+			                    VkRenderingAttachmentInfo*              depthAttachment,
+			                    VkRenderingAttachmentInfo*              stencilAttachment,
+			                    VkRect2D                                renderArea,
+			                    VkRenderingFlags                        renderingFlags);
 
 			/*
 			 * Binds a pipeline to use for rendering.
@@ -145,7 +149,8 @@ namespace Radiant {
 			 * @param uint32_t Index of the first descriptor set to bind.
 			 * @param std::vector<VulkanDescriptorSet>& A reference to a vector of descriptor sets.
 			 */
-			void bindDescriptorSets(VulkanPipeline& pipeline, uint32_t firstSet,
+			void bindDescriptorSets(VulkanPipeline&                   pipeline,
+			                        uint32_t                          firstSet,
 			                        std::vector<VulkanDescriptorSet>& descriptorSets);
 
 			/*
@@ -205,7 +210,7 @@ namespace Radiant {
 		private:
 			friend class VulkanCommandPool;
 			VkCommandBuffer commandBuffer;
-			VkDevice device;
-			VkCommandPool commandPool;
+			VkDevice        device;
+			VkCommandPool   commandPool;
 	};
 } // namespace Radiant

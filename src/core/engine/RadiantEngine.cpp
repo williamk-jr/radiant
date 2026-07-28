@@ -20,9 +20,9 @@
 
 namespace Radiant {
 	RadiantEngine::RadiantEngine(const std::string& title, uint32_t width, uint32_t height) {
-		this->window = std::make_unique<Window>(title, width, height);
+		this->window      = std::make_unique<Window>(title, width, height);
 		this->fontManager = std::make_unique<FontManager>();
-		Font notoSans = this->fontManager->loadFont("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf");
+		Font notoSans     = this->fontManager->loadFont("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf");
 
 		for (int i = 8; i <= 16; i++) {
 			notoSans.setPointSize(i);
@@ -44,23 +44,23 @@ namespace Radiant {
 
 		this->widgetManager = std::make_unique<WidgetManager>(*this->window, *this->stylesheetParser);
 
-		this->vertexBuffer = renderer->createVertexBuffer(2048);
+		this->vertexBuffer   = renderer->createVertexBuffer(2048);
 		this->instanceBuffer = renderer->createInstanceBuffer(2048);
-		this->indexBuffer = renderer->createIndexBuffer(2048);
+		this->indexBuffer    = renderer->createIndexBuffer(2048);
 
 		std::unordered_map<std::string, StyleSheetParser::StyleSheet> styleSheets =
 		    this->stylesheetParser->getStyleSheets("./assets/test.css");
 
-		Quad2D quad;
-		std::vector<Vertex> verticies = quad.getVerticies();
-		std::vector<uint16_t> indicies = quad.getIndicies();
+		Quad2D                quad;
+		std::vector<Vertex>   verticies = quad.getVerticies();
+		std::vector<uint16_t> indicies  = quad.getIndicies();
 
 		this->vertexBuffer->append(verticies);
 		this->indexBuffer->append(indicies);
 
 		TextureAtlas& textureAtlas = this->fontManager->getTextureAtlas();
-		Texture texture = this->renderer->loadTexture(textureAtlas.getBuffer(), textureAtlas.getWidth(),
-		                                              textureAtlas.getHeight(), textureAtlas.getPixelSize());
+		Texture       texture      = this->renderer->loadTexture(textureAtlas.getBuffer(), textureAtlas.getWidth(),
+		                                                         textureAtlas.getHeight(), textureAtlas.getPixelSize());
 
 		this->fontAtlasGpu = std::make_unique<Texture>(std::move(texture));
 		this->fontAtlasGpu->getDescriptorSet();

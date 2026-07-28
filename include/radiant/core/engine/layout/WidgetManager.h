@@ -12,13 +12,13 @@ namespace Radiant {
 		public:
 			WidgetManager(Window& window, StyleSheetParser::Parser& styleSheetParser);
 
-			std::shared_ptr<Widget> getRootWidget();
+			std::shared_ptr<Widget>   getRootWidget();
 			StyleSheetParser::Parser& getStyleSheetParser();
-			RenderBatch createRenderBatch();
+			RenderBatch               createRenderBatch();
 
 		private:
 			StyleSheetParser::Parser& styleSheetParser;
-			std::shared_ptr<Widget> rootWidget;
+			std::shared_ptr<Widget>   rootWidget;
 			// std::unordered_map<typename Key, typename Tp>
 	};
 } // namespace Radiant
