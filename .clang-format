@@ -1,0 +1,30 @@
+BasedOnStyle: LLVM
+UseTab: ForIndentation
+IndentWidth: 4
+TabWidth: 4
+ColumnLimit: 120
+
+PointerAlignment: Left
+IndentAccessModifiers: true
+IndentCaseLabels: true
+
+
+SeparateDefinitionBlocks: Always
+MaxEmptyLinesToKeep: 1
+
+SortIncludes: CaseSensitive
+IncludeBlocks: Regroup
+
+Cpp11BracedListStyle: AlignFirstComment
+
+AccessModifierOffset: 1
+AlignArrayOfStructures: Right
+AlignOperands: AlignAfterOperator
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Empty
+NamespaceIndentation: All
+
+#AlignAfterOpenBracket: DontAlign
+BreakAfterOpenBracketFunction: false
+BreakAfterOpenBracketBracedList: false
+BreakBeforeBraces: Attach

@@ -1,32 +1,32 @@
 #pragma once
 
 #include <freetype/ftcache.h>
+
 namespace Radiant {
 
-  template<typename T>
-  class FontCacheNode {
-    public:
-      FontCacheNode(FTC_Manager manager, T value, FTC_Node node) :
-        manager(manager), value(value), node(node) {}
+	template <typename T> class FontCacheNode {
+		public:
+			FontCacheNode(FTC_Manager manager, T value, FTC_Node node) : manager(manager), value(value), node(node) {}
 
-      ~FontCacheNode() {
-        FTC_Node_Unref(this->node, this->manager);
-      }
+			~FontCacheNode() {
+				FTC_Node_Unref(this->node, this->manager);
+			}
 
-      static FontCacheNode<T> empty() {
-        return {nullptr, 0, nullptr};
-      }
+			static FontCacheNode<T> empty() {
+				return {nullptr, 0, nullptr};
+			}
 
-      bool isEmpty() {
-        return this->node == nullptr;
-      }
+			bool isEmpty() {
+				return this->node == nullptr;
+			}
 
-      T getValue() {
-        return this->value;
-      }
-    private:
-      FTC_Manager manager;
-      FTC_Node node;
-      T value;
-  };
-}
+			T getValue() {
+				return this->value;
+			}
+
+		private:
+			FTC_Manager manager;
+			FTC_Node node;
+			T value;
+	};
+} // namespace Radiant

@@ -2,10 +2,12 @@
 
 #include "radiant/core/render/Instance.h"
 #include "radiant/core/render/models/Model.h"
+
 #include <vector>
+
 namespace Radiant {
-  struct RenderBatch {
-    Model model;
-    std::vector<Instance> instances;
-  };
-}
+	struct RenderBatch {
+			Model model;
+			std::vector<Instance> instances;
+	};
+} // namespace Radiant

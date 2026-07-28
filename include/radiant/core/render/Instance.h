@@ -4,9 +4,9 @@
 #include <glm/ext/vector_float4.hpp>
 
 namespace Radiant {
-  struct Instance {
-    glm::vec4 color;
-    glm::vec2 position;
-    glm::vec2 size;
-  };
-}
+	struct Instance {
+			glm::vec4 color;
+			glm::vec2 position;
+			glm::vec2 size;
+	};
+} // namespace Radiant

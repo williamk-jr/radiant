@@ -3,42 +3,43 @@
 #include "radiant/core/engine/font/Bitmap.h"
 #include "radiant/core/engine/font/cache/FontCache.h"
 #include "radiant/core/engine/font/cache/FontCacheIdentifier.h"
-#include <filesystem>
 
+#include <filesystem>
+#include <freetype/freetype.h>
 #include <freetype/ftcache.h>
 #include <ft2build.h>
-#include <freetype/freetype.h>
 #include <vector>
+
 namespace Radiant {
-  class FontManager;
+	class FontManager;
 
-  class Font {
-    friend FontManager;
+	class Font {
+			friend FontManager;
 
-    public:
-      Font(const Font&);
-      Font& operator=(const Font&) = default;
+		public:
+			Font(const Font&);
+			Font& operator=(const Font&) = default;
 
-      Font(Font&&) noexcept;
-      Font& operator=(Font&&) noexcept = default;
-      ~Font();
-      
-      uint32_t getPixelSize();
-      void setPointSize(uint32_t pointSize);
-      void setPixelSize(uint32_t pixelSize);
-      
-      int getNumCharmaps();
-      std::string getFamilyName();
-      std::string getStyleName();
+			Font(Font&&) noexcept;
+			Font& operator=(Font&&) noexcept = default;
+			~Font();
 
-      bool isScalable();
+			uint32_t getPixelSize();
+			void setPointSize(uint32_t pointSize);
+			void setPixelSize(uint32_t pixelSize);
 
-    private:
-      Font(FontCache& fontCache, FontCacheIdentifier fontFaceIdentifier);
-      FontCacheIdentifier fontFaceIdentifier;
-      FT_Face fontFace;
+			int getNumCharmaps();
+			std::string getFamilyName();
+			std::string getStyleName();
 
-      uint32_t size = 0;
-      uint32_t dpi = 72; // TODO get actual dpi.
-  };
-}
+			bool isScalable();
+
+		private:
+			Font(FontCache& fontCache, FontCacheIdentifier fontFaceIdentifier);
+			FontCacheIdentifier fontFaceIdentifier;
+			FT_Face fontFace;
+
+			uint32_t size = 0;
+			uint32_t dpi = 72; // TODO get actual dpi.
+	};
+} // namespace Radiant

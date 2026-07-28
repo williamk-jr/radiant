@@ -1,166 +1,163 @@
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorPool.h"
-#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
+
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
+#include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
+
 #include <algorithm>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-  VulkanDescriptorPool::VulkanDescriptorPool(VulkanDevice& device, std::vector<VkDescriptorPoolSize> poolSizes, uint32_t maxDescriptorSets) : 
-    device(device.get()) {
+	VulkanDescriptorPool::VulkanDescriptorPool(VulkanDevice& device, std::vector<VkDescriptorPoolSize> poolSizes,
+	                                           uint32_t maxDescriptorSets)
+	    : device(device.get()) {
 
-    VkDescriptorPoolCreateInfo descriptorPoolInfo{};
-    descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    descriptorPoolInfo.poolSizeCount = poolSizes.size();
-    descriptorPoolInfo.pPoolSizes = poolSizes.data();
-    descriptorPoolInfo.maxSets = maxDescriptorSets;
-    descriptorPoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
+		VkDescriptorPoolCreateInfo descriptorPoolInfo{};
+		descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		descriptorPoolInfo.poolSizeCount = poolSizes.size();
+		descriptorPoolInfo.pPoolSizes = poolSizes.data();
+		descriptorPoolInfo.maxSets = maxDescriptorSets;
+		descriptorPoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
 
-    vkCreateDescriptorPool(device.get(), &descriptorPoolInfo, nullptr, &this->descriptorPool);
-  }
-  
-  VulkanDescriptorPool::VulkanDescriptorPool(VulkanDescriptorPool&& other) noexcept :
-    descriptorPool(other.descriptorPool), device(other.device) {
-    other.descriptorPool = nullptr;
-  }
+		vkCreateDescriptorPool(device.get(), &descriptorPoolInfo, nullptr, &this->descriptorPool);
+	}
 
-  VulkanDescriptorPool::~VulkanDescriptorPool() {
-    vkDestroyDescriptorPool(this->device, this->descriptorPool, nullptr);
-  }
+	VulkanDescriptorPool::VulkanDescriptorPool(VulkanDescriptorPool&& other) noexcept
+	    : descriptorPool(other.descriptorPool), device(other.device) {
+		other.descriptorPool = nullptr;
+	}
 
-  VkDescriptorPool VulkanDescriptorPool::get() {
-    return this->descriptorPool;
-  }
-  
-  void VulkanDescriptorPool::reset() {
-    vkResetDescriptorPool(this->device, this->descriptorPool, 0);
-  }
+	VulkanDescriptorPool::~VulkanDescriptorPool() {
+		vkDestroyDescriptorPool(this->device, this->descriptorPool, nullptr);
+	}
 
-  std::vector<VulkanDescriptorSet> VulkanDescriptorPool::allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts) {
-    std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts;
-    rawDescriptorSetLayouts.reserve(descriptorSetLayouts.size());
+	VkDescriptorPool VulkanDescriptorPool::get() {
+		return this->descriptorPool;
+	}
 
-    for (VulkanDescriptorSetLayout& descriptorSetLayout : descriptorSetLayouts) {
-      rawDescriptorSetLayouts.emplace_back(descriptorSetLayout.get());
-    }
+	void VulkanDescriptorPool::reset() {
+		vkResetDescriptorPool(this->device, this->descriptorPool, 0);
+	}
 
-    std::vector<VkDescriptorSet> rawDescriptorSets(descriptorSetLayouts.size());
-    //rawDescriptorSets.reserve(descriptorSetLayouts.size());
+	std::vector<VulkanDescriptorSet>
+	VulkanDescriptorPool::allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts) {
+		std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts;
+		rawDescriptorSetLayouts.reserve(descriptorSetLayouts.size());
 
-    VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
-    descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    descriptorSetAllocateInfo.descriptorPool = this->descriptorPool;
-    descriptorSetAllocateInfo.descriptorSetCount = rawDescriptorSetLayouts.size();
-    descriptorSetAllocateInfo.pSetLayouts = rawDescriptorSetLayouts.data();
+		for (VulkanDescriptorSetLayout& descriptorSetLayout : descriptorSetLayouts) {
+			rawDescriptorSetLayouts.emplace_back(descriptorSetLayout.get());
+		}
 
-    vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data());
+		std::vector<VkDescriptorSet> rawDescriptorSets(descriptorSetLayouts.size());
+		// rawDescriptorSets.reserve(descriptorSetLayouts.size());
 
-    std::vector<VulkanDescriptorSet> wrappedDescriptorSets;
-    wrappedDescriptorSets.reserve(descriptorSetLayouts.size());
+		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
+		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		descriptorSetAllocateInfo.descriptorPool = this->descriptorPool;
+		descriptorSetAllocateInfo.descriptorSetCount = rawDescriptorSetLayouts.size();
+		descriptorSetAllocateInfo.pSetLayouts = rawDescriptorSetLayouts.data();
 
-    for (VkDescriptorSet& descriptorSet : rawDescriptorSets) {
-      wrappedDescriptorSets.emplace_back(descriptorSet);
-    }
-    return wrappedDescriptorSets;
-  }
-  
-  std::vector<VulkanDescriptorSet> VulkanDescriptorPool::allocateDescriptorSets(VulkanDescriptorSetLayout& descriptorSetLayout, uint32_t count) {
-    std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts(count, descriptorSetLayout.get());
-    std::vector<VkDescriptorSet> rawDescriptorSets(rawDescriptorSetLayouts.size());
+		vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data());
 
-    VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
-    descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    descriptorSetAllocateInfo.descriptorPool = this->descriptorPool;
-    descriptorSetAllocateInfo.descriptorSetCount = rawDescriptorSetLayouts.size();
-    descriptorSetAllocateInfo.pSetLayouts = rawDescriptorSetLayouts.data();
+		std::vector<VulkanDescriptorSet> wrappedDescriptorSets;
+		wrappedDescriptorSets.reserve(descriptorSetLayouts.size());
 
-    vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data());
+		for (VkDescriptorSet& descriptorSet : rawDescriptorSets) {
+			wrappedDescriptorSets.emplace_back(descriptorSet);
+		}
+		return wrappedDescriptorSets;
+	}
 
-    std::vector<VulkanDescriptorSet> wrappedDescriptorSets;
-    wrappedDescriptorSets.reserve(rawDescriptorSetLayouts.size());
+	std::vector<VulkanDescriptorSet>
+	VulkanDescriptorPool::allocateDescriptorSets(VulkanDescriptorSetLayout& descriptorSetLayout, uint32_t count) {
+		std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts(count, descriptorSetLayout.get());
+		std::vector<VkDescriptorSet> rawDescriptorSets(rawDescriptorSetLayouts.size());
 
-    for (VkDescriptorSet& descriptorSet : rawDescriptorSets) {
-      wrappedDescriptorSets.emplace_back(descriptorSet);
-    }
-    return wrappedDescriptorSets;
-  }
-  
-  VulkanDescriptorSet VulkanDescriptorPool::allocateDescriptorSet(VulkanDescriptorSetLayout& descriptorSetLayout) {
-    std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts{descriptorSetLayout.get()};
+		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
+		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		descriptorSetAllocateInfo.descriptorPool = this->descriptorPool;
+		descriptorSetAllocateInfo.descriptorSetCount = rawDescriptorSetLayouts.size();
+		descriptorSetAllocateInfo.pSetLayouts = rawDescriptorSetLayouts.data();
 
-    VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
-    descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    descriptorSetAllocateInfo.descriptorPool = this->descriptorPool;
-    descriptorSetAllocateInfo.descriptorSetCount = 1;
-    descriptorSetAllocateInfo.pSetLayouts = rawDescriptorSetLayouts.data();
+		vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data());
 
-    std::vector<VkDescriptorSet> rawDescriptorSets(1);
-    Validation::verify(vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data()));
-    
-    return {rawDescriptorSets[0]};
-  }
-  
-  void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites, std::vector<VulkanCopyDescriptorSet> descriptorSetCopies) {
-    std::vector<VkWriteDescriptorSet> rawDescriptorWrites = this->toRawDescriptorWrites(descriptorSetWrites);
-    std::vector<VkCopyDescriptorSet> rawDescriptorCopies = this->toRawDescriptorCopies(descriptorSetCopies);
+		std::vector<VulkanDescriptorSet> wrappedDescriptorSets;
+		wrappedDescriptorSets.reserve(rawDescriptorSetLayouts.size());
 
-    vkUpdateDescriptorSets(this->device, 
-        rawDescriptorWrites.size(), descriptorSetWrites.size() != 0 ? rawDescriptorWrites.data() : nullptr, 
-        rawDescriptorCopies.size(), descriptorSetCopies.size() != 0 ? rawDescriptorCopies.data() : nullptr
-    );
-  }
+		for (VkDescriptorSet& descriptorSet : rawDescriptorSets) {
+			wrappedDescriptorSets.emplace_back(descriptorSet);
+		}
+		return wrappedDescriptorSets;
+	}
 
-  void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites) {
-    this->updateDescriptorSets(descriptorSetWrites, {});
-  }
+	VulkanDescriptorSet VulkanDescriptorPool::allocateDescriptorSet(VulkanDescriptorSetLayout& descriptorSetLayout) {
+		std::vector<VkDescriptorSetLayout> rawDescriptorSetLayouts{descriptorSetLayout.get()};
 
-  void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanCopyDescriptorSet> descriptorSetCopies) {
-    this->updateDescriptorSets({}, descriptorSetCopies);
-  }
-  
-  std::vector<VkWriteDescriptorSet> VulkanDescriptorPool::toRawDescriptorWrites(std::vector<VulkanWriteDescriptorSet>& descriptorSetWrites) {
-    std::vector<VkWriteDescriptorSet> rawDescriptorWrites;
-    rawDescriptorWrites.reserve(descriptorSetWrites.size());
+		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
+		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		descriptorSetAllocateInfo.descriptorPool = this->descriptorPool;
+		descriptorSetAllocateInfo.descriptorSetCount = 1;
+		descriptorSetAllocateInfo.pSetLayouts = rawDescriptorSetLayouts.data();
 
-    for (VulkanWriteDescriptorSet& descriptorWrite : descriptorSetWrites) {
-      uint32_t descriptorCount = std::max({
-          descriptorWrite.imageInfo.size(), 
-          descriptorWrite.bufferInfo.size(), 
-          descriptorWrite.texelBufferViews.size()
-      });
+		std::vector<VkDescriptorSet> rawDescriptorSets(1);
+		Validation::verify(
+		    vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data()));
 
-      rawDescriptorWrites.emplace_back(VkWriteDescriptorSet{
-        VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, nullptr, 
-        descriptorWrite.descriptorSet,
-        descriptorWrite.descriptorBindingIndex, 
-        descriptorWrite.descriptorArrayElement,
-        descriptorCount,
-        descriptorWrite.descriptorType, 
-        descriptorWrite.imageInfo.size() != 0 ? descriptorWrite.imageInfo.data() : nullptr, 
-        descriptorWrite.bufferInfo.size() != 0 ? descriptorWrite.bufferInfo.data() : nullptr, 
-        descriptorWrite.texelBufferViews.size() != 0 ? descriptorWrite.texelBufferViews.data() : nullptr
-      });
-    }
-    return rawDescriptorWrites;
-  }
+		return {rawDescriptorSets[0]};
+	}
 
-  std::vector<VkCopyDescriptorSet> VulkanDescriptorPool::toRawDescriptorCopies(std::vector<VulkanCopyDescriptorSet>& descriptorSetCopies) {
-    std::vector<VkCopyDescriptorSet> rawDescriptorCopies;
-    rawDescriptorCopies.reserve(descriptorSetCopies.size());
+	void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites,
+	                                                std::vector<VulkanCopyDescriptorSet> descriptorSetCopies) {
+		std::vector<VkWriteDescriptorSet> rawDescriptorWrites = this->toRawDescriptorWrites(descriptorSetWrites);
+		std::vector<VkCopyDescriptorSet> rawDescriptorCopies = this->toRawDescriptorCopies(descriptorSetCopies);
 
-    for (VulkanCopyDescriptorSet& descriptorCopy : descriptorSetCopies) {
-      rawDescriptorCopies.emplace_back(VkCopyDescriptorSet{
-        VK_STRUCTURE_TYPE_COPY_DESCRIPTOR_SET, nullptr, 
-        descriptorCopy.srcDescriptorSet,
-        descriptorCopy.srcDecriptorBindingIndex,
-        descriptorCopy.srcDescriptorArrayElement,
-        descriptorCopy.dstDescriptorSet,
-        descriptorCopy.dstDecriptorBindingIndex,
-        descriptorCopy.dstDescriptorArrayElement,
-        descriptorCopy.descriptorCount
-      });
-    }
-    return rawDescriptorCopies;
-  }
-}
+		vkUpdateDescriptorSets(this->device, rawDescriptorWrites.size(),
+		                       descriptorSetWrites.size() != 0 ? rawDescriptorWrites.data() : nullptr,
+		                       rawDescriptorCopies.size(),
+		                       descriptorSetCopies.size() != 0 ? rawDescriptorCopies.data() : nullptr);
+	}
+
+	void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites) {
+		this->updateDescriptorSets(descriptorSetWrites, {});
+	}
+
+	void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanCopyDescriptorSet> descriptorSetCopies) {
+		this->updateDescriptorSets({}, descriptorSetCopies);
+	}
+
+	std::vector<VkWriteDescriptorSet>
+	VulkanDescriptorPool::toRawDescriptorWrites(std::vector<VulkanWriteDescriptorSet>& descriptorSetWrites) {
+		std::vector<VkWriteDescriptorSet> rawDescriptorWrites;
+		rawDescriptorWrites.reserve(descriptorSetWrites.size());
+
+		for (VulkanWriteDescriptorSet& descriptorWrite : descriptorSetWrites) {
+			uint32_t descriptorCount = std::max({descriptorWrite.imageInfo.size(), descriptorWrite.bufferInfo.size(),
+			                                     descriptorWrite.texelBufferViews.size()});
+
+			rawDescriptorWrites.emplace_back(VkWriteDescriptorSet{
+			    VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, nullptr, descriptorWrite.descriptorSet,
+			    descriptorWrite.descriptorBindingIndex, descriptorWrite.descriptorArrayElement, descriptorCount,
+			    descriptorWrite.descriptorType,
+			    descriptorWrite.imageInfo.size() != 0 ? descriptorWrite.imageInfo.data() : nullptr,
+			    descriptorWrite.bufferInfo.size() != 0 ? descriptorWrite.bufferInfo.data() : nullptr,
+			    descriptorWrite.texelBufferViews.size() != 0 ? descriptorWrite.texelBufferViews.data() : nullptr});
+		}
+		return rawDescriptorWrites;
+	}
+
+	std::vector<VkCopyDescriptorSet>
+	VulkanDescriptorPool::toRawDescriptorCopies(std::vector<VulkanCopyDescriptorSet>& descriptorSetCopies) {
+		std::vector<VkCopyDescriptorSet> rawDescriptorCopies;
+		rawDescriptorCopies.reserve(descriptorSetCopies.size());
+
+		for (VulkanCopyDescriptorSet& descriptorCopy : descriptorSetCopies) {
+			rawDescriptorCopies.emplace_back(
+			    VkCopyDescriptorSet{VK_STRUCTURE_TYPE_COPY_DESCRIPTOR_SET, nullptr, descriptorCopy.srcDescriptorSet,
+			                        descriptorCopy.srcDecriptorBindingIndex, descriptorCopy.srcDescriptorArrayElement,
+			                        descriptorCopy.dstDescriptorSet, descriptorCopy.dstDecriptorBindingIndex,
+			                        descriptorCopy.dstDescriptorArrayElement, descriptorCopy.descriptorCount});
+		}
+		return rawDescriptorCopies;
+	}
+} // namespace Radiant

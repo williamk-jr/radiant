@@ -2,20 +2,22 @@
 
 #include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/StyleSheetValue.h"
+
 #include <string>
 #include <vector>
+
 namespace Radiant::StyleSheetParser {
-  class Parser;
+	class Parser;
 
-  class StyleSheet {
-    public:
-      void add(std::string name, StyleSheetEntry entry);
-      size_t size() const;
+	class StyleSheet {
+		public:
+			void add(std::string name, StyleSheetEntry entry);
+			size_t size() const;
 
-      StyleSheetEntry getOrDefault(std::string name, StyleSheetEntry defaultEntry);
-      StyleSheetEntry getAbsolute(Parser& parser, std::string name);
-      
-    private:
-      std::unordered_map<std::string, StyleSheetEntry> styles;
-  };
-} 
+			StyleSheetEntry getOrDefault(std::string name, StyleSheetEntry defaultEntry);
+			StyleSheetEntry getAbsolute(Parser& parser, std::string name);
+
+		private:
+			std::unordered_map<std::string, StyleSheetEntry> styles;
+	};
+} // namespace Radiant::StyleSheetParser

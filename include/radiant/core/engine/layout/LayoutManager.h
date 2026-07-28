@@ -1,16 +1,17 @@
 #pragma once
 
 #include <cstdint>
+
 namespace Radiant {
-  class Widget;
+	class Widget;
 
-  class LayoutManager {
-    public:
-      LayoutManager() = default;
+	class LayoutManager {
+		public:
+			LayoutManager() = default;
 
-      void updateLayout(Widget* widget);
-      float resolveRelativeStyle();
+			void updateLayout(Widget* widget);
+			float resolveRelativeStyle();
 
-    private:
-  };
-}
+		private:
+	};
+} // namespace Radiant

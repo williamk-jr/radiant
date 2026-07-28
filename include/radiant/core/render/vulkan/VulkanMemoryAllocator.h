@@ -1,24 +1,24 @@
 #pragma once
 
-#include <vma/vk_mem_alloc.h>
-
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanInstance.h"
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
 
+#include <vma/vk_mem_alloc.h>
+
 namespace Radiant {
-  class VulkanMemoryAllocator {
-    public:
-      VulkanMemoryAllocator(VulkanInstance& instance, VulkanPhysicalDevice& physicalDevice, VulkanDevice& device);
-      VulkanMemoryAllocator(const VulkanMemoryAllocator&) = delete;
-      VulkanMemoryAllocator& operator=(const VulkanMemoryAllocator&) = delete;
+	class VulkanMemoryAllocator {
+		public:
+			VulkanMemoryAllocator(VulkanInstance& instance, VulkanPhysicalDevice& physicalDevice, VulkanDevice& device);
+			VulkanMemoryAllocator(const VulkanMemoryAllocator&) = delete;
+			VulkanMemoryAllocator& operator=(const VulkanMemoryAllocator&) = delete;
 
-      VulkanMemoryAllocator(VulkanMemoryAllocator&&) noexcept;
-      VulkanMemoryAllocator& operator=(VulkanMemoryAllocator&&) noexcept = default;
-      ~VulkanMemoryAllocator();
-      VmaAllocator& get();
+			VulkanMemoryAllocator(VulkanMemoryAllocator&&) noexcept;
+			VulkanMemoryAllocator& operator=(VulkanMemoryAllocator&&) noexcept = default;
+			~VulkanMemoryAllocator();
+			VmaAllocator& get();
 
-    private:
-      VmaAllocator memoryAllocator;
-  };
-}
+		private:
+			VmaAllocator memoryAllocator;
+	};
+} // namespace Radiant

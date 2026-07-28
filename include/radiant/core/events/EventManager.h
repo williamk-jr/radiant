@@ -1,10 +1,10 @@
 #pragma once
 
-namespace Radiant { 
-  class EventManager {
-    public:
-      void dispatchEvent();
-    private:
-      
-  };
-}
+namespace Radiant {
+	class EventManager {
+		public:
+			void dispatchEvent();
+
+		private:
+	};
+} // namespace Radiant

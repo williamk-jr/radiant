@@ -14,21 +14,22 @@
 #include "radiant/core/render/vulkan/VulkanInstance.h"
 
 namespace Radiant {
-  class VulkanSurface {
-    public:
+	class VulkanSurface {
+		public:
 #ifdef HAS_GLFW
-      VulkanSurface(VulkanInstance& instance, GLFWwindow* window);
+			VulkanSurface(VulkanInstance& instance, GLFWwindow* window);
 #endif
-      VulkanSurface(const VulkanSurface&) = delete;
-      VulkanSurface& operator=(const VulkanSurface&) = delete;
+			VulkanSurface(const VulkanSurface&) = delete;
+			VulkanSurface& operator=(const VulkanSurface&) = delete;
 
-      VulkanSurface(VulkanSurface&&) noexcept;
-      VulkanSurface& operator=(VulkanSurface&&) noexcept = default;
-      ~VulkanSurface();
+			VulkanSurface(VulkanSurface&&) noexcept;
+			VulkanSurface& operator=(VulkanSurface&&) noexcept = default;
+			~VulkanSurface();
 
-      VkSurfaceKHR get();
-    private:
-      VkSurfaceKHR surface;
-      VkInstance instance;
-  };
-}
+			VkSurfaceKHR get();
+
+		private:
+			VkSurfaceKHR surface;
+			VkInstance instance;
+	};
+} // namespace Radiant

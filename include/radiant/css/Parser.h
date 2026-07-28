@@ -1,5 +1,13 @@
 
 #pragma once
+#include "radiant/css/StyleSheet.h"
+#include "radiant/css/StyleSheetEntry.h"
+#include "radiant/css/StyleSheetValue.h"
+#include "radiant/css/Token.h"
+#include "radiant/css/ast/ast_node.h"
+#include "radiant/util/logger/Logger.h"
+#include "radiant/util/string_util.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
@@ -8,66 +16,59 @@
 #include <utility>
 #include <variant>
 #include <vector>
-#include "radiant/css/StyleSheet.h"
-#include "radiant/css/StyleSheetEntry.h"
-#include "radiant/css/StyleSheetValue.h"
-#include "radiant/css/ast/ast_node.h"
-#include "radiant/util/logger/Logger.h"
-#include "radiant/util/string_util.h"
-#include "radiant/css/Token.h"
 
 namespace Radiant::StyleSheetParser {
-  using PropertyResolver = StyleSheetEntry (*)(StyleSheetEntry, float);
-  using RuntimeFunction = std::function<StyleSheetValue(std::vector<StyleSheetValue>)>;
+	using PropertyResolver = StyleSheetEntry (*)(StyleSheetEntry, float);
+	using RuntimeFunction = std::function<StyleSheetValue(std::vector<StyleSheetValue>)>;
 
-  struct PropertyEntry {
-    std::vector<ValueTypes> signature;
-    StyleSheetEntry defaultValue;
-    PropertyResolver resolver;
-  };
+	struct PropertyEntry {
+			std::vector<ValueTypes> signature;
+			StyleSheetEntry defaultValue;
+			PropertyResolver resolver;
+	};
 
-  struct RegisteredFunction {
-    RuntimeFunction runtimeFunction;
-  };
+	struct RegisteredFunction {
+			RuntimeFunction runtimeFunction;
+	};
 
-  template<typename R, typename... Args, std::size_t... Is>
-  static R invokeHelper(R(*fn)(Args...), std::vector<StyleSheetValue> params, std::index_sequence<Is...> indexSequence) {
-    return fn( params[Is].get<MapValue<Args>::value>().value()... );
-  }
+	template <typename R, typename... Args, std::size_t... Is>
+	static R invokeHelper(R (*fn)(Args...), std::vector<StyleSheetValue> params,
+	                      std::index_sequence<Is...> indexSequence) {
+		return fn(params[Is].get<MapValue<Args>::value>().value()...);
+	}
 
-  template<typename R, typename... Args>
-  static RuntimeFunction wrapper(R(*fn)(Args...)) {
-    return [fn](std::vector<StyleSheetValue> params) {
-      return StyleSheetValue{ invokeHelper(fn, params, std::index_sequence_for<Args...>{}) }; 
-    };
-  };
+	template <typename R, typename... Args> static RuntimeFunction wrapper(R (*fn)(Args...)) {
+		return [fn](std::vector<StyleSheetValue> params) {
+			return StyleSheetValue{invokeHelper(fn, params, std::index_sequence_for<Args...>{})};
+		};
+	};
 
-  class Parser {
-    public:
-      void registerProperty(std::string name, std::vector<ValueTypes> signature, StyleSheetEntry defaultValue, PropertyResolver resolver);
-      PropertyEntry getPropertyEntry(std::string name);
+	class Parser {
+		public:
+			void registerProperty(std::string name, std::vector<ValueTypes> signature, StyleSheetEntry defaultValue,
+			                      PropertyResolver resolver);
+			PropertyEntry getPropertyEntry(std::string name);
 
+			template <typename Fn> void registerFunction(std::string name, Fn function) {
+				this->functionRegistry[name] = {wrapper(function)};
+			}
 
-      template<typename Fn>
-      void registerFunction(std::string name, Fn function) {
-        this->functionRegistry[name] = {wrapper(function)};
-      }
+			RegisteredFunction getFunction(std::string name);
+			std::unordered_map<std::string, StyleSheet> getStyleSheets(std::filesystem::path path);
 
-      RegisteredFunction getFunction(std::string name);
-      std::unordered_map<std::string, StyleSheet> getStyleSheets(std::filesystem::path path);
+			std::vector<Token> tokenize(std::filesystem::path file);
+			static std::string tokenTypeToString(TokenType tokenType);
 
-      std::vector<Token> tokenize(std::filesystem::path file);
-      static std::string tokenTypeToString(TokenType tokenType);
-    private:
-      std::unordered_map<std::string, PropertyEntry> propertyRegistry;
-      std::unordered_map<std::string, RegisteredFunction> functionRegistry;
+		private:
+			std::unordered_map<std::string, PropertyEntry> propertyRegistry;
+			std::unordered_map<std::string, RegisteredFunction> functionRegistry;
 
-      TokenType identifyToken(std::string token);
-      StyleSheetValue getValue(AstNode* value);
-      void addToken(std::vector<Token>& tokenList, std::string token);
-      
-      bool isString(const std::string& token);
-      bool isUnit(const std::string& token);
-      bool isIdentifier(const std::string& token);
-  };
-}
+			TokenType identifyToken(std::string token);
+			StyleSheetValue getValue(AstNode* value);
+			void addToken(std::vector<Token>& tokenList, std::string token);
+
+			bool isString(const std::string& token);
+			bool isUnit(const std::string& token);
+			bool isIdentifier(const std::string& token);
+	};
+} // namespace Radiant::StyleSheetParser

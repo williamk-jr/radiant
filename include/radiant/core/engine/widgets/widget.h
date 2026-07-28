@@ -1,68 +1,66 @@
 #pragma once
-#include <cstdint>
-#include <memory>
-#include <vector>
 #include "radiant/core/engine/LayoutBox.h"
 #include "radiant/core/engine/layout/LayoutManager.h"
 #include "radiant/core/render/renderable.h"
 #include "radiant/css/Parser.h"
 
+#include <cstdint>
+#include <memory>
+#include <vector>
+
 namespace Radiant {
-  class WidgetManager;
+	class WidgetManager;
 
-  enum class PositionType {
-    ABSOLUTE,
-    RELATIVE,
-    FIXED
-  };
+	enum class PositionType { ABSOLUTE, RELATIVE, FIXED };
 
-  class Widget: public Renderable {
-    friend WidgetManager;
-    public:
+	class Widget : public Renderable {
+			friend WidgetManager;
 
-      Widget(std::shared_ptr<Widget> parent, uint32_t width, uint32_t height);
-      Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, uint32_t width, uint32_t height);
+		public:
+			Widget(std::shared_ptr<Widget> parent, uint32_t width, uint32_t height);
+			Widget(std::shared_ptr<Widget> parent, uint32_t positionX, uint32_t positionY, uint32_t width,
+			       uint32_t height);
 
-      void addStyle(std::string name, StyleSheetParser::StyleSheetEntry entry);
-      StyleSheetParser::StyleSheetEntry getStyle(std::string name, StyleSheetParser::StyleSheetEntry defaultEntry);
+			void addStyle(std::string name, StyleSheetParser::StyleSheetEntry entry);
+			StyleSheetParser::StyleSheetEntry getStyle(std::string name,
+			                                           StyleSheetParser::StyleSheetEntry defaultEntry);
 
-      uint32_t getPositionX();
-      uint32_t getPositionY();
-      
-      uint32_t getWidth();
-      uint32_t getHeight();
+			uint32_t getPositionX();
+			uint32_t getPositionY();
 
-      LayoutManager& getLayoutManager();
-      const LayoutBox& getLayoutBox();
+			uint32_t getWidth();
+			uint32_t getHeight();
 
-      void setPositionX(uint32_t x);
-      void setPositionY(uint32_t y);
+			LayoutManager& getLayoutManager();
+			const LayoutBox& getLayoutBox();
 
-      void setWidth(uint32_t width);
-      void setHeight(uint32_t height);
+			void setPositionX(uint32_t x);
+			void setPositionY(uint32_t y);
 
-      void setTopOffset(uint32_t offset);
-      void setBottomOffset(uint32_t offset);
-      void setLeftOffset(uint32_t offset);
-      void setRightOffset(uint32_t offset);
+			void setWidth(uint32_t width);
+			void setHeight(uint32_t height);
 
-      void updateLayout();
-      std::vector<Widget*> getChildren();
-      std::shared_ptr<Widget> getParent();
-      void addChild(Widget* child);
+			void setTopOffset(uint32_t offset);
+			void setBottomOffset(uint32_t offset);
+			void setLeftOffset(uint32_t offset);
+			void setRightOffset(uint32_t offset);
 
-      void render() override;
+			void updateLayout();
+			std::vector<Widget*> getChildren();
+			std::shared_ptr<Widget> getParent();
+			void addChild(Widget* child);
 
-    private:
-      std::shared_ptr<Widget> parent;
-      std::vector<Widget*> children;
+			void render() override;
 
-      WidgetManager& manager; 
-      LayoutManager layoutManager;
-      LayoutBox layoutBox;
-      StyleSheetParser::StyleSheet styleSheet;
+		private:
+			std::shared_ptr<Widget> parent;
+			std::vector<Widget*> children;
 
-      Widget(WidgetManager& manager, uint32_t width, uint32_t height);
+			WidgetManager& manager;
+			LayoutManager layoutManager;
+			LayoutBox layoutBox;
+			StyleSheetParser::StyleSheet styleSheet;
 
-  };
-}
+			Widget(WidgetManager& manager, uint32_t width, uint32_t height);
+	};
+} // namespace Radiant

@@ -1,8 +1,8 @@
 #pragma once
 
 namespace Radiant {
-  class Renderable {
-    public:
-      virtual void render() = 0;
-  };
-}
+	class Renderable {
+		public:
+			virtual void render() = 0;
+	};
+} // namespace Radiant

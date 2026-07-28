@@ -2,63 +2,60 @@
 
 #include "radiant/util/logger/Logger.h"
 #include "radiant/util/logger/MessageStyle.h"
-#include <vector>
+
 #include <string>
+#include <vector>
 #include <vulkan/vulkan.h>
 
 namespace Radiant {
-  /* VulkanInstance
-   *
-   *  Wrapper class for VkInstance.
-   */
-  class VulkanInstance {
-    public:
-      VulkanInstance(
-        const std::string& applicationName,
-        const std::vector<const char*>& extensionNames,
-        const std::vector<const char*>& layerNames
-      );
-      VulkanInstance(const VulkanInstance&) = delete;
-      VulkanInstance& operator=(const VulkanInstance&) = delete;
+	/* VulkanInstance
+	 *
+	 *  Wrapper class for VkInstance.
+	 */
+	class VulkanInstance {
+		public:
+			VulkanInstance(const std::string& applicationName, const std::vector<const char*>& extensionNames,
+			               const std::vector<const char*>& layerNames);
+			VulkanInstance(const VulkanInstance&) = delete;
+			VulkanInstance& operator=(const VulkanInstance&) = delete;
 
-      VulkanInstance(VulkanInstance&&) noexcept;
-      VulkanInstance& operator=(VulkanInstance&&) noexcept = default;
-      ~VulkanInstance();
-      
-      /* 
-       * @return returns a raw VkInstance
-       */
-      VkInstance get();
-      
-    private:
-      VkInstance instance;
-      
-      static VkBool32 debugCallback(
-        VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-        VkDebugUtilsMessageTypeFlagsEXT messageTypes,
-        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-        void* pUserData
-      ) {
-        if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
-          Logger::info(pCallbackData->pMessage, {
-            {"VULKAN", MessageStyle::WHITE},
-            {pCallbackData->pMessageIdName, MessageStyle::WHITE},
-            LogPrefixes::time(MessageStyle::WHITE)
-          }, 1);
-        } else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-          Logger::warn(pCallbackData->pMessage, {
-            {"VULKAN", MessageStyle::WHITE},
-            {pCallbackData->pMessageIdName, MessageStyle::WHITE},
-            LogPrefixes::time(MessageStyle::WHITE)
-          });
-        } else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-          Logger::error(pCallbackData->pMessage, {
-            {"VULKAN", MessageStyle::WHITE},
-            {pCallbackData->pMessageIdName, MessageStyle::WHITE},
-            LogPrefixes::time(MessageStyle::WHITE)
-          });
-        }
-        return VK_FALSE;
-      }
-  };
-}
+			VulkanInstance(VulkanInstance&&) noexcept;
+			VulkanInstance& operator=(VulkanInstance&&) noexcept = default;
+			~VulkanInstance();
+
+			/*
+			 * @return returns a raw VkInstance
+			 */
+			VkInstance get();
+
+		private:
+			VkInstance instance;
+
+			static VkBool32 debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+			                              VkDebugUtilsMessageTypeFlagsEXT messageTypes,
+			                              const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+				if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+					Logger::info(pCallbackData->pMessage,
+					             {
+					                 {                     "VULKAN", MessageStyle::WHITE},
+					                 {pCallbackData->pMessageIdName, MessageStyle::WHITE},
+					                 LogPrefixes::time(MessageStyle::WHITE)
+                    },
+					             1);
+				} else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+					Logger::warn(pCallbackData->pMessage, {
+					                                          {                     "VULKAN", MessageStyle::WHITE},
+					                                          {pCallbackData->pMessageIdName, MessageStyle::WHITE},
+					                                          LogPrefixes::time(MessageStyle::WHITE)
+                    });
+				} else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+					Logger::error(pCallbackData->pMessage, {
+					                                           {                     "VULKAN", MessageStyle::WHITE},
+					                                           {pCallbackData->pMessageIdName, MessageStyle::WHITE},
+					                                           LogPrefixes::time(MessageStyle::WHITE)
+                    });
+				}
+				return VK_FALSE;
+			}
+	};
+} // namespace Radiant

@@ -1,57 +1,59 @@
 #pragma once
 #include "radiant/util/logger/MessageStyle.h"
-#include <iostream>
-#include <vector>
+
+#include <chrono>
 #include <iomanip>
+#include <iostream>
 #include <numeric>
 #include <string>
-#include <chrono>
+#include <vector>
 
 namespace Radiant {
-  struct LogPrefix;
+	struct LogPrefix;
 
-  class Logger {
-    public: 
-      static void info(const std::string& message);
-      static void info(const std::string& message, unsigned short verbosity);
-      static void warn(const std::string& message);
-      static void error(const std::string& message);
-      static void fatal(const std::string& message);
+	class Logger {
+		public:
+			static void info(const std::string& message);
+			static void info(const std::string& message, unsigned short verbosity);
+			static void warn(const std::string& message);
+			static void error(const std::string& message);
+			static void fatal(const std::string& message);
 
-      static void info(const std::string& message, std::vector<LogPrefix> prefixes);
-      static void info(const std::string& message, std::vector<LogPrefix> prefixes, unsigned short verbosity);
-      static void warn(const std::string& message, std::vector<LogPrefix> prefixes);
-      static void error(const std::string& message, std::vector<LogPrefix> prefixes);
-      static void fatal(const std::string& message, std::vector<LogPrefix> prefixes);
+			static void info(const std::string& message, std::vector<LogPrefix> prefixes);
+			static void info(const std::string& message, std::vector<LogPrefix> prefixes, unsigned short verbosity);
+			static void warn(const std::string& message, std::vector<LogPrefix> prefixes);
+			static void error(const std::string& message, std::vector<LogPrefix> prefixes);
+			static void fatal(const std::string& message, std::vector<LogPrefix> prefixes);
 
-      static void shouldAllowExceptions(bool value);
-      static void shouldAllowColor(bool value);
-      static void setVerbosity(unsigned short verbosity);
+			static void shouldAllowExceptions(bool value);
+			static void shouldAllowColor(bool value);
+			static void setVerbosity(unsigned short verbosity);
 
-      static bool canThrowExceptions();
-      static bool canShowColor();
-      static unsigned short getVerbosity();
-    private:
-      static bool allowExceptions;
-      static bool allowColor;
-      static unsigned short verbosity;
+			static bool canThrowExceptions();
+			static bool canShowColor();
+			static unsigned short getVerbosity();
 
-      static std::string formatAll(std::vector<LogPrefix> prefixes);
-  };
+		private:
+			static bool allowExceptions;
+			static bool allowColor;
+			static unsigned short verbosity;
 
-  struct LogPrefix {
-    std::string message;
-    MessageStyle::MessageColor color;
+			static std::string formatAll(std::vector<LogPrefix> prefixes);
+	};
 
-    std::string format() {
-      if (Logger::canShowColor()) {
-        return std::string(color)+"["+message+"]"+"\x1b[0m";
-      }
-      return "["+message+"]";
-    }
-  };
+	struct LogPrefix {
+			std::string message;
+			MessageStyle::MessageColor color;
 
-  namespace LogPrefixes {
-    LogPrefix time(MessageStyle::MessageColor color);
-  }
-}
+			std::string format() {
+				if (Logger::canShowColor()) {
+					return std::string(color) + "[" + message + "]" + "\x1b[0m";
+				}
+				return "[" + message + "]";
+			}
+	};
+
+	namespace LogPrefixes {
+		LogPrefix time(MessageStyle::MessageColor color);
+	}
+} // namespace Radiant

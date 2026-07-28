@@ -5,32 +5,35 @@
 #include "radiant/core/render/Renderer.h"
 #include "radiant/core/render/Window.h"
 #include "radiant/css/Parser.h"
+
 #include <cstdint>
 #include <memory>
+
 namespace Radiant {
-  class RadiantEngine {
-    public:
-      RadiantEngine(const std::string& title, uint32_t width, uint32_t height);
-      ~RadiantEngine();
+	class RadiantEngine {
+		public:
+			RadiantEngine(const std::string& title, uint32_t width, uint32_t height);
+			~RadiantEngine();
 
-      std::shared_ptr<Widget> getRootWidget();
-      void loadStylesheet(std::filesystem::path path);
-      bool isRunning();
-      void update();
-    private:
-      std::unique_ptr<Window> window;
-      std::unique_ptr<WidgetManager> widgetManager;
-      std::unique_ptr<FontManager> fontManager;
+			std::shared_ptr<Widget> getRootWidget();
+			void loadStylesheet(std::filesystem::path path);
+			bool isRunning();
+			void update();
 
-      std::unique_ptr<Renderer> renderer;
-      std::unique_ptr<VertexBuffer> vertexBuffer;
-      std::unique_ptr<InstanceBuffer> instanceBuffer;
-      std::unique_ptr<IndexBuffer> indexBuffer;
+		private:
+			std::unique_ptr<Window> window;
+			std::unique_ptr<WidgetManager> widgetManager;
+			std::unique_ptr<FontManager> fontManager;
 
-      std::unique_ptr<StyleSheetParser::Parser> stylesheetParser;
-      std::unique_ptr<Texture> fontAtlasGpu;
+			std::unique_ptr<Renderer> renderer;
+			std::unique_ptr<VertexBuffer> vertexBuffer;
+			std::unique_ptr<InstanceBuffer> instanceBuffer;
+			std::unique_ptr<IndexBuffer> indexBuffer;
 
-      void registerProperties();
-      void registerFunctions();
-  };
-}
+			std::unique_ptr<StyleSheetParser::Parser> stylesheetParser;
+			std::unique_ptr<Texture> fontAtlasGpu;
+
+			void registerProperties();
+			void registerFunctions();
+	};
+} // namespace Radiant

@@ -1,11 +1,12 @@
 #pragma once
-#include "radiant/core/render/buffers/Buffer.h"
 #include "radiant/core/render/Vertex.h"
+#include "radiant/core/render/buffers/Buffer.h"
+
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-  class VertexBuffer : public Buffer<Vertex> {
-    public:
-      VertexBuffer(VulkanMemoryAllocator& memoryAllocator, VkDeviceSize size);
-  };
-}
+	class VertexBuffer : public Buffer<Vertex> {
+		public:
+			VertexBuffer(VulkanMemoryAllocator& memoryAllocator, VkDeviceSize size);
+	};
+} // namespace Radiant

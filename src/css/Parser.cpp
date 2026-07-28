@@ -1,4 +1,5 @@
 #include "radiant/css/Parser.h"
+
 #include "radiant/css/StyleSheet.h"
 #include "radiant/css/StyleSheetValue.h"
 #include "radiant/css/Token.h"
@@ -8,218 +9,231 @@
 #include "radiant/css/values/Function.h"
 #include "radiant/util/logger/Logger.h"
 #include "radiant/util/string_util.h"
+
+#include <algorithm>
 #include <cctype>
 #include <filesystem>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <algorithm>
 
 namespace Radiant::StyleSheetParser {
-  void Parser::registerProperty(std::string name, std::vector<ValueTypes> signature, StyleSheetEntry defaultValue, PropertyResolver resolver) {
-    this->propertyRegistry[name] = {signature, defaultValue, resolver};
-  }
+	void Parser::registerProperty(std::string name, std::vector<ValueTypes> signature, StyleSheetEntry defaultValue,
+	                              PropertyResolver resolver) {
+		this->propertyRegistry[name] = {signature, defaultValue, resolver};
+	}
 
-  PropertyEntry Parser::getPropertyEntry(std::string name) {
-    return this->propertyRegistry[name];
-  }
+	PropertyEntry Parser::getPropertyEntry(std::string name) {
+		return this->propertyRegistry[name];
+	}
 
-  RegisteredFunction Parser::getFunction(std::string name) {
-    return this->functionRegistry[name];
-  }
+	RegisteredFunction Parser::getFunction(std::string name) {
+		return this->functionRegistry[name];
+	}
 
-  std::unordered_map<std::string, StyleSheet> Parser::getStyleSheets(std::filesystem::path path) {
-    std::vector<Token> tokens = this->tokenize(path); 
-    AbstractSyntaxTree abstractSyntaxTree(tokens); 
-    abstractSyntaxTree.display();
-    return abstractSyntaxTree.toStyleSheets();
-  }
+	std::unordered_map<std::string, StyleSheet> Parser::getStyleSheets(std::filesystem::path path) {
+		std::vector<Token> tokens = this->tokenize(path);
+		AbstractSyntaxTree abstractSyntaxTree(tokens);
+		abstractSyntaxTree.display();
+		return abstractSyntaxTree.toStyleSheets();
+	}
 
-  std::vector<Token> Parser::tokenize(std::filesystem::path file) {
-    if (!std::filesystem::exists(file)) {
-      std::cout << "Invalid Path: " << std::filesystem::absolute(file) << "\n";
-    }
+	std::vector<Token> Parser::tokenize(std::filesystem::path file) {
+		if (!std::filesystem::exists(file)) {
+			std::cout << "Invalid Path: " << std::filesystem::absolute(file) << "\n";
+		}
 
-    std::ifstream stream(file);
-    std::vector<Token> tokens;
-   
-    std::string line;
-    std::string fileContents;
-    while (std::getline(stream, line)) {
-      fileContents += line;
-    }
-    
-    std::string currentToken;
-    bool isString = false;
-    for (int i = 0; i < fileContents.size(); i++) {
-      char currentChar = fileContents.at(i);
+		std::ifstream stream(file);
+		std::vector<Token> tokens;
 
-      // Ignore whitespace & newlines
-      if ((std::isblank(currentChar) && currentChar != ' ') || currentChar == '\n') {
-        continue;
-      }
+		std::string line;
+		std::string fileContents;
+		while (std::getline(stream, line)) {
+			fileContents += line;
+		}
 
-      if (isString) {
-        currentToken += currentChar;
-        if (currentChar == '"') {
-          this->addToken(tokens, currentToken);
-          currentToken = "";
-          isString = false;
-        }
-        continue;
-      }
+		std::string currentToken;
+		bool isString = false;
+		for (int i = 0; i < fileContents.size(); i++) {
+			char currentChar = fileContents.at(i);
 
-      // Check delimiters
-      switch (currentChar) {
-        case '"':
-          if (fileContents.at(i-1) != '\\') {
-            this->addToken(tokens, currentToken);
-            currentToken = "";
-            currentToken += '"';
-            isString = true;
-          }
-          break;
-        case ' ':
-          if (!currentToken.empty()) {
-            this->addToken(tokens, currentToken);
-            currentToken = "";
-          }
-          break;
+			// Ignore whitespace & newlines
+			if ((std::isblank(currentChar) && currentChar != ' ') || currentChar == '\n') {
+				continue;
+			}
 
-        case '{':
-          this->addToken(tokens, currentToken);
-          tokens.push_back(Token(TokenType::BLOCK_OPEN, "{"));
-          currentToken = "";
-          break;
+			if (isString) {
+				currentToken += currentChar;
+				if (currentChar == '"') {
+					this->addToken(tokens, currentToken);
+					currentToken = "";
+					isString = false;
+				}
+				continue;
+			}
 
-        case '}':
-          this->addToken(tokens, currentToken);
-          tokens.push_back(Token(TokenType::BLOCK_CLOSE, "}"));
-          currentToken = "";
-          break;
+			// Check delimiters
+			switch (currentChar) {
+				case '"':
+					if (fileContents.at(i - 1) != '\\') {
+						this->addToken(tokens, currentToken);
+						currentToken = "";
+						currentToken += '"';
+						isString = true;
+					}
+					break;
+				case ' ':
+					if (!currentToken.empty()) {
+						this->addToken(tokens, currentToken);
+						currentToken = "";
+					}
+					break;
 
-        case '(':
-          this->addToken(tokens, currentToken);
-          tokens.push_back(Token(TokenType::PARAMETER_LIST_OPEN, "("));
-          currentToken = "";
-          break;
+				case '{':
+					this->addToken(tokens, currentToken);
+					tokens.push_back(Token(TokenType::BLOCK_OPEN, "{"));
+					currentToken = "";
+					break;
 
-        case ')':
-          this->addToken(tokens, currentToken);
-          tokens.push_back(Token(TokenType::PARAMETER_LIST_CLOSE, ")"));
-          currentToken = "";
-          break;
+				case '}':
+					this->addToken(tokens, currentToken);
+					tokens.push_back(Token(TokenType::BLOCK_CLOSE, "}"));
+					currentToken = "";
+					break;
 
-        case ',':
-          this->addToken(tokens, currentToken);
-          tokens.push_back(Token(TokenType::PARAMETER_LIST_SEPARATOR, ","));
-          currentToken = "";
-          break;
+				case '(':
+					this->addToken(tokens, currentToken);
+					tokens.push_back(Token(TokenType::PARAMETER_LIST_OPEN, "("));
+					currentToken = "";
+					break;
 
-        case ':':
-          this->addToken(tokens, currentToken);
-          tokens.push_back(Token(TokenType::COLON, ":"));
-          currentToken = "";
-          break;
+				case ')':
+					this->addToken(tokens, currentToken);
+					tokens.push_back(Token(TokenType::PARAMETER_LIST_CLOSE, ")"));
+					currentToken = "";
+					break;
 
-        case ';':
-          this->addToken(tokens, currentToken);
-          tokens.push_back(Token(TokenType::SEMI_COLON, ";"));
-          currentToken = "";
-          break;
+				case ',':
+					this->addToken(tokens, currentToken);
+					tokens.push_back(Token(TokenType::PARAMETER_LIST_SEPARATOR, ","));
+					currentToken = "";
+					break;
 
-        case '[':
-          this->addToken(tokens, currentToken);
-          tokens.push_back(Token(TokenType::BLOCK_CLOSE, "}"));
-          currentToken = "";
-          break;
+				case ':':
+					this->addToken(tokens, currentToken);
+					tokens.push_back(Token(TokenType::COLON, ":"));
+					currentToken = "";
+					break;
 
-        case ']':
-          this->addToken(tokens, currentToken);
-          tokens.push_back(Token(TokenType::BLOCK_CLOSE, "}"));
-          currentToken = "";
-          break;
+				case ';':
+					this->addToken(tokens, currentToken);
+					tokens.push_back(Token(TokenType::SEMI_COLON, ";"));
+					currentToken = "";
+					break;
 
-        default:
-          currentToken += currentChar;
-      }
-    }
+				case '[':
+					this->addToken(tokens, currentToken);
+					tokens.push_back(Token(TokenType::BLOCK_CLOSE, "}"));
+					currentToken = "";
+					break;
 
-    stream.close();
-    return tokens;
-  };
+				case ']':
+					this->addToken(tokens, currentToken);
+					tokens.push_back(Token(TokenType::BLOCK_CLOSE, "}"));
+					currentToken = "";
+					break;
 
-  std::string tokenTypeToString(TokenType tokenType) {
-    switch (tokenType) {
-      case TokenType::BLOCK_OPEN: return "BLOCK_OPEN";
-      case TokenType::BLOCK_CLOSE: return "BLOCK_CLOSE";
-      case TokenType::COLON: return "COLON";
-      case TokenType::SEMI_COLON: return "SEMI_COLON";
-      case TokenType::IDENTFIER: return "IDENTIFIER";
-      case TokenType::STRING: return "STRING";
-      case TokenType::INTEGER: return "INTEGER";
-      case TokenType::FLOAT: return "FLOAT";
-      case TokenType::UNIT: return "UNIT";
-      case TokenType::COLOR: return "COLOR";
-      case TokenType::PARAMETER_LIST_OPEN: return "PARAMETER_LIST_OPEN";
-      case TokenType::PARAMETER_LIST_CLOSE: return "PARAMETER_LIST_CLOSE";
-      case TokenType::PARAMETER_LIST_SEPARATOR: return "PARAMETER_LIST_SEPARATOR";
-      case TokenType::INVALID: return "INVALID";
-      default: throw std::invalid_argument("Unknown TokenType");
-    }
-  }
+				default:
+					currentToken += currentChar;
+			}
+		}
 
-  TokenType Parser::identifyToken(std::string token) {
-    if (this->isString(token)) {
-      return TokenType::STRING;
-    } else if (this->isUnit(token)) {
-      return TokenType::UNIT; 
-    } else if (Color::isColor(token)) {
-      return TokenType::COLOR;
-    } else if (string_util::isFloat(token)) {
-      return TokenType::FLOAT;
-    } else if (string_util::isInteger(token)) {
-      return TokenType::INTEGER;
-    } else if (this->isIdentifier(token)) {
-      return TokenType::IDENTFIER;
-    }
-    return TokenType::INVALID;
-  }
+		stream.close();
+		return tokens;
+	};
 
-  void Parser::addToken(std::vector<Token>& tokens, std::string token) {
-    if (token.empty()) {
-      return;
-    }
+	std::string tokenTypeToString(TokenType tokenType) {
+		switch (tokenType) {
+			case TokenType::BLOCK_OPEN:
+				return "BLOCK_OPEN";
+			case TokenType::BLOCK_CLOSE:
+				return "BLOCK_CLOSE";
+			case TokenType::COLON:
+				return "COLON";
+			case TokenType::SEMI_COLON:
+				return "SEMI_COLON";
+			case TokenType::IDENTFIER:
+				return "IDENTIFIER";
+			case TokenType::STRING:
+				return "STRING";
+			case TokenType::INTEGER:
+				return "INTEGER";
+			case TokenType::FLOAT:
+				return "FLOAT";
+			case TokenType::UNIT:
+				return "UNIT";
+			case TokenType::COLOR:
+				return "COLOR";
+			case TokenType::PARAMETER_LIST_OPEN:
+				return "PARAMETER_LIST_OPEN";
+			case TokenType::PARAMETER_LIST_CLOSE:
+				return "PARAMETER_LIST_CLOSE";
+			case TokenType::PARAMETER_LIST_SEPARATOR:
+				return "PARAMETER_LIST_SEPARATOR";
+			case TokenType::INVALID:
+				return "INVALID";
+			default:
+				throw std::invalid_argument("Unknown TokenType");
+		}
+	}
 
-    tokens.push_back(Token(
-      this->identifyToken(token), 
-      token
-    ));
-  }
+	TokenType Parser::identifyToken(std::string token) {
+		if (this->isString(token)) {
+			return TokenType::STRING;
+		} else if (this->isUnit(token)) {
+			return TokenType::UNIT;
+		} else if (Color::isColor(token)) {
+			return TokenType::COLOR;
+		} else if (string_util::isFloat(token)) {
+			return TokenType::FLOAT;
+		} else if (string_util::isInteger(token)) {
+			return TokenType::INTEGER;
+		} else if (this->isIdentifier(token)) {
+			return TokenType::IDENTFIER;
+		}
+		return TokenType::INVALID;
+	}
 
-  bool Parser::isString(const std::string& token) {
-    return (string_util::startsWith(token, "\"") && string_util::endsWith(token, "\"")) ||
-            string_util::startsWith(token, "\'") && string_util::endsWith(token, "\'");
-  }
+	void Parser::addToken(std::vector<Token>& tokens, std::string token) {
+		if (token.empty()) {
+			return;
+		}
 
-  bool Parser::isUnit(const std::string& token) {
-    int lastDigitIndex = string_util::findLastOf(token, string_util::isCharNumeric);
-    if (lastDigitIndex == -1 || lastDigitIndex == token.size()-1) {
-      return false;
-    }
+		tokens.push_back(Token(this->identifyToken(token), token));
+	}
 
-    std::string number = token.substr(0, lastDigitIndex+1);
-    std::string unit = token.substr(lastDigitIndex+1, token.size());
+	bool Parser::isString(const std::string& token) {
+		return (string_util::startsWith(token, "\"") && string_util::endsWith(token, "\"")) ||
+		       string_util::startsWith(token, "\'") && string_util::endsWith(token, "\'");
+	}
 
-    return string_util::isNumeric(number) && string_util::isAlphabetic(unit);
-  }
+	bool Parser::isUnit(const std::string& token) {
+		int lastDigitIndex = string_util::findLastOf(token, string_util::isCharNumeric);
+		if (lastDigitIndex == -1 || lastDigitIndex == token.size() - 1) {
+			return false;
+		}
 
-  bool Parser::isIdentifier(const std::string& token) {
-    return !string_util::isCharNumeric(token.at(0)) && string_util::containsOnly(token, [](unsigned char c) {
-      return string_util::isCharAlphanumeric(c) || c == '-';
-    }); 
-  }
-}
+		std::string number = token.substr(0, lastDigitIndex + 1);
+		std::string unit = token.substr(lastDigitIndex + 1, token.size());
 
+		return string_util::isNumeric(number) && string_util::isAlphabetic(unit);
+	}
+
+	bool Parser::isIdentifier(const std::string& token) {
+		return !string_util::isCharNumeric(token.at(0)) && string_util::containsOnly(token, [](unsigned char c) {
+			return string_util::isCharAlphanumeric(c) || c == '-';
+		});
+	}
+} // namespace Radiant::StyleSheetParser

@@ -1,7 +1,8 @@
 #include "radiant/core/render/Renderer.h"
-#include "radiant/core/render/vulkan/resource/VulkanBuffer.h"
+
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
 #include "radiant/core/render/vulkan/pipeline/VulkanGraphicsPipelineBuilder.h"
+#include "radiant/core/render/vulkan/resource/VulkanBuffer.h"
 
 #include <algorithm>
 #include <cstddef>
@@ -13,402 +14,406 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-  Renderer::Renderer(Window& window, bool debug) {
-    this->instanceExtensions = this->getInstanceExtensions(window, debug); 
-    this->instanceLayers = this->getInstanceLayers(debug);
-    this->frameBufferSize = window.getFrameBufferSize();
+	Renderer::Renderer(Window& window, bool debug) {
+		this->instanceExtensions = this->getInstanceExtensions(window, debug);
+		this->instanceLayers = this->getInstanceLayers(debug);
+		this->frameBufferSize = window.getFrameBufferSize();
 
-    this->initVulkan(window, debug);
-  }
+		this->initVulkan(window, debug);
+	}
 
-  void Renderer::waitIdle() {
-    this->device->waitIdle();
-  } 
+	void Renderer::waitIdle() {
+		this->device->waitIdle();
+	}
 
-  std::unique_ptr<VertexBuffer> Renderer::createVertexBuffer(VkDeviceSize size) {
-    return std::make_unique<VertexBuffer>(*this->memoryAllocator, size);
-  }
+	std::unique_ptr<VertexBuffer> Renderer::createVertexBuffer(VkDeviceSize size) {
+		return std::make_unique<VertexBuffer>(*this->memoryAllocator, size);
+	}
 
-  std::unique_ptr<IndexBuffer> Renderer::createIndexBuffer(VkDeviceSize size) {
-    return std::make_unique<IndexBuffer>(*this->memoryAllocator, size);
-  }
+	std::unique_ptr<IndexBuffer> Renderer::createIndexBuffer(VkDeviceSize size) {
+		return std::make_unique<IndexBuffer>(*this->memoryAllocator, size);
+	}
 
-  std::unique_ptr<InstanceBuffer> Renderer::createInstanceBuffer(VkDeviceSize size) {
-    return std::make_unique<InstanceBuffer>(*this->memoryAllocator, size);
-  }
-  
-  Texture Renderer::loadTexture(void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize) {
-    return {
-      *this->device, *this->memoryAllocator, 
-      *this->descriptorPool, *this->textureDescriptorSetLayout, 
-      *this->commandPool, *this->graphicsQueue,
-      buffer, width, height, pixelSize
-    };
-  }
+	std::unique_ptr<InstanceBuffer> Renderer::createInstanceBuffer(VkDeviceSize size) {
+		return std::make_unique<InstanceBuffer>(*this->memoryAllocator, size);
+	}
 
-  void Renderer::beginFrame(Window& window) {
-    if (this->solidColorGraphicsPipeline.get() == nullptr) {
-      this->initGraphicsPipeline();
-    }
+	Texture Renderer::loadTexture(void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize) {
+		return {*this->device,
+		        *this->memoryAllocator,
+		        *this->descriptorPool,
+		        *this->textureDescriptorSetLayout,
+		        *this->commandPool,
+		        *this->graphicsQueue,
+		        buffer,
+		        width,
+		        height,
+		        pixelSize};
+	}
 
-    this->fences[currentFrame].wait(UINT32_MAX);
-    this->fences[currentFrame].reset();
+	void Renderer::beginFrame(Window& window) {
+		if (this->solidColorGraphicsPipeline.get() == nullptr) {
+			this->initGraphicsPipeline();
+		}
 
-    VulkanResult<uint32_t> imageIndex = this->swapchain->acquireNextImage(&this->imageReadySemaphores[currentFrame], UINT64_MAX);
-    if (this->isSwapchainOutOfDate(window, imageIndex)) {
-      this->updateSwapchain = true; // Swapchain updated at the end of frame.
-    }
+		this->fences[currentFrame].wait(UINT32_MAX);
+		this->fences[currentFrame].reset();
 
-    VulkanImage& currentImage = this->swapchain->getImage(imageIndex.value);
-    VulkanImageView& currentImageView = this->swapchain->getImageView(imageIndex.value);
+		VulkanResult<uint32_t> imageIndex =
+		    this->swapchain->acquireNextImage(&this->imageReadySemaphores[currentFrame], UINT64_MAX);
+		if (this->isSwapchainOutOfDate(window, imageIndex)) {
+			this->updateSwapchain = true; // Swapchain updated at the end of frame.
+		}
 
-    VkImageSubresourceRange subresourceRange{};
-    subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    subresourceRange.levelCount = 1;
-    subresourceRange.layerCount = 1;
+		VulkanImage& currentImage = this->swapchain->getImage(imageIndex.value);
+		VulkanImageView& currentImageView = this->swapchain->getImageView(imageIndex.value);
 
-    this->commandBuffers[currentFrame].reset(false);
-    this->commandBuffers[currentFrame].begin(0);
+		VkImageSubresourceRange subresourceRange{};
+		subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		subresourceRange.levelCount = 1;
+		subresourceRange.layerCount = 1;
 
-    // Transition image layout to transfer dst optimal.
-    VkImageMemoryBarrier2 imageMemoryBarrier{};
-    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
-    imageMemoryBarrier.srcStageMask = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
-    imageMemoryBarrier.srcAccessMask = 0;
-    imageMemoryBarrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
-    imageMemoryBarrier.dstAccessMask = VK_ACCESS_2_MEMORY_READ_BIT | VK_ACCESS_2_MEMORY_WRITE_BIT;
-    imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
-    imageMemoryBarrier.image = currentImage.get();
-    imageMemoryBarrier.subresourceRange = subresourceRange;
+		this->commandBuffers[currentFrame].reset(false);
+		this->commandBuffers[currentFrame].begin(0);
 
-    std::vector<VkImageMemoryBarrier2> imageMemoryBarriers{imageMemoryBarrier};
-    this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(imageMemoryBarriers, 0);
+		// Transition image layout to transfer dst optimal.
+		VkImageMemoryBarrier2 imageMemoryBarrier{};
+		imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+		imageMemoryBarrier.srcStageMask = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
+		imageMemoryBarrier.srcAccessMask = 0;
+		imageMemoryBarrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+		imageMemoryBarrier.dstAccessMask = VK_ACCESS_2_MEMORY_READ_BIT | VK_ACCESS_2_MEMORY_WRITE_BIT;
+		imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
+		imageMemoryBarrier.image = currentImage.get();
+		imageMemoryBarrier.subresourceRange = subresourceRange;
 
-    // Global render state. Allows usage similar to OpenGL.
-    this->context.imageIndex = imageIndex.value;
-    this->context.rendering = true;
-  }
+		std::vector<VkImageMemoryBarrier2> imageMemoryBarriers{imageMemoryBarrier};
+		this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(imageMemoryBarriers, 0);
 
-  void Renderer::beginRendering(Color clearColor) {
-    if (!this->context.rendering) {
-      return;
-    }
+		// Global render state. Allows usage similar to OpenGL.
+		this->context.imageIndex = imageIndex.value;
+		this->context.rendering = true;
+	}
 
-    float* rawColor = clearColor.raw();
-    VulkanImageView& imageView = this->swapchain->getImageView(this->context.imageIndex);
+	void Renderer::beginRendering(Color clearColor) {
+		if (!this->context.rendering) {
+			return;
+		}
 
-    std::vector<VkRenderingAttachmentInfo> colorAttachment(1);
-    colorAttachment[0].sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-    colorAttachment[0].imageLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
-    colorAttachment[0].imageView = imageView.get(); 
-    colorAttachment[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    colorAttachment[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    colorAttachment[0].clearValue = {{rawColor[0], rawColor[1], rawColor[2], rawColor[3]}};
+		float* rawColor = clearColor.raw();
+		VulkanImageView& imageView = this->swapchain->getImageView(this->context.imageIndex);
 
-    VkExtent3D imageViewExtent = imageView.getExtent();
+		std::vector<VkRenderingAttachmentInfo> colorAttachment(1);
+		colorAttachment[0].sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+		colorAttachment[0].imageLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
+		colorAttachment[0].imageView = imageView.get();
+		colorAttachment[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		colorAttachment[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+		colorAttachment[0].clearValue = {
+		    {rawColor[0], rawColor[1], rawColor[2], rawColor[3]}
+        };
 
-    VkRect2D renderArea{};
-    renderArea.extent = {
-      std::min(this->frameBufferSize.width, imageViewExtent.width), 
-      std::min(this->frameBufferSize.height, imageViewExtent.height)
-    };
+		VkExtent3D imageViewExtent = imageView.getExtent();
 
-    this->commandBuffers[currentFrame].beginRendering(&colorAttachment, nullptr, nullptr, renderArea, 0);
-    this->commandBuffers[currentFrame].bindPipeline(*this->solidColorGraphicsPipeline);
+		VkRect2D renderArea{};
+		renderArea.extent = {std::min(this->frameBufferSize.width, imageViewExtent.width),
+		                     std::min(this->frameBufferSize.height, imageViewExtent.height)};
 
-    // Clear uniform buffer and buffer writes from previous frame.
-    this->descriptorBuffer->resetOffset();
-    this->descriptorBufferWrites.clear();
-  }
+		this->commandBuffers[currentFrame].beginRendering(&colorAttachment, nullptr, nullptr, renderArea, 0);
+		this->commandBuffers[currentFrame].bindPipeline(*this->solidColorGraphicsPipeline);
 
-  void Renderer::bindDescriptorSets() {
-    this->descriptorPool->updateDescriptorSets({
-      VulkanWriteDescriptorSet{
-        this->descriptorSets[currentFrame].get(), 
-        0, 0, 
-        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 
-        this->descriptorBufferWrites, 
-        {}, {}
-      }
-    });
+		// Clear uniform buffer and buffer writes from previous frame.
+		this->descriptorBuffer->resetOffset();
+		this->descriptorBufferWrites.clear();
+	}
 
-    //this->commandBuffers[currentFrame].bindDescriptorSets(*this->graphicsPipeline, 0, this->descriptorSets);
-    this->commandBuffers[currentFrame].bindDescriptorSet(*this->solidColorGraphicsPipeline, 0, this->descriptorSets[currentFrame]);
-  }
-  
-  void Renderer::bindTexture(Texture& texture) {
-    this->commandBuffers[currentFrame].bindDescriptorSet(*this->solidColorGraphicsPipeline, 1, texture.getDescriptorSet());
-  }
+	void Renderer::bindDescriptorSets() {
+		this->descriptorPool->updateDescriptorSets({
+		    VulkanWriteDescriptorSet{this->descriptorSets[currentFrame].get(),
+		                             0, 0,
+		                             VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, this->descriptorBufferWrites,
+		                             {},
+		                             {}}
+        });
 
-  void Renderer::setViewport(float width, float height, float minDepth, float maxDepth) {
-    if (!this->context.rendering) {
-      return;
-    }
-    this->commandBuffers[currentFrame].setViewport(width, height, minDepth, maxDepth);
-  }
+		// this->commandBuffers[currentFrame].bindDescriptorSets(*this->graphicsPipeline, 0, this->descriptorSets);
+		this->commandBuffers[currentFrame].bindDescriptorSet(*this->solidColorGraphicsPipeline, 0,
+		                                                     this->descriptorSets[currentFrame]);
+	}
 
-  void Renderer::setScissor(uint32_t width, uint32_t height) {
-    if (!this->context.rendering) {
-      return;
-    }
-    this->commandBuffers[currentFrame].setScissor(width, height);
-  }
+	void Renderer::bindTexture(Texture& texture) {
+		this->commandBuffers[currentFrame].bindDescriptorSet(*this->solidColorGraphicsPipeline, 1,
+		                                                     texture.getDescriptorSet());
+	}
 
+	void Renderer::setViewport(float width, float height, float minDepth, float maxDepth) {
+		if (!this->context.rendering) {
+			return;
+		}
+		this->commandBuffers[currentFrame].setViewport(width, height, minDepth, maxDepth);
+	}
 
-  void Renderer::bindVertexBuffer(VertexBuffer& vertexBuffer) {
-    this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.get(), 0, 0, vertexBuffer.size());
-  }
+	void Renderer::setScissor(uint32_t width, uint32_t height) {
+		if (!this->context.rendering) {
+			return;
+		}
+		this->commandBuffers[currentFrame].setScissor(width, height);
+	}
 
-  void Renderer::bindVertexBuffer(VertexBuffer& vertexBuffer, VkDeviceSize size) {
-    this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.get(), 0, 0, size);
-  }
+	void Renderer::bindVertexBuffer(VertexBuffer& vertexBuffer) {
+		this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.get(), 0, 0, vertexBuffer.size());
+	}
 
-  void Renderer::bindInstanceBuffer(InstanceBuffer& instanceBuffer) {
-    this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.get(), 1, 0);
-  }
+	void Renderer::bindVertexBuffer(VertexBuffer& vertexBuffer, VkDeviceSize size) {
+		this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.get(), 0, 0, size);
+	}
 
-  void Renderer::bindInstanceBuffer(InstanceBuffer& instanceBuffer, VkDeviceSize size) {
-    this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.get(), 1, 0, size);
-  }
+	void Renderer::bindInstanceBuffer(InstanceBuffer& instanceBuffer) {
+		this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.get(), 1, 0);
+	}
 
-  void Renderer::bindIndexBuffer(IndexBuffer& indexBuffer) {
-    this->commandBuffers[currentFrame].bindIndexBuffer(indexBuffer.get(), 0, VK_INDEX_TYPE_UINT16);
-  }
+	void Renderer::bindInstanceBuffer(InstanceBuffer& instanceBuffer, VkDeviceSize size) {
+		this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.get(), 1, 0, size);
+	}
 
+	void Renderer::bindIndexBuffer(IndexBuffer& indexBuffer) {
+		this->commandBuffers[currentFrame].bindIndexBuffer(indexBuffer.get(), 0, VK_INDEX_TYPE_UINT16);
+	}
 
-  void Renderer::drawIndexed(uint32_t indexCount, uint32_t instanceCount) {
-    this->commandBuffers[currentFrame].drawIndexed(indexCount, instanceCount);
-  }
+	void Renderer::drawIndexed(uint32_t indexCount, uint32_t instanceCount) {
+		this->commandBuffers[currentFrame].drawIndexed(indexCount, instanceCount);
+	}
 
-  void Renderer::clear(Color color) {
-    if (!this->context.rendering) {
-      return;
-    }
-    VkExtent2D swapchainExtent = {this->frameBufferSize.width, this->frameBufferSize.height};
-    this->clear(color, {{0,0},swapchainExtent});
-  }
+	void Renderer::clear(Color color) {
+		if (!this->context.rendering) {
+			return;
+		}
+		VkExtent2D swapchainExtent = {this->frameBufferSize.width, this->frameBufferSize.height};
+		this->clear(color, {
+		                       {0, 0},
+                               swapchainExtent
+        });
+	}
 
-  void Renderer::clear(Color color, VkRect2D clearArea) {
-    if (!this->context.rendering) {
-      return;
-    }
-    float* rawColor = color.raw();
+	void Renderer::clear(Color color, VkRect2D clearArea) {
+		if (!this->context.rendering) {
+			return;
+		}
+		float* rawColor = color.raw();
 
-    VkClearAttachment clearAttachment{};
-    clearAttachment.clearValue = {{rawColor[0], rawColor[1], rawColor[2], rawColor[3]}};
-    clearAttachment.colorAttachment = 0;
-    clearAttachment.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		VkClearAttachment clearAttachment{};
+		clearAttachment.clearValue = {
+		    {rawColor[0], rawColor[1], rawColor[2], rawColor[3]}
+        };
+		clearAttachment.colorAttachment = 0;
+		clearAttachment.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 
-    VkClearRect clearRect{};
-    clearRect.rect = clearArea;
-    clearRect.baseArrayLayer = 0;
-    clearRect.layerCount = 1;
-  
-    this->commandBuffers[currentFrame].clearAttachments({clearAttachment}, {clearRect});
-  }
+		VkClearRect clearRect{};
+		clearRect.rect = clearArea;
+		clearRect.baseArrayLayer = 0;
+		clearRect.layerCount = 1;
 
-  void Renderer::endRendering() {
-    if (!this->context.rendering) {
-      return;
-    }
-    this->commandBuffers[currentFrame].endRendering();
-  }
+		this->commandBuffers[currentFrame].clearAttachments({clearAttachment}, {clearRect});
+	}
 
-  void Renderer::endFrame() {
-    if (!this->context.rendering) {
-      return;
-    }
+	void Renderer::endRendering() {
+		if (!this->context.rendering) {
+			return;
+		}
+		this->commandBuffers[currentFrame].endRendering();
+	}
 
-    VkImageSubresourceRange subresourceRange{};
-    subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    subresourceRange.levelCount = 1;
-    subresourceRange.layerCount = 1;
+	void Renderer::endFrame() {
+		if (!this->context.rendering) {
+			return;
+		}
 
-    VkImageMemoryBarrier2 presentImageMemoryBarrier{};
-    presentImageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
-    presentImageMemoryBarrier.srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
-    presentImageMemoryBarrier.srcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT;
-    presentImageMemoryBarrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
-    presentImageMemoryBarrier.dstAccessMask = 0;
-    presentImageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
-    presentImageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-    presentImageMemoryBarrier.image = this->swapchain->getImage(this->context.imageIndex).get();
-    presentImageMemoryBarrier.subresourceRange = subresourceRange;
+		VkImageSubresourceRange subresourceRange{};
+		subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		subresourceRange.levelCount = 1;
+		subresourceRange.layerCount = 1;
 
-    std::vector<VkImageMemoryBarrier2> presentImageMemoryBarriers{presentImageMemoryBarrier};
-    this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(presentImageMemoryBarriers, 0);
-    this->commandBuffers[currentFrame].end();
-    this->context.rendering = false;
-  }
+		VkImageMemoryBarrier2 presentImageMemoryBarrier{};
+		presentImageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+		presentImageMemoryBarrier.srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+		presentImageMemoryBarrier.srcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT;
+		presentImageMemoryBarrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+		presentImageMemoryBarrier.dstAccessMask = 0;
+		presentImageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
+		presentImageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		presentImageMemoryBarrier.image = this->swapchain->getImage(this->context.imageIndex).get();
+		presentImageMemoryBarrier.subresourceRange = subresourceRange;
 
-  void Renderer::submit() {
-    VulkanSemaphoreSubmitInfo imageReadySemaphoreSubmitInfo{};
-    imageReadySemaphoreSubmitInfo.semaphore = &this->imageReadySemaphores[currentFrame];
-    imageReadySemaphoreSubmitInfo.flags = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+		std::vector<VkImageMemoryBarrier2> presentImageMemoryBarriers{presentImageMemoryBarrier};
+		this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(presentImageMemoryBarriers, 0);
+		this->commandBuffers[currentFrame].end();
+		this->context.rendering = false;
+	}
 
-    VulkanSemaphoreSubmitInfo frameFinishedSemaphoreSubmitInfo{};
-    frameFinishedSemaphoreSubmitInfo.semaphore = &this->frameFinishedSemaphores[currentFrame];
+	void Renderer::submit() {
+		VulkanSemaphoreSubmitInfo imageReadySemaphoreSubmitInfo{};
+		imageReadySemaphoreSubmitInfo.semaphore = &this->imageReadySemaphores[currentFrame];
+		imageReadySemaphoreSubmitInfo.flags = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
 
-    this->graphicsQueue->submit(
-        this->commandBuffers[currentFrame], 
-        {imageReadySemaphoreSubmitInfo}, 
-        {frameFinishedSemaphoreSubmitInfo}, 
-        &this->fences[currentFrame]
-    );
-  }
+		VulkanSemaphoreSubmitInfo frameFinishedSemaphoreSubmitInfo{};
+		frameFinishedSemaphoreSubmitInfo.semaphore = &this->frameFinishedSemaphores[currentFrame];
 
-  void Renderer::present(Window& window) {
-    this->presentQueue->present(*this->swapchain, {this->context.imageIndex}, this->frameFinishedSemaphores[currentFrame]);
-    this->currentFrame = (currentFrame+1)%swapchain->getImageCount();
+		this->graphicsQueue->submit(this->commandBuffers[currentFrame], {imageReadySemaphoreSubmitInfo},
+		                            {frameFinishedSemaphoreSubmitInfo}, &this->fences[currentFrame]);
+	}
 
-    if (this->updateSwapchain) {
-      this->updateSwapchain = false;
-      this->frameBufferSize = window.getFrameBufferSize();
+	void Renderer::present(Window& window) {
+		this->presentQueue->present(*this->swapchain, {this->context.imageIndex},
+		                            this->frameFinishedSemaphores[currentFrame]);
+		this->currentFrame = (currentFrame + 1) % swapchain->getImageCount();
 
-      this->swapchain->recreate(
-          *this->physicalDevice,
-          *this->device, 
-          *this->surface, 
-          VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-          VK_PRESENT_MODE_IMMEDIATE_KHR,
-          0
-      );
-      return;
-    }
-  }
+		if (this->updateSwapchain) {
+			this->updateSwapchain = false;
+			this->frameBufferSize = window.getFrameBufferSize();
 
-  std::vector<const char*> Renderer::getInstanceExtensions(Window& window, bool debug) {
-    std::vector<const char*> extensions = window.getSurfaceExtensions();
-    extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
-    extensions.push_back(VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME);
-    if (debug) extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-    return extensions;
-  }
-  
-  std::vector<const char*> Renderer::getInstanceLayers(bool debug) {
-    std::vector<const char*> instanceLayers;
-    if (debug) instanceLayers.push_back("VK_LAYER_KHRONOS_validation");
-    return instanceLayers;
-  }
-  
-  void Renderer::initVulkan(Window& window, bool debug) { 
-    this->instance = std::make_unique<VulkanInstance>(window.getTitle(), this->instanceExtensions, this->instanceLayers);
-    this->surface = std::make_unique<VulkanSurface>(*this->instance, window.getHandle());
-    this->physicalDevice = std::make_unique<VulkanPhysicalDevice>(*this->instance, getPhysicalDeviceRequirements);
+			this->swapchain->recreate(*this->physicalDevice, *this->device, *this->surface,
+			                          VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+			                          VK_PRESENT_MODE_IMMEDIATE_KHR, 0);
+			return;
+		}
+	}
 
-    std::vector<const char*> enabledDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-    this->device = std::make_unique<VulkanDevice>(*this->physicalDevice, *this->surface, enabledDeviceExtensions); 
-    this->memoryAllocator = std::make_unique<VulkanMemoryAllocator>(*instance, *physicalDevice, *device);
-    this->swapchain = std::make_unique<VulkanSwapchain>(
-        *this->physicalDevice, 
-        *this->device, 
-        *this->surface, 
-        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-        VK_PRESENT_MODE_IMMEDIATE_KHR,
-        0
-    );
+	std::vector<const char*> Renderer::getInstanceExtensions(Window& window, bool debug) {
+		std::vector<const char*> extensions = window.getSurfaceExtensions();
+		extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+		extensions.push_back(VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME);
+		if (debug)
+			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		return extensions;
+	}
 
-    this->graphicsQueue = std::make_unique<VulkanQueue>(*this->device, this->device->getGraphicsQueueFamily(), 0);
-    this->presentQueue = std::make_unique<VulkanQueue>(*this->device, this->device->getPresentQueueFamily(), 0);
-    
-    this->commandPool = std::make_unique<VulkanCommandPool>(*device, device->getGraphicsQueueFamily());
-    this->commandBuffers = this->commandPool->allocateCommandBuffers(this->swapchain->getImageCount(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	std::vector<const char*> Renderer::getInstanceLayers(bool debug) {
+		std::vector<const char*> instanceLayers;
+		if (debug)
+			instanceLayers.push_back("VK_LAYER_KHRONOS_validation");
+		return instanceLayers;
+	}
 
-    uint32_t imageCount = this->swapchain->getImageCount();
-    this->fences.reserve(imageCount);
-    this->imageReadySemaphores.reserve(imageCount);
-    this->frameFinishedSemaphores.reserve(imageCount);
+	void Renderer::initVulkan(Window& window, bool debug) {
+		this->instance =
+		    std::make_unique<VulkanInstance>(window.getTitle(), this->instanceExtensions, this->instanceLayers);
+		this->surface = std::make_unique<VulkanSurface>(*this->instance, window.getHandle());
+		this->physicalDevice = std::make_unique<VulkanPhysicalDevice>(*this->instance, getPhysicalDeviceRequirements);
 
-    for (int i = 0; i < this->fences.capacity(); i++) {
-      this->fences.emplace_back(*this->device, VK_FENCE_CREATE_SIGNALED_BIT);
-      this->imageReadySemaphores.emplace_back(*this->device, 0);
-      this->frameFinishedSemaphores.emplace_back(*this->device, 0);
-    }
+		std::vector<const char*> enabledDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+		this->device = std::make_unique<VulkanDevice>(*this->physicalDevice, *this->surface, enabledDeviceExtensions);
+		this->memoryAllocator = std::make_unique<VulkanMemoryAllocator>(*instance, *physicalDevice, *device);
+		this->swapchain = std::make_unique<VulkanSwapchain>(
+		    *this->physicalDevice, *this->device, *this->surface,
+		    VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_PRESENT_MODE_IMMEDIATE_KHR, 0);
 
-    this->descriptorBuffer = std::make_unique<VulkanBuffer>(
-        *this->memoryAllocator, 2048, 
-        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 
-        VK_SHARING_MODE_EXCLUSIVE, std::vector<uint32_t>{}
-    );
+		this->graphicsQueue = std::make_unique<VulkanQueue>(*this->device, this->device->getGraphicsQueueFamily(), 0);
+		this->presentQueue = std::make_unique<VulkanQueue>(*this->device, this->device->getPresentQueueFamily(), 0);
 
-    this->descriptorPool = std::make_unique<VulkanDescriptorPool>(*this->device, std::vector<VkDescriptorPoolSize>{
-      {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3},
-      {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}
-    }, 1024);
+		this->commandPool = std::make_unique<VulkanCommandPool>(*device, device->getGraphicsQueueFamily());
+		this->commandBuffers = this->commandPool->allocateCommandBuffers(this->swapchain->getImageCount(),
+		                                                                 VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-    this->frameDescriptorSetLayout = std::make_unique<VulkanDescriptorSetLayout>(
-      *this->device, std::vector<VkDescriptorSetLayoutBinding>{
-        {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr}
-      }, VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT
-    );
-    
-    this->textureDescriptorSetLayout = std::make_unique<VulkanDescriptorSetLayout>(
-      *this->device, std::vector<VkDescriptorSetLayoutBinding>{
-        {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
-      }, 0);
-  }
-  
-  void Renderer::initGraphicsPipeline() {
-    // Init descriptor sets
-    this->descriptorSets = this->descriptorPool->allocateDescriptorSets(*this->frameDescriptorSetLayout, this->swapchain->getImageCount());
+		uint32_t imageCount = this->swapchain->getImageCount();
+		this->fences.reserve(imageCount);
+		this->imageReadySemaphores.reserve(imageCount);
+		this->frameFinishedSemaphores.reserve(imageCount);
 
-    // Init graphics pipeline.
-    VkPipelineColorBlendAttachmentState attachmentState{};
-    attachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-    attachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    attachmentState.colorBlendOp = VK_BLEND_OP_ADD;
-    //attachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    //attachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    //attachmentState.alphaBlendOp = VK_BLEND_OP_SUBTRACT;
-    attachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    attachmentState.blendEnable = VK_TRUE;
+		for (int i = 0; i < this->fences.capacity(); i++) {
+			this->fences.emplace_back(*this->device, VK_FENCE_CREATE_SIGNALED_BIT);
+			this->imageReadySemaphores.emplace_back(*this->device, 0);
+			this->frameFinishedSemaphores.emplace_back(*this->device, 0);
+		}
 
-    std::vector<VkDescriptorSetLayout> layouts = {
-      this->frameDescriptorSetLayout->get(),
-      this->textureDescriptorSetLayout->get() 
-    };
+		this->descriptorBuffer =
+		    std::make_unique<VulkanBuffer>(*this->memoryAllocator, 2048, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		                                   VK_SHARING_MODE_EXCLUSIVE, std::vector<uint32_t>{});
 
-    this->solidColorGraphicsPipeline = std::make_unique<VulkanPipeline>(VulkanGraphicsPipelineBuilder(*this->device)
-      .withLayout(layouts)
-      .withRenderingInfo({VK_FORMAT_B8G8R8A8_SRGB}, VK_FORMAT_UNDEFINED, VK_FORMAT_UNDEFINED)
-      .withVertexBindingDescription(sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX, {
-        {VK_FORMAT_R32G32_SFLOAT, 0},
-        {VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)},
-      })
-      .withVertexBindingDescription(sizeof(Instance), VK_VERTEX_INPUT_RATE_INSTANCE, {
-        {VK_FORMAT_R32G32B32A32_SFLOAT, 0},
-        {VK_FORMAT_R32G32_SFLOAT,       offsetof(Instance, position)},
-        {VK_FORMAT_R32G32_SFLOAT,       offsetof(Instance, size)},
-      })
-      .withInputAssemblyState(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE)
-      .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_VERTEX_BIT)
-      .withMultisampleState(VK_SAMPLE_COUNT_1_BIT, {VK_FALSE, 0.0}, VK_FALSE, VK_FALSE)
-      .withRasterizationState(
-          VK_POLYGON_MODE_FILL, 
-          VK_CULL_MODE_NONE, 
-          VK_FRONT_FACE_COUNTER_CLOCKWISE, 
-          {VK_FALSE}, 
-          1.0, 
-          VK_FALSE
-      )
-      .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_FRAGMENT_BIT)
-      .withColorBlendState({attachmentState}, nullptr)
-      .withDynamicState({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
-      .withViewportState(1, 1)
-      .build()
-    );
-  }
+		this->descriptorPool = std::make_unique<VulkanDescriptorPool>(
+		    *this->device,
+		    std::vector<VkDescriptorPoolSize>{
+		        {        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3},
+                {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}
+        },
+		    1024);
 
-  bool Renderer::getPhysicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
-    return true;
-  }
+		this->frameDescriptorSetLayout = std::make_unique<VulkanDescriptorSetLayout>(
+		    *this->device,
+		    std::vector<VkDescriptorSetLayoutBinding>{
+		        {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr}
+        },
+		    VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT);
 
-  bool Renderer::isSwapchainOutOfDate(Window& window, VulkanResult<uint32_t> imageIndex) {
-    Rect2D newFrameBufferSize = window.getFrameBufferSize();
-    bool isSurfaceOutOfDate = imageIndex.result == VK_ERROR_OUT_OF_DATE_KHR || imageIndex.result == VK_SUBOPTIMAL_KHR;
-    bool isFrameBufferResized = (newFrameBufferSize.width != this->frameBufferSize.width) || 
-                                (newFrameBufferSize.height != this->frameBufferSize.height);
-    return isSurfaceOutOfDate && isFrameBufferResized;
-  }
-}
+		this->textureDescriptorSetLayout = std::make_unique<VulkanDescriptorSetLayout>(
+		    *this->device,
+		    std::vector<VkDescriptorSetLayoutBinding>{
+		        {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
+        },
+		    0);
+	}
+
+	void Renderer::initGraphicsPipeline() {
+		// Init descriptor sets
+		this->descriptorSets = this->descriptorPool->allocateDescriptorSets(*this->frameDescriptorSetLayout,
+		                                                                    this->swapchain->getImageCount());
+
+		// Init graphics pipeline.
+		VkPipelineColorBlendAttachmentState attachmentState{};
+		attachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+		attachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		attachmentState.colorBlendOp = VK_BLEND_OP_ADD;
+		// attachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+		// attachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		// attachmentState.alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+		attachmentState.colorWriteMask =
+		    VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+		attachmentState.blendEnable = VK_TRUE;
+
+		std::vector<VkDescriptorSetLayout> layouts = {this->frameDescriptorSetLayout->get(),
+		                                              this->textureDescriptorSetLayout->get()};
+
+		this->solidColorGraphicsPipeline = std::make_unique<VulkanPipeline>(
+		    VulkanGraphicsPipelineBuilder(*this->device)
+		        .withLayout(layouts)
+		        .withRenderingInfo(
+		            {
+		                VK_FORMAT_B8G8R8A8_SRGB
+        },
+		            VK_FORMAT_UNDEFINED, VK_FORMAT_UNDEFINED)
+		        .withVertexBindingDescription(sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX,
+		                                      {
+		                                          {VK_FORMAT_R32G32_SFLOAT, 0},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)},
+		                                      })
+		        .withVertexBindingDescription(sizeof(Instance), VK_VERTEX_INPUT_RATE_INSTANCE,
+		                                      {
+		                                          {VK_FORMAT_R32G32B32A32_SFLOAT, 0},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, position)},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, size)},
+		                                      })
+		        .withInputAssemblyState(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE)
+		        .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_VERTEX_BIT)
+		        .withMultisampleState(VK_SAMPLE_COUNT_1_BIT, {VK_FALSE, 0.0}, VK_FALSE, VK_FALSE)
+		        .withRasterizationState(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE,
+		                                {VK_FALSE}, 1.0, VK_FALSE)
+		        .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_FRAGMENT_BIT)
+		        .withColorBlendState({attachmentState}, nullptr)
+		        .withDynamicState({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
+		        .withViewportState(1, 1)
+		        .build());
+	}
+
+	bool Renderer::getPhysicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
+		return true;
+	}
+
+	bool Renderer::isSwapchainOutOfDate(Window& window, VulkanResult<uint32_t> imageIndex) {
+		Rect2D newFrameBufferSize = window.getFrameBufferSize();
+		bool isSurfaceOutOfDate =
+		    imageIndex.result == VK_ERROR_OUT_OF_DATE_KHR || imageIndex.result == VK_SUBOPTIMAL_KHR;
+		bool isFrameBufferResized = (newFrameBufferSize.width != this->frameBufferSize.width) ||
+		                            (newFrameBufferSize.height != this->frameBufferSize.height);
+		return isSurfaceOutOfDate && isFrameBufferResized;
+	}
+} // namespace Radiant

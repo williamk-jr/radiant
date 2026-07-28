@@ -1,80 +1,79 @@
 #include "radiant/core/render/Window.h"
 
 namespace Radiant {
-  Window::Window(const std::string& title, int width, int height) : title(title) {
+	Window::Window(const std::string& title, int width, int height) : title(title) {
 #ifdef HAS_GLFW
-    glfwInit();
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
+		glfwInit();
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 #endif
-  }
-  
-  Window::~Window() {
+	}
+
+	Window::~Window() {
 #ifdef HAS_GLFW
-    glfwTerminate();
+		glfwTerminate();
 #endif
-  }
+	}
 
-  std::vector<const char*> Window::getSurfaceExtensions() {
+	std::vector<const char*> Window::getSurfaceExtensions() {
 #ifdef HAS_GLFW
-    std::vector<const char*> extensionsVector;
-    uint32_t extensionCount = 0;
+		std::vector<const char*> extensionsVector;
+		uint32_t extensionCount = 0;
 
-    const char** extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
-    for (int i = 0; i < extensionCount; i++) {
-      extensionsVector.push_back(extensions[i]);
-    }
+		const char** extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
+		for (int i = 0; i < extensionCount; i++) {
+			extensionsVector.push_back(extensions[i]);
+		}
 
-    return extensionsVector;
+		return extensionsVector;
 #endif
-  }
-  
-  Rect2D Window::getWindowSize() {
+	}
+
+	Rect2D Window::getWindowSize() {
 #ifdef HAS_GLFW
-    int width = 0;
-    int height = 0;
+		int width = 0;
+		int height = 0;
 
-    glfwGetWindowSize(this->window, &width, &height);
-    return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
+		glfwGetWindowSize(this->window, &width, &height);
+		return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
 #endif
-  }
+	}
 
-  Rect2D Window::getFrameBufferSize() {
+	Rect2D Window::getFrameBufferSize() {
 #ifdef HAS_GLFW
-    int width = 0;
-    int height = 0;
+		int width = 0;
+		int height = 0;
 
-    glfwGetFramebufferSize(this->window, &width, &height);
-    return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
+		glfwGetFramebufferSize(this->window, &width, &height);
+		return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
 #endif
-  }
+	}
 
-
-  bool Window::shouldClose() {
+	bool Window::shouldClose() {
 #ifdef HAS_GLFW
-    return glfwWindowShouldClose(this->window);
+		return glfwWindowShouldClose(this->window);
 #endif
-  }
+	}
 
-  void Window::makeContextCurrent() {
+	void Window::makeContextCurrent() {
 #ifdef HAS_GLFW
-    
-#endif
-  }
 
-  void Window::pollEvents() {
+#endif
+	}
+
+	void Window::pollEvents() {
 #ifdef HAS_GLFW
-    glfwPollEvents();
+		glfwPollEvents();
 #endif
-  }
+	}
 
-  const std::string& Window::getTitle() {
-    return this->title;
-  }
+	const std::string& Window::getTitle() {
+		return this->title;
+	}
 
 #ifdef HAS_GLFW
-  GLFWwindow* Window::getHandle() {
-    return this->window;
-  }
+	GLFWwindow* Window::getHandle() {
+		return this->window;
+	}
 #endif
-}
+} // namespace Radiant

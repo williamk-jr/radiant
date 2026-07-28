@@ -1,29 +1,28 @@
 #pragma once
 #include "radiant/css/values/IValue.h"
+
 #include <cstdint>
 #include <string>
 #include <unordered_map>
 
 namespace Radiant::StyleSheetParser {
-  enum class UnitType {
-    PIXEL,
-    PERCENTAGE
-  };
+	enum class UnitType { PIXEL, PERCENTAGE };
 
-  class Unit : IValue<Unit> {
-    public:
-      Unit(float value, UnitType unit);
+	class Unit : IValue<Unit> {
+		public:
+			Unit(float value, UnitType unit);
 
-      float getValue();
-      UnitType getUnit();
+			float getValue();
+			UnitType getUnit();
 
-      Unit resolve(float referenceLength) override;
+			Unit resolve(float referenceLength) override;
 
-      static Unit fromString(std::string str);
-    private:
-      float value;
-      UnitType unit;
+			static Unit fromString(std::string str);
 
-      static std::unordered_map<std::string, UnitType> UNIT_MAP;
-  };
-}
+		private:
+			float value;
+			UnitType unit;
+
+			static std::unordered_map<std::string, UnitType> UNIT_MAP;
+	};
+} // namespace Radiant::StyleSheetParser
