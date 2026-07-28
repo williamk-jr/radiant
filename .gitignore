@@ -2,3 +2,5 @@ build/
 libs/
 compile_commands.json
 heaptrack*
+
+!.clang-format
