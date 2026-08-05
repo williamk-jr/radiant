@@ -1,10 +1,7 @@
 #pragma once
 
-#include "radiant/core/render/buffers/Buffer.h"
-#include "radiant/core/render/resource/ShaderResource.h"
-#include "radiant/core/render/vulkan/resource/VulkanBuffer.h"
-
-#include <memory>
+#include "radiant/core/render/resources/Buffer.h"
+#include "radiant/core/render/resources/shader/ShaderResource.h"
 
 namespace Radiant {
 	class UniformBuffer : public ShaderResource, protected Buffer<void*> {

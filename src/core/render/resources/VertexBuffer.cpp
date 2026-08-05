@@ -1,4 +1,4 @@
-#include "radiant/core/render/buffers/VertexBuffer.h"
+#include "radiant/core/render/resources/VertexBuffer.h"
 
 namespace Radiant {
 	VertexBuffer::VertexBuffer(VulkanMemoryAllocator& memoryAllocator, VkDeviceSize size)

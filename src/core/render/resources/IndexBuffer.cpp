@@ -1,4 +1,4 @@
-#include "radiant/core/render/buffers/IndexBuffer.h"
+#include "radiant/core/render/resources/IndexBuffer.h"
 
 namespace Radiant {
 	IndexBuffer::IndexBuffer(VulkanMemoryAllocator& memoryAllocator, VkDeviceSize size)

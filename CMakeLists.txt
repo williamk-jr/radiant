@@ -91,15 +91,15 @@ add_executable(
   src/core/render/Renderer.cpp
   src/core/render/Window.cpp
   src/core/render/TextureAtlas.cpp
-  src/core/render/resource/Texture.cpp
-  src/core/render/resource/UniformBuffer.cpp
-  src/core/render/resource/ShaderResource.cpp
-  src/core/render/resource/ShaderResourceManager.cpp
+  src/core/render/resources/shader/Texture.cpp
+  src/core/render/resources/shader/UniformBuffer.cpp
+  src/core/render/resources/shader/ShaderResource.cpp
+  src/core/render/resources/shader/ShaderResourceManager.cpp
   src/core/render/models/Model.cpp
   src/core/render/models/Quad2D.cpp
-  src/core/render/buffers/VertexBuffer.cpp
-  src/core/render/buffers/InstanceBuffer.cpp
-  src/core/render/buffers/IndexBuffer.cpp)
+  src/core/render/resources/VertexBuffer.cpp
+  src/core/render/resources/InstanceBuffer.cpp
+  src/core/render/resources/IndexBuffer.cpp)
 
 target_link_libraries(
   Radiant

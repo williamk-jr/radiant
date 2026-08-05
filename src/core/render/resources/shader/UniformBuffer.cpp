@@ -1,7 +1,7 @@
-#include "radiant/core/render/resource/UniformBuffer.h"
+#include "radiant/core/render/resources/shader/UniformBuffer.h"
 
-#include "radiant/core/render/buffers/Buffer.h"
-#include "radiant/core/render/resource/ShaderResource.h"
+#include "radiant/core/render/resources/Buffer.h"
+#include "radiant/core/render/resources/shader/ShaderResource.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorPool.h"
 
 #include <glm/ext/matrix_float4x4.hpp>

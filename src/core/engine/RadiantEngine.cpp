@@ -8,7 +8,7 @@
 #include "radiant/core/render/TextureAtlas.h"
 #include "radiant/core/render/Window.h"
 #include "radiant/core/render/models/Quad2D.h"
-#include "radiant/core/render/resource/Texture.h"
+#include "radiant/core/render/resources/shader/Texture.h"
 #include "radiant/core/render/vulkan/pipeline/VulkanGraphicsPipelineBuilder.h"
 #include "radiant/css/Parser.h"
 #include "radiant/css/StyleSheetEntry.h"

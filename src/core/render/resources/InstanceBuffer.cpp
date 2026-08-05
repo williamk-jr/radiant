@@ -1,5 +1,5 @@
 
-#include "radiant/core/render/buffers/InstanceBuffer.h"
+#include "radiant/core/render/resources/InstanceBuffer.h"
 
 namespace Radiant {
 	InstanceBuffer::InstanceBuffer(VulkanMemoryAllocator& memoryAllocator, VkDeviceSize size)

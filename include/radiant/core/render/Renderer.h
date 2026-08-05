@@ -2,12 +2,12 @@
 #include "radiant/core/render/Color.h"
 #include "radiant/core/render/Rect2D.h"
 #include "radiant/core/render/Window.h"
-#include "radiant/core/render/buffers/IndexBuffer.h"
-#include "radiant/core/render/buffers/InstanceBuffer.h"
-#include "radiant/core/render/buffers/VertexBuffer.h"
-#include "radiant/core/render/resource/ShaderResourceManager.h"
-#include "radiant/core/render/resource/Texture.h"
-#include "radiant/core/render/resource/UniformBuffer.h"
+#include "radiant/core/render/resources/IndexBuffer.h"
+#include "radiant/core/render/resources/InstanceBuffer.h"
+#include "radiant/core/render/resources/VertexBuffer.h"
+#include "radiant/core/render/resources/shader/ShaderResourceManager.h"
+#include "radiant/core/render/resources/shader/Texture.h"
+#include "radiant/core/render/resources/shader/UniformBuffer.h"
 #include "radiant/core/render/vulkan/VulkanCommandPool.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanInstance.h"
@@ -70,20 +70,8 @@ namespace Radiant {
 
 			void bindIndexBuffer(IndexBuffer& indexBuffer);
 
-			// template <typename T>
-			// void updateUniformBuffer(T value) {
-			//	size_t currentOffset = this->descriptorBuffer->getOffset();
-			//	this->descriptorBuffer->append(&value, sizeof(T));
-
-			//	this->descriptorBufferWrites.push_back(
-			//	    VkDescriptorBufferInfo{this->descriptorBuffer->get(), currentOffset, sizeof(T)});
-			//}
-
-			void bindDescriptorSets();
-
-			void bindTexture(Texture& texture);
-
 			void drawIndexed(uint32_t indexCount, uint32_t instanceCount);
+
 			void clear(Color color);
 
 			void clear(Color color, VkRect2D clearArea);

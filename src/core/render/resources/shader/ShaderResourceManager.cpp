@@ -1,4 +1,4 @@
-#include "radiant/core/render/resource/ShaderResourceManager.h"
+#include "radiant/core/render/resources/shader/ShaderResourceManager.h"
 
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 

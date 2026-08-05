@@ -1,6 +1,6 @@
 #pragma once
 #include "radiant/core/render/Vertex.h"
-#include "radiant/core/render/buffers/Buffer.h"
+#include "radiant/core/render/resources/Buffer.h"
 
 #include <vulkan/vulkan_core.h>
 

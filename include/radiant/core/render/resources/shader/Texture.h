@@ -1,5 +1,5 @@
 #pragma once
-#include "radiant/core/render/resource/ShaderResource.h"
+#include "radiant/core/render/resources/shader/ShaderResource.h"
 #include "radiant/core/render/vulkan/VulkanQueue.h"
 #include "radiant/core/render/vulkan/VulkanSampler.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorPool.h"

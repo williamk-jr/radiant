@@ -1,6 +1,6 @@
-#include "radiant/core/render/resource/Texture.h"
+#include "radiant/core/render/resources/shader/Texture.h"
 
-#include "radiant/core/render/resource/ShaderResource.h"
+#include "radiant/core/render/resources/shader/ShaderResource.h"
 #include "radiant/core/render/vulkan/VulkanCommandPool.h"
 #include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorPool.h"

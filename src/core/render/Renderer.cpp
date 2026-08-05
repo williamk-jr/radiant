@@ -1,14 +1,11 @@
 #include "radiant/core/render/Renderer.h"
 
-#include "radiant/core/render/resource/ShaderResource.h"
-#include "radiant/core/render/resource/UniformBuffer.h"
+#include "radiant/core/render/resources/shader/ShaderResource.h"
+#include "radiant/core/render/resources/shader/UniformBuffer.h"
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
-#include "radiant/core/render/vulkan/pipeline/VulkanGraphicsPipelineBuilder.h"
 #include "radiant/core/render/vulkan/pipeline/VulkanPipeline.h"
-#include "radiant/core/render/vulkan/resource/VulkanBuffer.h"
 
 #include <algorithm>
-#include <cstddef>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -54,10 +51,6 @@ namespace Radiant {
 	}
 
 	void Renderer::beginFrame(Window& window) {
-		// if (this->solidColorGraphicsPipeline.get() == nullptr) {
-		//	this->initGraphicsPipeline();
-		// }
-
 		this->fences[currentFrame].wait(UINT32_MAX);
 		this->fences[currentFrame].reset();
 
@@ -122,10 +115,6 @@ namespace Radiant {
 		                     std::min(this->frameBufferSize.height, imageViewExtent.height)};
 
 		this->commandBuffers[currentFrame].beginRendering(&colorAttachment, nullptr, nullptr, renderArea, 0);
-
-		// Clear uniform buffer and buffer writes from previous frame.
-		// this->descriptorBuffer->resetOffset();
-		// this->descriptorBufferWrites.clear();
 	}
 
 	void Renderer::bindPipeline(VulkanPipeline& pipeline) {
@@ -134,25 +123,6 @@ namespace Radiant {
 
 	void Renderer::bindResource(VulkanPipeline& pipeline, ShaderResource& resource, uint32_t firstSet) {
 		resource.bind(pipeline, this->commandBuffers[currentFrame], firstSet);
-	}
-
-	void Renderer::bindDescriptorSets() {
-		// this->descriptorPool->updateDescriptorSets({VulkanWriteDescriptorSet{this->descriptorSets[currentFrame].get(),
-		//                                                                      0,
-		//                                                                      0,
-		//                                                                      VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-		//                                                                      this->descriptorBufferWrites,
-		//                                                                      {},
-		//                                                                      {}}});
-
-		//// this->commandBuffers[currentFrame].bindDescriptorSets(*this->graphicsPipeline, 0, this->descriptorSets);
-		// this->commandBuffers[currentFrame].bindDescriptorSet(*this->solidColorGraphicsPipeline, 0,
-		//                                                      this->descriptorSets[currentFrame]);
-	}
-
-	void Renderer::bindTexture(Texture& texture) {
-		// this->commandBuffers[currentFrame].bindDescriptorSet(*this->solidColorGraphicsPipeline, 1,
-		//                                                      texture.getDescriptorSet());
 	}
 
 	void Renderer::setViewport(float width, float height, float minDepth, float maxDepth) {
@@ -338,16 +308,6 @@ namespace Radiant {
 			this->frameFinishedSemaphores.emplace_back(*this->device, 0);
 		}
 
-		// this->descriptorBuffer =
-		//     std::make_unique<VulkanBuffer>(*this->memoryAllocator, 2048, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-		//                                    VK_SHARING_MODE_EXCLUSIVE, std::vector<uint32_t>{});
-
-		// this->descriptorPool = std::make_unique<VulkanDescriptorPool>(
-		//     *this->device,
-		//     std::vector<VkDescriptorPoolSize>{{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3},
-		//                                       {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}},
-		//     1024);
-
 		this->frameDescriptorSetLayout = std::make_unique<VulkanDescriptorSetLayout>(
 		    *this->device,
 		    std::vector<VkDescriptorSetLayoutBinding>{
@@ -359,9 +319,6 @@ namespace Radiant {
 		    std::vector<VkDescriptorSetLayoutBinding>{
 		        {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}},
 		    0);
-
-		// this->descriptorSets = this->descriptorPool->allocateDescriptorSets(*this->frameDescriptorSetLayout,
-		//                                                                     this->swapchain->getImageCount());
 	}
 
 	void Renderer::initShaderResourceManager() {

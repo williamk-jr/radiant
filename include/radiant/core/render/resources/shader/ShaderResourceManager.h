@@ -1,7 +1,7 @@
 #pragma once
 
-#include "radiant/core/render/resource/Texture.h"
-#include "radiant/core/render/resource/UniformBuffer.h"
+#include "radiant/core/render/resources/shader/Texture.h"
+#include "radiant/core/render/resources/shader/UniformBuffer.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorPool.h"
 
 #include <memory>
