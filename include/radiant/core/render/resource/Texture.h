@@ -1,4 +1,5 @@
 #pragma once
+#include "radiant/core/render/resource/ShaderResource.h"
 #include "radiant/core/render/vulkan/VulkanQueue.h"
 #include "radiant/core/render/vulkan/VulkanSampler.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorPool.h"
@@ -10,18 +11,17 @@
 #include <memory>
 
 namespace Radiant {
-	class Renderer;
+	class ShaderResourceManager;
 
-	class Texture {
-			friend Renderer;
+	class Texture : public ShaderResource {
+			friend ShaderResourceManager;
 
 		public:
 			Texture(const Texture&)            = delete;
 			Texture& operator=(const Texture&) = delete;
 
 			Texture(Texture&&) noexcept;
-			Texture&             operator=(Texture&&) noexcept = default;
-			VulkanDescriptorSet& getDescriptorSet();
+			Texture& operator=(Texture&&) noexcept = default;
 
 		private:
 			Texture(VulkanDevice&              device,
@@ -35,9 +35,8 @@ namespace Radiant {
 			        uint32_t                   height,
 			        uint32_t                   pixelSize);
 
-			std::unique_ptr<VulkanImage>         image;
-			std::unique_ptr<VulkanImageView>     imageView;
-			std::unique_ptr<VulkanSampler>       sampler;
-			std::unique_ptr<VulkanDescriptorSet> descriptorSet;
+			std::unique_ptr<VulkanImage>     image;
+			std::unique_ptr<VulkanImageView> imageView;
+			std::unique_ptr<VulkanSampler>   sampler;
 	};
 } // namespace Radiant

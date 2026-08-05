@@ -16,12 +16,20 @@ namespace Radiant {
 
 			~Buffer() {}
 
-			VulkanBuffer& get() {
+			VulkanBuffer& getBuffer() {
 				return *this->buffer;
+			}
+
+			VkDeviceSize getOffset() {
+				return this->buffer->getOffset();
 			}
 
 			void append(std::vector<T> data) {
 				this->buffer->append(data.data(), sizeof(T) * data.size());
+			}
+
+			void append(T data) {
+				this->buffer->append(data, sizeof(T));
 			}
 
 			void resetOffset() {

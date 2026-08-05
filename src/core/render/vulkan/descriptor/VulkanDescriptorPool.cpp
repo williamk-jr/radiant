@@ -19,7 +19,8 @@ namespace Radiant {
 		descriptorPoolInfo.poolSizeCount = poolSizes.size();
 		descriptorPoolInfo.pPoolSizes    = poolSizes.data();
 		descriptorPoolInfo.maxSets       = maxDescriptorSets;
-		descriptorPoolInfo.flags         = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
+		descriptorPoolInfo.flags =
+		    VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT | VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 
 		vkCreateDescriptorPool(device.get(), &descriptorPoolInfo, nullptr, &this->descriptorPool);
 	}
@@ -65,7 +66,7 @@ namespace Radiant {
 		wrappedDescriptorSets.reserve(descriptorSetLayouts.size());
 
 		for (VkDescriptorSet& descriptorSet : rawDescriptorSets) {
-			wrappedDescriptorSets.emplace_back(descriptorSet);
+			wrappedDescriptorSets.emplace_back(this->device, descriptorSet, this->descriptorPool);
 		}
 		return wrappedDescriptorSets;
 	}
@@ -87,7 +88,7 @@ namespace Radiant {
 		wrappedDescriptorSets.reserve(rawDescriptorSetLayouts.size());
 
 		for (VkDescriptorSet& descriptorSet : rawDescriptorSets) {
-			wrappedDescriptorSets.emplace_back(descriptorSet);
+			wrappedDescriptorSets.emplace_back(this->device, descriptorSet, this->descriptorPool);
 		}
 		return wrappedDescriptorSets;
 	}
@@ -105,7 +106,7 @@ namespace Radiant {
 		Validation::verify(
 		    vkAllocateDescriptorSets(this->device, &descriptorSetAllocateInfo, rawDescriptorSets.data()));
 
-		return {rawDescriptorSets[0]};
+		return {this->device, rawDescriptorSets[0], this->descriptorPool};
 	}
 
 	void VulkanDescriptorPool::updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites,

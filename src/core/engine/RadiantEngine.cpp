@@ -5,10 +5,11 @@
 #include "radiant/core/engine/font/Bitmap.h"
 #include "radiant/core/engine/font/Font.h"
 #include "radiant/core/engine/layout/WidgetManager.h"
-#include "radiant/core/render/Texture.h"
 #include "radiant/core/render/TextureAtlas.h"
 #include "radiant/core/render/Window.h"
 #include "radiant/core/render/models/Quad2D.h"
+#include "radiant/core/render/resource/Texture.h"
+#include "radiant/core/render/vulkan/pipeline/VulkanGraphicsPipelineBuilder.h"
 #include "radiant/css/Parser.h"
 #include "radiant/css/StyleSheetEntry.h"
 
@@ -47,6 +48,45 @@ namespace Radiant {
 		this->vertexBuffer   = renderer->createVertexBuffer(2048);
 		this->instanceBuffer = renderer->createInstanceBuffer(2048);
 		this->indexBuffer    = renderer->createIndexBuffer(2048);
+		this->uniformBuffer  = renderer->createUniformBuffer(2048);
+
+		// Init graphics pipeline.
+		VkPipelineColorBlendAttachmentState attachmentState{};
+		attachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+		attachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		attachmentState.colorBlendOp        = VK_BLEND_OP_ADD;
+		// attachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+		// attachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		// attachmentState.alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+		attachmentState.colorWriteMask =
+		    VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+		attachmentState.blendEnable = VK_TRUE;
+
+		this->solidColorGraphicsPipeline = std::make_unique<VulkanPipeline>(
+		    VulkanGraphicsPipelineBuilder(this->renderer->getDevice())
+		        .withLayout(this->renderer->getDescriptorSetLayouts())
+		        .withRenderingInfo({VK_FORMAT_B8G8R8A8_SRGB}, VK_FORMAT_UNDEFINED, VK_FORMAT_UNDEFINED)
+		        .withVertexBindingDescription(sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX,
+		                                      {
+		                                          {VK_FORMAT_R32G32_SFLOAT, 0},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)},
+		                                      })
+		        .withVertexBindingDescription(sizeof(Instance), VK_VERTEX_INPUT_RATE_INSTANCE,
+		                                      {
+		                                          {VK_FORMAT_R32G32B32A32_SFLOAT, 0},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, position)},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, size)},
+		                                      })
+		        .withInputAssemblyState(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE)
+		        .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_VERTEX_BIT)
+		        .withMultisampleState(VK_SAMPLE_COUNT_1_BIT, {VK_FALSE, 0.0}, VK_FALSE, VK_FALSE)
+		        .withRasterizationState(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE,
+		                                {VK_FALSE}, 1.0, VK_FALSE)
+		        .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_FRAGMENT_BIT)
+		        .withColorBlendState({attachmentState}, nullptr)
+		        .withDynamicState({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
+		        .withViewportState(1, 1)
+		        .build());
 
 		std::unordered_map<std::string, StyleSheetParser::StyleSheet> styleSheets =
 		    this->stylesheetParser->getStyleSheets("./assets/test.css");
@@ -59,10 +99,8 @@ namespace Radiant {
 		this->indexBuffer->append(indicies);
 
 		TextureAtlas& textureAtlas = this->fontManager->getTextureAtlas();
-		Texture       texture      = this->renderer->loadTexture(textureAtlas.getBuffer(), textureAtlas.getWidth(),
-		                                                         textureAtlas.getHeight(), textureAtlas.getPixelSize());
-
-		this->fontAtlasGpu = std::make_unique<Texture>(std::move(texture));
+		this->fontAtlasGpu = this->renderer->createTexture(textureAtlas.getBuffer(), textureAtlas.getWidth(),
+		                                                   textureAtlas.getHeight(), textureAtlas.getPixelSize());
 		this->fontAtlasGpu->getDescriptorSet();
 	}
 
@@ -110,6 +148,8 @@ namespace Radiant {
 		renderer->beginFrame(*window);
 		renderer->beginRendering(color);
 
+		renderer->bindPipeline(*this->solidColorGraphicsPipeline);
+
 		Radiant::Rect2D frameBufferSize = window->getFrameBufferSize();
 		renderer->setViewport(frameBufferSize.width, frameBufferSize.height, 0, 1.0);
 		renderer->setScissor(frameBufferSize.width, frameBufferSize.height);
@@ -117,11 +157,17 @@ namespace Radiant {
 		// Update uniforms
 		glm::mat4 orthoMatrix =
 		    glm::ortho(0.0f, (float)frameBufferSize.width, 0.0f, (float)frameBufferSize.height, -1.0f, 1.0f);
-		renderer->updateUniformBuffer(orthoMatrix);
-		renderer->bindDescriptorSets();
+		// renderer->updateUniformBuffer(orthoMatrix);
+
+		this->uniformBuffer->resetOffset();
+		this->uniformBuffer->append(&orthoMatrix);
+		this->uniformBuffer->write();
+		renderer->bindResource(*this->solidColorGraphicsPipeline, *this->uniformBuffer, 0);
+		renderer->bindResource(*this->solidColorGraphicsPipeline, *this->fontAtlasGpu, 1);
+		// renderer->bindDescriptorSets();
 
 		// Bind textures
-		renderer->bindTexture(*this->fontAtlasGpu);
+		// renderer->bindTexture(*this->fontAtlasGpu);
 
 		// Bind buffers
 		renderer->bindVertexBuffer(*this->vertexBuffer);

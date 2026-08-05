@@ -36,7 +36,10 @@ BreakTemplateDeclarations: Yes
 BreakBeforeTemplateCloser: false
 
 AccessModifierOffset: 1
+
 AlignOperands: AlignAfterOperator
+BreakBeforeBinaryOperators: NonAssignment
+
 AllowShortBlocksOnASingleLine: true
 AllowShortFunctionsOnASingleLine: Empty
 NamespaceIndentation: All

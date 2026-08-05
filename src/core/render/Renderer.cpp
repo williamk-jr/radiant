@@ -1,7 +1,10 @@
 #include "radiant/core/render/Renderer.h"
 
+#include "radiant/core/render/resource/ShaderResource.h"
+#include "radiant/core/render/resource/UniformBuffer.h"
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
 #include "radiant/core/render/vulkan/pipeline/VulkanGraphicsPipelineBuilder.h"
+#include "radiant/core/render/vulkan/pipeline/VulkanPipeline.h"
 #include "radiant/core/render/vulkan/resource/VulkanBuffer.h"
 
 #include <algorithm>
@@ -18,8 +21,8 @@ namespace Radiant {
 		this->instanceExtensions = this->getInstanceExtensions(window, debug);
 		this->instanceLayers     = this->getInstanceLayers(debug);
 		this->frameBufferSize    = window.getFrameBufferSize();
-
 		this->initVulkan(window, debug);
+		this->initShaderResourceManager();
 	}
 
 	void Renderer::waitIdle() {
@@ -38,29 +41,29 @@ namespace Radiant {
 		return std::make_unique<InstanceBuffer>(*this->memoryAllocator, size);
 	}
 
-	Texture Renderer::loadTexture(void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize) {
-		return {*this->device,
-		        *this->memoryAllocator,
-		        *this->descriptorPool,
-		        *this->textureDescriptorSetLayout,
-		        *this->commandPool,
-		        *this->graphicsQueue,
-		        buffer,
-		        width,
-		        height,
-		        pixelSize};
+	std::unique_ptr<UniformBuffer> Renderer::createUniformBuffer(VkDeviceSize size) {
+		return this->shaderResourceManager->allocateUniformBuffer(*this->memoryAllocator,
+		                                                          *this->frameDescriptorSetLayout, size);
+	}
+
+	std::unique_ptr<Texture>
+	Renderer::createTexture(void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize) {
+		return this->shaderResourceManager->allocateTexture(*this->device, *this->memoryAllocator,
+		                                                    *this->textureDescriptorSetLayout, *this->commandPool,
+		                                                    *this->graphicsQueue, buffer, width, height, pixelSize);
 	}
 
 	void Renderer::beginFrame(Window& window) {
-		if (this->solidColorGraphicsPipeline.get() == nullptr) {
-			this->initGraphicsPipeline();
-		}
+		// if (this->solidColorGraphicsPipeline.get() == nullptr) {
+		//	this->initGraphicsPipeline();
+		// }
 
 		this->fences[currentFrame].wait(UINT32_MAX);
 		this->fences[currentFrame].reset();
 
 		VulkanResult<uint32_t> imageIndex =
 		    this->swapchain->acquireNextImage(&this->imageReadySemaphores[currentFrame], UINT64_MAX);
+
 		if (this->isSwapchainOutOfDate(window, imageIndex)) {
 			this->updateSwapchain = true; // Swapchain updated at the end of frame.
 		}
@@ -119,30 +122,37 @@ namespace Radiant {
 		                     std::min(this->frameBufferSize.height, imageViewExtent.height)};
 
 		this->commandBuffers[currentFrame].beginRendering(&colorAttachment, nullptr, nullptr, renderArea, 0);
-		this->commandBuffers[currentFrame].bindPipeline(*this->solidColorGraphicsPipeline);
 
 		// Clear uniform buffer and buffer writes from previous frame.
-		this->descriptorBuffer->resetOffset();
-		this->descriptorBufferWrites.clear();
+		// this->descriptorBuffer->resetOffset();
+		// this->descriptorBufferWrites.clear();
+	}
+
+	void Renderer::bindPipeline(VulkanPipeline& pipeline) {
+		this->commandBuffers[currentFrame].bindPipeline(pipeline);
+	}
+
+	void Renderer::bindResource(VulkanPipeline& pipeline, ShaderResource& resource, uint32_t firstSet) {
+		resource.bind(pipeline, this->commandBuffers[currentFrame], firstSet);
 	}
 
 	void Renderer::bindDescriptorSets() {
-		this->descriptorPool->updateDescriptorSets({VulkanWriteDescriptorSet{this->descriptorSets[currentFrame].get(),
-		                                                                     0,
-		                                                                     0,
-		                                                                     VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-		                                                                     this->descriptorBufferWrites,
-		                                                                     {},
-		                                                                     {}}});
+		// this->descriptorPool->updateDescriptorSets({VulkanWriteDescriptorSet{this->descriptorSets[currentFrame].get(),
+		//                                                                      0,
+		//                                                                      0,
+		//                                                                      VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		//                                                                      this->descriptorBufferWrites,
+		//                                                                      {},
+		//                                                                      {}}});
 
-		// this->commandBuffers[currentFrame].bindDescriptorSets(*this->graphicsPipeline, 0, this->descriptorSets);
-		this->commandBuffers[currentFrame].bindDescriptorSet(*this->solidColorGraphicsPipeline, 0,
-		                                                     this->descriptorSets[currentFrame]);
+		//// this->commandBuffers[currentFrame].bindDescriptorSets(*this->graphicsPipeline, 0, this->descriptorSets);
+		// this->commandBuffers[currentFrame].bindDescriptorSet(*this->solidColorGraphicsPipeline, 0,
+		//                                                      this->descriptorSets[currentFrame]);
 	}
 
 	void Renderer::bindTexture(Texture& texture) {
-		this->commandBuffers[currentFrame].bindDescriptorSet(*this->solidColorGraphicsPipeline, 1,
-		                                                     texture.getDescriptorSet());
+		// this->commandBuffers[currentFrame].bindDescriptorSet(*this->solidColorGraphicsPipeline, 1,
+		//                                                      texture.getDescriptorSet());
 	}
 
 	void Renderer::setViewport(float width, float height, float minDepth, float maxDepth) {
@@ -160,23 +170,23 @@ namespace Radiant {
 	}
 
 	void Renderer::bindVertexBuffer(VertexBuffer& vertexBuffer) {
-		this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.get(), 0, 0, vertexBuffer.size());
+		this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.getBuffer(), 0, 0, vertexBuffer.size());
 	}
 
 	void Renderer::bindVertexBuffer(VertexBuffer& vertexBuffer, VkDeviceSize size) {
-		this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.get(), 0, 0, size);
+		this->commandBuffers[currentFrame].bindVertexBuffer(vertexBuffer.getBuffer(), 0, 0, size);
 	}
 
 	void Renderer::bindInstanceBuffer(InstanceBuffer& instanceBuffer) {
-		this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.get(), 1, 0);
+		this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.getBuffer(), 1, 0);
 	}
 
 	void Renderer::bindInstanceBuffer(InstanceBuffer& instanceBuffer, VkDeviceSize size) {
-		this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.get(), 1, 0, size);
+		this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.getBuffer(), 1, 0, size);
 	}
 
 	void Renderer::bindIndexBuffer(IndexBuffer& indexBuffer) {
-		this->commandBuffers[currentFrame].bindIndexBuffer(indexBuffer.get(), 0, VK_INDEX_TYPE_UINT16);
+		this->commandBuffers[currentFrame].bindIndexBuffer(indexBuffer.getBuffer(), 0, VK_INDEX_TYPE_UINT16);
 	}
 
 	void Renderer::drawIndexed(uint32_t indexCount, uint32_t instanceCount) {
@@ -259,6 +269,7 @@ namespace Radiant {
 	void Renderer::present(Window& window) {
 		this->presentQueue->present(*this->swapchain, {this->context.imageIndex},
 		                            this->frameFinishedSemaphores[currentFrame]);
+
 		this->currentFrame = (currentFrame + 1) % swapchain->getImageCount();
 
 		if (this->updateSwapchain) {
@@ -270,6 +281,14 @@ namespace Radiant {
 			                          VK_PRESENT_MODE_IMMEDIATE_KHR, 0);
 			return;
 		}
+	}
+
+	VulkanDevice& Renderer::getDevice() {
+		return *this->device;
+	}
+
+	std::vector<VkDescriptorSetLayout> Renderer::getDescriptorSetLayouts() {
+		return {this->frameDescriptorSetLayout->get(), this->textureDescriptorSetLayout->get()};
 	}
 
 	std::vector<const char*> Renderer::getInstanceExtensions(Window& window, bool debug) {
@@ -319,15 +338,15 @@ namespace Radiant {
 			this->frameFinishedSemaphores.emplace_back(*this->device, 0);
 		}
 
-		this->descriptorBuffer =
-		    std::make_unique<VulkanBuffer>(*this->memoryAllocator, 2048, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-		                                   VK_SHARING_MODE_EXCLUSIVE, std::vector<uint32_t>{});
+		// this->descriptorBuffer =
+		//     std::make_unique<VulkanBuffer>(*this->memoryAllocator, 2048, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		//                                    VK_SHARING_MODE_EXCLUSIVE, std::vector<uint32_t>{});
 
-		this->descriptorPool = std::make_unique<VulkanDescriptorPool>(
-		    *this->device,
-		    std::vector<VkDescriptorPoolSize>{{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3},
-		                                      {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}},
-		    1024);
+		// this->descriptorPool = std::make_unique<VulkanDescriptorPool>(
+		//     *this->device,
+		//     std::vector<VkDescriptorPoolSize>{{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3},
+		//                                       {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}},
+		//     1024);
 
 		this->frameDescriptorSetLayout = std::make_unique<VulkanDescriptorSetLayout>(
 		    *this->device,
@@ -340,54 +359,16 @@ namespace Radiant {
 		    std::vector<VkDescriptorSetLayoutBinding>{
 		        {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}},
 		    0);
+
+		// this->descriptorSets = this->descriptorPool->allocateDescriptorSets(*this->frameDescriptorSetLayout,
+		//                                                                     this->swapchain->getImageCount());
 	}
 
-	void Renderer::initGraphicsPipeline() {
-		// Init descriptor sets
-		this->descriptorSets = this->descriptorPool->allocateDescriptorSets(*this->frameDescriptorSetLayout,
-		                                                                    this->swapchain->getImageCount());
-
-		// Init graphics pipeline.
-		VkPipelineColorBlendAttachmentState attachmentState{};
-		attachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-		attachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-		attachmentState.colorBlendOp        = VK_BLEND_OP_ADD;
-		// attachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-		// attachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-		// attachmentState.alphaBlendOp = VK_BLEND_OP_SUBTRACT;
-		attachmentState.colorWriteMask =
-		    VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-		attachmentState.blendEnable = VK_TRUE;
-
-		std::vector<VkDescriptorSetLayout> layouts = {this->frameDescriptorSetLayout->get(),
-		                                              this->textureDescriptorSetLayout->get()};
-
-		this->solidColorGraphicsPipeline = std::make_unique<VulkanPipeline>(
-		    VulkanGraphicsPipelineBuilder(*this->device)
-		        .withLayout(layouts)
-		        .withRenderingInfo({VK_FORMAT_B8G8R8A8_SRGB}, VK_FORMAT_UNDEFINED, VK_FORMAT_UNDEFINED)
-		        .withVertexBindingDescription(sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX,
-		                                      {
-		                                          {VK_FORMAT_R32G32_SFLOAT, 0},
-		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)},
-		                                      })
-		        .withVertexBindingDescription(sizeof(Instance), VK_VERTEX_INPUT_RATE_INSTANCE,
-		                                      {
-		                                          {VK_FORMAT_R32G32B32A32_SFLOAT, 0},
-		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, position)},
-		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, size)},
-		                                      })
-		        .withInputAssemblyState(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE)
-		        .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_VERTEX_BIT)
-		        .withMultisampleState(VK_SAMPLE_COUNT_1_BIT, {VK_FALSE, 0.0}, VK_FALSE, VK_FALSE)
-		        .withRasterizationState(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE,
-		                                {VK_FALSE}, 1.0, VK_FALSE)
-		        .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_FRAGMENT_BIT)
-		        .withColorBlendState({attachmentState}, nullptr)
-		        .withDynamicState({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
-		        .withViewportState(1, 1)
-		        .build());
+	void Renderer::initShaderResourceManager() {
+		this->shaderResourceManager = std::make_unique<ShaderResourceManager>(*this->device);
 	}
+
+	void Renderer::initGraphicsPipeline() {}
 
 	bool Renderer::getPhysicalDeviceRequirements(VkPhysicalDevice& physicalDevice) {
 		return true;
@@ -398,8 +379,9 @@ namespace Radiant {
 
 		bool isSurfaceOutOfDate =
 		    (imageIndex.result == VK_ERROR_OUT_OF_DATE_KHR) || (imageIndex.result == VK_SUBOPTIMAL_KHR);
-		bool isFrameBufferResized = (newFrameBufferSize.width != this->frameBufferSize.width) ||
-		                            (newFrameBufferSize.height != this->frameBufferSize.height);
+
+		bool isFrameBufferResized = (newFrameBufferSize.width != this->frameBufferSize.width)
+		                         || (newFrameBufferSize.height != this->frameBufferSize.height);
 		return isSurfaceOutOfDate && isFrameBufferResized;
 	}
 } // namespace Radiant

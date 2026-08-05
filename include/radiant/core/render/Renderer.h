@@ -1,11 +1,13 @@
 #pragma once
 #include "radiant/core/render/Color.h"
 #include "radiant/core/render/Rect2D.h"
-#include "radiant/core/render/Texture.h"
 #include "radiant/core/render/Window.h"
 #include "radiant/core/render/buffers/IndexBuffer.h"
 #include "radiant/core/render/buffers/InstanceBuffer.h"
 #include "radiant/core/render/buffers/VertexBuffer.h"
+#include "radiant/core/render/resource/ShaderResourceManager.h"
+#include "radiant/core/render/resource/Texture.h"
+#include "radiant/core/render/resource/UniformBuffer.h"
 #include "radiant/core/render/vulkan/VulkanCommandPool.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanInstance.h"
@@ -42,7 +44,9 @@ namespace Radiant {
 
 			std::unique_ptr<InstanceBuffer> createInstanceBuffer(VkDeviceSize size);
 
-			Texture loadTexture(void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize);
+			std::unique_ptr<UniformBuffer> createUniformBuffer(VkDeviceSize size);
+
+			std::unique_ptr<Texture> createTexture(void* buffer, uint32_t width, uint32_t height, uint32_t pixelSize);
 
 			void beginFrame(Window& window);
 
@@ -51,6 +55,10 @@ namespace Radiant {
 			void setViewport(float width, float height, float minDepth, float maxDepth);
 
 			void setScissor(uint32_t width, uint32_t height);
+
+			void bindPipeline(VulkanPipeline& pipeline);
+
+			void bindResource(VulkanPipeline& pipeline, ShaderResource& resource, uint32_t firstSet);
 
 			void bindVertexBuffer(VertexBuffer& vertexBuffer);
 
@@ -62,14 +70,14 @@ namespace Radiant {
 
 			void bindIndexBuffer(IndexBuffer& indexBuffer);
 
-			template <typename T>
-			void updateUniformBuffer(T value) {
-				size_t currentOffset = this->descriptorBuffer->getOffset();
-				this->descriptorBuffer->append(&value, sizeof(T));
+			// template <typename T>
+			// void updateUniformBuffer(T value) {
+			//	size_t currentOffset = this->descriptorBuffer->getOffset();
+			//	this->descriptorBuffer->append(&value, sizeof(T));
 
-				this->descriptorBufferWrites.push_back(
-				    VkDescriptorBufferInfo{this->descriptorBuffer->get(), currentOffset, sizeof(T)});
-			}
+			//	this->descriptorBufferWrites.push_back(
+			//	    VkDescriptorBufferInfo{this->descriptorBuffer->get(), currentOffset, sizeof(T)});
+			//}
 
 			void bindDescriptorSets();
 
@@ -87,6 +95,10 @@ namespace Radiant {
 			void submit();
 
 			void present(Window& window);
+
+			VulkanDevice& getDevice();
+
+			std::vector<VkDescriptorSetLayout> getDescriptorSetLayouts();
 
 		private:
 			std::vector<const char*> instanceExtensions;
@@ -109,7 +121,9 @@ namespace Radiant {
 			std::vector<VulkanBinarySemaphore> imageReadySemaphores;
 			std::vector<VulkanBinarySemaphore> frameFinishedSemaphores;
 
-			std::unique_ptr<VulkanBuffer>         descriptorBuffer;
+			std::unique_ptr<ShaderResourceManager> shaderResourceManager;
+
+			// std::unique_ptr<VulkanBuffer>         descriptorBuffer;
 			std::unique_ptr<VulkanDescriptorPool> descriptorPool;
 
 			std::unique_ptr<VulkanDescriptorSetLayout> frameDescriptorSetLayout;
@@ -117,17 +131,15 @@ namespace Radiant {
 
 			std::vector<VulkanDescriptorSet> descriptorSets;
 
-			std::unique_ptr<VulkanPipeline> solidColorGraphicsPipeline;
-
 			RenderContext context;
-
-			std::vector<VkDescriptorBufferInfo> descriptorBufferWrites;
 
 			int    currentFrame    = 0;
 			bool   updateSwapchain = false;
 			Rect2D frameBufferSize;
 
 			void initVulkan(Window& window, bool debug);
+
+			void initShaderResourceManager();
 
 			void initGraphicsPipeline();
 

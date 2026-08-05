@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -13,7 +14,7 @@ namespace Radiant {
 			/*
 			 * @param VkDescriptorSet A raw descriptor set.
 			 */
-			VulkanDescriptorSet(VkDescriptorSet descriptorSet);
+			VulkanDescriptorSet(VkDevice device, VkDescriptorSet descriptorSet, VkDescriptorPool descriptorPool);
 			VulkanDescriptorSet(const VulkanDescriptorSet&)            = delete;
 			VulkanDescriptorSet& operator=(const VulkanDescriptorSet&) = delete;
 
@@ -26,7 +27,24 @@ namespace Radiant {
 			 */
 			VkDescriptorSet get();
 
+			void update(uint32_t                            descriptorBindingIndex,
+			            uint32_t                            descriptorArrayElement,
+			            VkDescriptorType                    descriptorType,
+			            std::vector<VkDescriptorBufferInfo> bufferInfo);
+
+			void update(uint32_t                           descriptorBindingIndex,
+			            uint32_t                           descriptorArrayElement,
+			            VkDescriptorType                   descriptorType,
+			            std::vector<VkDescriptorImageInfo> bufferInfo);
+
+			void update(uint32_t                  descriptorBindingIndex,
+			            uint32_t                  descriptorArrayElement,
+			            VkDescriptorType          descriptorType,
+			            std::vector<VkBufferView> bufferInfo);
+
 		private:
-			VkDescriptorSet descriptorSet;
+			VkDescriptorSet  descriptorSet;
+			VkDescriptorPool descriptorPool;
+			VkDevice         device;
 	};
 } // namespace Radiant

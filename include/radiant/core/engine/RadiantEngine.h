@@ -4,6 +4,7 @@
 #include "radiant/core/engine/layout/WidgetManager.h"
 #include "radiant/core/render/Renderer.h"
 #include "radiant/core/render/Window.h"
+#include "radiant/core/render/resource/UniformBuffer.h"
 #include "radiant/css/Parser.h"
 
 #include <cstdint>
@@ -30,7 +31,10 @@ namespace Radiant {
 			std::unique_ptr<InstanceBuffer> instanceBuffer;
 			std::unique_ptr<IndexBuffer>    indexBuffer;
 
+			std::unique_ptr<VulkanPipeline> solidColorGraphicsPipeline;
+
 			std::unique_ptr<StyleSheetParser::Parser> stylesheetParser;
+			std::unique_ptr<UniformBuffer>            uniformBuffer;
 			std::unique_ptr<Texture>                  fontAtlasGpu;
 
 			void registerProperties();

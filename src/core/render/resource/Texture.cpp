@@ -1,5 +1,6 @@
-#include "radiant/core/render/Texture.h"
+#include "radiant/core/render/resource/Texture.h"
 
+#include "radiant/core/render/resource/ShaderResource.h"
 #include "radiant/core/render/vulkan/VulkanCommandPool.h"
 #include "radiant/core/render/vulkan/VulkanMemoryAllocator.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorPool.h"
@@ -19,7 +20,8 @@ namespace Radiant {
 	                 void*                      buffer,
 	                 uint32_t                   width,
 	                 uint32_t                   height,
-	                 uint32_t                   pixelSize) {
+	                 uint32_t                   pixelSize)
+	    : ShaderResource(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptorPool, descriptorSetLayout) {
 		uint32_t size = width * height * pixelSize;
 
 		// CPU staging buffer.
@@ -99,25 +101,23 @@ namespace Radiant {
 		queue.waitIdle();
 
 		// Init descriptor set
-		this->descriptorSet =
-		    std::make_unique<VulkanDescriptorSet>(descriptorPool.allocateDescriptorSet(descriptorSetLayout));
 
-		descriptorPool.updateDescriptorSets(
-		    {VulkanWriteDescriptorSet{this->descriptorSet->get(),
-		                              0,
-		                              0,
-		                              VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-		                              {},
-		                              {VkDescriptorImageInfo{this->sampler->get(), this->imageView->get(),
-		                                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL}},
-		                              {}}});
+		// descriptorPool.updateDescriptorSets(
+		//     {VulkanWriteDescriptorSet{this->descriptorSet->get(),
+		//                               0,
+		//                               0,
+		//                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		//                               {},
+		//                               {VkDescriptorImageInfo{this->sampler->get(), this->imageView->get(),
+		//                                                      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL}},
+		//                               {}}});
+
+		this->writeImage({VkDescriptorImageInfo{this->sampler->get(), this->imageView->get(),
+		                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL}});
 	}
 
 	Texture::Texture(Texture&& other) noexcept
-	    : image(std::move(other.image)), imageView(std::move(other.imageView)), sampler(std::move(other.sampler)),
-	      descriptorSet(std::move(other.descriptorSet)) {}
+	    : ShaderResource(std::move(other)), image(std::move(other.image)), imageView(std::move(other.imageView)),
+	      sampler(std::move(other.sampler)) {}
 
-	VulkanDescriptorSet& Texture::getDescriptorSet() {
-		return *this->descriptorSet;
-	}
 } // namespace Radiant
