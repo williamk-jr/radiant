@@ -7,13 +7,15 @@
 #include <memory>
 
 namespace Radiant {
-	class UniformBuffer : public ShaderResource, public Buffer<void*> {
+	class UniformBuffer : public ShaderResource, protected Buffer<void*> {
 		public:
 			UniformBuffer(VulkanMemoryAllocator&     memoryAllocator,
 			              VulkanDescriptorPool&      descriptorPool,
 			              VulkanDescriptorSetLayout& descriptorSetLayout,
 			              VkDeviceSize               size);
 
+			void reset();
+			void append(void* data, size_t size);
 			void write();
 
 		private:

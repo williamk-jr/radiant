@@ -157,17 +157,15 @@ namespace Radiant {
 		// Update uniforms
 		glm::mat4 orthoMatrix =
 		    glm::ortho(0.0f, (float)frameBufferSize.width, 0.0f, (float)frameBufferSize.height, -1.0f, 1.0f);
-		// renderer->updateUniformBuffer(orthoMatrix);
 
-		this->uniformBuffer->resetOffset();
-		this->uniformBuffer->append(&orthoMatrix);
+		this->uniformBuffer->reset();
+		this->uniformBuffer->append(&orthoMatrix, sizeof(glm::mat4));
 		this->uniformBuffer->write();
-		renderer->bindResource(*this->solidColorGraphicsPipeline, *this->uniformBuffer, 0);
-		renderer->bindResource(*this->solidColorGraphicsPipeline, *this->fontAtlasGpu, 1);
-		// renderer->bindDescriptorSets();
 
-		// Bind textures
-		// renderer->bindTexture(*this->fontAtlasGpu);
+		renderer->bindResource(*this->solidColorGraphicsPipeline, *this->uniformBuffer, 0);
+
+		// Bind Font Atlas
+		renderer->bindResource(*this->solidColorGraphicsPipeline, *this->fontAtlasGpu, 1);
 
 		// Bind buffers
 		renderer->bindVertexBuffer(*this->vertexBuffer);

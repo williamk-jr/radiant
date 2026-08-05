@@ -24,12 +24,16 @@ namespace Radiant {
 				return this->buffer->getOffset();
 			}
 
+			void append(void* data, size_t size) {
+				this->buffer->append(data, size);
+			}
+
 			void append(std::vector<T> data) {
 				this->buffer->append(data.data(), sizeof(T) * data.size());
 			}
 
 			void append(T data) {
-				this->buffer->append(data, sizeof(T));
+				this->append(&data, sizeof(T));
 			}
 
 			void resetOffset() {
@@ -40,7 +44,7 @@ namespace Radiant {
 				return this->buffer->getSize();
 			}
 
-		private:
+		protected:
 			std::unique_ptr<VulkanBuffer> buffer;
 	};
 } // namespace Radiant
