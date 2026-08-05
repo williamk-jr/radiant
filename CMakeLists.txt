@@ -38,68 +38,68 @@ endif()
 # Add the executable
 add_executable(
   Radiant
-  src/main.cpp
-  src/css/Parser.cpp
-  src/css/Token.cpp
-  src/css/StyleSheetValue.cpp
-  src/css/StyleSheetEntry.cpp
-  src/css/StyleSheet.cpp
-  src/css/values/Unit.cpp
-  src/css/values/Integer.cpp
-  src/css/values/Float.cpp
-  src/css/values/Color.cpp
-  src/css/values/Function.cpp
-  src/css/ast/abstract_syntax_tree.cpp
-  src/util/string_util.cpp
-  src/util/logger/Logger.cpp
-  src/core/engine/RadiantEngine.cpp
-  src/core/engine/LayoutBox.cpp
-  src/core/engine/StyleSheetPropertyResolvers.cpp
-  src/core/engine/StyleSheetStandardFunctions.cpp
-  src/core/engine/layout/WidgetManager.cpp
-  src/core/engine/layout/LayoutManager.cpp
-  src/core/engine/widgets/widget.cpp
   src/core/engine/font/Bitmap.cpp
-  src/core/engine/font/Font.cpp
   src/core/engine/font/cache/FontCache.cpp
   src/core/engine/font/cache/FontGPUCache.cpp
+  src/core/engine/font/Font.cpp
   src/core/engine/font/FontManager.cpp
-  src/core/render/vulkan/VulkanInstance.cpp
-  src/core/render/vulkan/VulkanPhysicalDevice.cpp
-  src/core/render/vulkan/VulkanDevice.cpp
-  src/core/render/vulkan/VulkanSurface.cpp
-  src/core/render/vulkan/VulkanCommandPool.cpp
-  src/core/render/vulkan/VulkanCommandBuffer.cpp
-  src/core/render/vulkan/VulkanMemoryAllocator.cpp
-  src/core/render/vulkan/VulkanQueue.cpp
-  src/core/render/vulkan/VulkanSwapchain.cpp
-  src/core/render/vulkan/VulkanSampler.cpp
-  src/core/render/vulkan/VulkanUtil.cpp
-  src/core/render/vulkan/syncronization/VulkanFence.cpp
-  src/core/render/vulkan/syncronization/VulkanSemaphore.cpp
-  src/core/render/vulkan/syncronization/VulkanBinarySemaphore.cpp
-  src/core/render/vulkan/syncronization/VulkanTimelineSemaphore.cpp
-  src/core/render/vulkan/resource/VulkanImage.cpp
-  src/core/render/vulkan/resource/VulkanImageView.cpp
-  src/core/render/vulkan/resource/VulkanBuffer.cpp
-  src/core/render/vulkan/descriptor/VulkanDescriptorSetLayout.cpp
-  src/core/render/vulkan/descriptor/VulkanDescriptorPool.cpp
-  src/core/render/vulkan/descriptor/VulkanDescriptorSet.cpp
-  src/core/render/vulkan/pipeline/VulkanGraphicsPipelineBuilder.cpp
-  src/core/render/vulkan/pipeline/VulkanPipeline.cpp
+  src/core/engine/layout/LayoutManager.cpp
+  src/core/engine/layout/WidgetManager.cpp
+  src/core/engine/LayoutBox.cpp
+  src/core/engine/RadiantEngine.cpp
+  src/core/engine/StyleSheetPropertyResolvers.cpp
+  src/core/engine/StyleSheetStandardFunctions.cpp
+  src/core/engine/widgets/widget.cpp
   src/core/render/Color.cpp
-  src/core/render/Renderer.cpp
-  src/core/render/Window.cpp
-  src/core/render/TextureAtlas.cpp
-  src/core/render/resources/shader/Texture.cpp
-  src/core/render/resources/shader/UniformBuffer.cpp
-  src/core/render/resources/shader/ShaderResource.cpp
-  src/core/render/resources/shader/ShaderResourceManager.cpp
   src/core/render/models/Model.cpp
   src/core/render/models/Quad2D.cpp
-  src/core/render/resources/VertexBuffer.cpp
+  src/core/render/Renderer.cpp
+  src/core/render/resources/IndexBuffer.cpp
   src/core/render/resources/InstanceBuffer.cpp
-  src/core/render/resources/IndexBuffer.cpp)
+  src/core/render/resources/shader/ShaderResource.cpp
+  src/core/render/resources/shader/ShaderResourceManager.cpp
+  src/core/render/resources/shader/Texture.cpp
+  src/core/render/resources/shader/UniformBuffer.cpp
+  src/core/render/resources/VertexBuffer.cpp
+  src/core/render/TextureAtlas.cpp
+  src/core/render/vulkan/descriptor/VulkanDescriptorPool.cpp
+  src/core/render/vulkan/descriptor/VulkanDescriptorSet.cpp
+  src/core/render/vulkan/descriptor/VulkanDescriptorSetLayout.cpp
+  src/core/render/vulkan/pipeline/VulkanGraphicsPipelineBuilder.cpp
+  src/core/render/vulkan/pipeline/VulkanPipeline.cpp
+  src/core/render/vulkan/resource/VulkanBuffer.cpp
+  src/core/render/vulkan/resource/VulkanImage.cpp
+  src/core/render/vulkan/resource/VulkanImageView.cpp
+  src/core/render/vulkan/syncronization/VulkanBinarySemaphore.cpp
+  src/core/render/vulkan/syncronization/VulkanFence.cpp
+  src/core/render/vulkan/syncronization/VulkanSemaphore.cpp
+  src/core/render/vulkan/syncronization/VulkanTimelineSemaphore.cpp
+  src/core/render/vulkan/VulkanCommandBuffer.cpp
+  src/core/render/vulkan/VulkanCommandPool.cpp
+  src/core/render/vulkan/VulkanDevice.cpp
+  src/core/render/vulkan/VulkanInstance.cpp
+  src/core/render/vulkan/VulkanMemoryAllocator.cpp
+  src/core/render/vulkan/VulkanPhysicalDevice.cpp
+  src/core/render/vulkan/VulkanQueue.cpp
+  src/core/render/vulkan/VulkanSampler.cpp
+  src/core/render/vulkan/VulkanSurface.cpp
+  src/core/render/vulkan/VulkanSwapchain.cpp
+  src/core/render/vulkan/VulkanUtil.cpp
+  src/core/render/Window.cpp
+  src/css/ast/abstract_syntax_tree.cpp
+  src/css/Parser.cpp
+  src/css/StyleSheet.cpp
+  src/css/StyleSheetEntry.cpp
+  src/css/StyleSheetValue.cpp
+  src/css/Token.cpp
+  src/css/values/Color.cpp
+  src/css/values/Float.cpp
+  src/css/values/Function.cpp
+  src/css/values/Integer.cpp
+  src/css/values/Unit.cpp
+  src/main.cpp
+  src/util/logger/Logger.cpp
+  src/util/string_util.cpp)
 
 target_link_libraries(
   Radiant
