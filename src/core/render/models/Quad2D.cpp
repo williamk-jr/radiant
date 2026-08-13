@@ -15,4 +15,17 @@ namespace Radiant {
 
 		this->indicies = {0, 2, 3, 0, 1, 3};
 	}
+
+	Quad2D::Quad2D(Box uv) {
+
+		this->verticies = {
+		    // Position   UV
+		    {{-1, 1}, {uv.minX, uv.maxY}},  // Top Left
+		    {{1, 1}, {uv.maxX, uv.maxY}},   // Top Right
+		    {{-1, -1}, {uv.minX, uv.minY}}, // Bottom Left
+		    {{1, -1}, {uv.maxX, uv.minY}}   // Bottom Right
+		};
+
+		this->indicies = {0, 2, 3, 0, 1, 3};
+	}
 } // namespace Radiant

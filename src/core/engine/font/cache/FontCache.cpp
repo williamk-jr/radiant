@@ -1,6 +1,7 @@
 #include "radiant/core/engine/font/cache/FontCache.h"
 
 #include "radiant/core/engine/font/cache/FontCacheIdentifier.h"
+#include "radiant/util/debug/ExecutionProfiler.h"
 #include "radiant/util/logger/Logger.h"
 
 #include <cstddef>
@@ -21,7 +22,6 @@ namespace Radiant {
 		}
 
 		FTC_Manager_New(freetype, 1024, 1024, cacheSize, FontCache::requestFontFace, nullptr, &this->cacheManager);
-
 		FTC_CMapCache_New(this->cacheManager, &this->charMapCache);
 
 		if (cacheType & FONT_CACHE_GLYPH) {
@@ -29,7 +29,7 @@ namespace Radiant {
 		}
 
 		if (cacheType & FONT_CACHE_SMALL_BITMAP) {
-			FTC_ImageCache_New(this->cacheManager, &this->glyphImageCache);
+			FTC_SBitCache_New(this->cacheManager, &this->smallBitmapCache);
 		}
 	}
 
@@ -84,11 +84,12 @@ namespace Radiant {
 
 	FontCacheNode<FT_Glyph>
 	FontCache::lookupGlyph(FontCacheIdentifier faceIdentifier, unsigned long charCode, int width, int height) {
-		FTC_ImageTypeRec imageType{};
+		Debug::ExecutionProfiler profiler{"FontCache::lookupGlyph", true};
+		FTC_ImageTypeRec         imageType{};
 		imageType.face_id = &faceIdentifier;
 		imageType.width   = width;
 		imageType.height  = height;
-		imageType.flags   = FT_LOAD_DEFAULT;
+		imageType.flags   = FT_LOAD_ADVANCE_ONLY;
 
 		FT_Glyph glyph;
 		FTC_Node cacheNode;
@@ -98,7 +99,10 @@ namespace Radiant {
 			return FontCacheNode<FT_Glyph>::empty();
 		}
 
+		profiler.begin();
 		FTC_ImageCache_Lookup(this->glyphImageCache, &imageType, gindex, &glyph, &cacheNode);
+		// this->lookupBitmap(faceIdentifier, charCode, width, height);
+		profiler.end();
 		return {this->cacheManager, glyph, cacheNode};
 	}
 

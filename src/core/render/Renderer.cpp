@@ -151,6 +151,10 @@ namespace Radiant {
 		this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.getBuffer(), 1, 0);
 	}
 
+	void Renderer::bindInstanceBuffer(InstanceBuffer& instanceBuffer, VkDeviceSize offset, VkDeviceSize size) {
+		this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.getBuffer(), 1, offset, size);
+	}
+
 	void Renderer::bindInstanceBuffer(InstanceBuffer& instanceBuffer, VkDeviceSize size) {
 		this->commandBuffers[currentFrame].bindVertexBuffer(instanceBuffer.getBuffer(), 1, 0, size);
 	}
@@ -310,8 +314,9 @@ namespace Radiant {
 
 		this->frameDescriptorSetLayout = std::make_unique<VulkanDescriptorSetLayout>(
 		    *this->device,
-		    std::vector<VkDescriptorSetLayoutBinding>{
-		        {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr}},
+		    std::vector<VkDescriptorSetLayoutBinding>{{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1,
+		                                               VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+		                                               nullptr}},
 		    VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT);
 
 		this->textureDescriptorSetLayout = std::make_unique<VulkanDescriptorSetLayout>(

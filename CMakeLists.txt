@@ -98,6 +98,7 @@ add_executable(
   src/css/values/Integer.cpp
   src/css/values/Unit.cpp
   src/main.cpp
+  src/util/debug/ExecutionProfiler.cpp
   src/util/logger/Logger.cpp
   src/util/string_util.cpp)
 

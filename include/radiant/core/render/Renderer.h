@@ -68,6 +68,8 @@ namespace Radiant {
 
 			void bindInstanceBuffer(InstanceBuffer& instanceBuffer, VkDeviceSize size);
 
+			void bindInstanceBuffer(InstanceBuffer& instanceBuffer, VkDeviceSize offset, VkDeviceSize size);
+
 			void bindIndexBuffer(IndexBuffer& indexBuffer);
 
 			void drawIndexed(uint32_t indexCount, uint32_t instanceCount);

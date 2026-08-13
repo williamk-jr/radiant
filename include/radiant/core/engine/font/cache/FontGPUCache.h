@@ -4,8 +4,11 @@
 #include "radiant/core/render/TextureAtlas.h"
 #include "radiant/util/Box.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <freetype/ftglyph.h>
+#include <freetype/ftimage.h>
+#include <freetype/fttypes.h>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -31,6 +34,15 @@ namespace Radiant {
 			}
 	};
 
+	struct GlyphEntry {
+			Box       uv;
+			size_t    width;
+			size_t    height;
+			FT_Vector advance;
+			FT_Int    top;
+			FT_Int    left;
+	};
+
 	/*
 	 * Cache glyphs for use in gpu texture atlas generation.
 	 *
@@ -48,17 +60,21 @@ namespace Radiant {
 		public:
 			FontGPUCache();
 
-			void addEntry(FT_Bitmap& bitmapGlyph, GlyphIdentifier identifier);
+			void addEntry(FT_BitmapGlyph& bitmapGlyph, FT_Vector advance, GlyphIdentifier identifier);
+
+			GlyphEntry getEntry(GlyphIdentifier identifier);
 
 			bool hasEntry(GlyphIdentifier identifier);
 
 			bool isDirty();
 
+			void markClean();
+
 			TextureAtlas& getTextureAtlas();
 
 		private:
-			std::unordered_map<GlyphIdentifier, Box, GlyphIdentifierHasher> cache;
-			std::unique_ptr<TextureAtlas>                                   textureAtlas;
-			bool                                                            cacheDirty;
+			std::unordered_map<GlyphIdentifier, GlyphEntry, GlyphIdentifierHasher> cache;
+			std::unique_ptr<TextureAtlas>                                          textureAtlas;
+			bool                                                                   cacheDirty;
 	};
 } // namespace Radiant

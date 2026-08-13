@@ -32,10 +32,12 @@ namespace Radiant {
 			std::unique_ptr<IndexBuffer>    indexBuffer;
 
 			std::unique_ptr<VulkanPipeline> solidColorGraphicsPipeline;
+			std::unique_ptr<VulkanPipeline> alphaMapGraphicsPipeline;
 
 			std::unique_ptr<StyleSheetParser::Parser> stylesheetParser;
 			std::unique_ptr<UniformBuffer>            uniformBuffer;
 			std::unique_ptr<Texture>                  fontAtlasGpu;
+			std::unique_ptr<Font>                     notoSans;
 
 			void registerProperties();
 			void registerFunctions();

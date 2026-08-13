@@ -286,10 +286,13 @@ namespace Radiant {
 			slangGlobalSession->createSession(slangSessionDesc, this->slangSession.writeRef());
 		}
 
+		// TODO proper module name generation.
 		const char*                   cShaderPath = shaderPath.c_str();
+		const char*                   moduleName  = shaderPath.filename().c_str();
 		Slang::ComPtr<slang::IBlob>   diagnostics;
 		Slang::ComPtr<slang::IModule> slangModule{
-		    slangSession->loadModuleFromSource("test", cShaderPath, nullptr, diagnostics.writeRef())};
+		    slangSession->loadModuleFromSource(moduleName, cShaderPath, nullptr, diagnostics.writeRef())};
+		Logger::info(moduleName);
 
 		if (diagnostics != nullptr) {
 			const char* message = (const char*)diagnostics->getBufferPointer();

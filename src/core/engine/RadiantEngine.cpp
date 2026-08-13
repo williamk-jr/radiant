@@ -18,19 +18,30 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
 	RadiantEngine::RadiantEngine(const std::string& title, uint32_t width, uint32_t height) {
 		this->window      = std::make_unique<Window>(title, width, height);
 		this->fontManager = std::make_unique<FontManager>();
-		Font notoSans     = this->fontManager->loadFont("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf");
+		this->notoSans =
+		    std::make_unique<Font>(this->fontManager->loadFont("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf"));
 
 		for (int i = 8; i <= 16; i++) {
-			notoSans.setPointSize(i);
-			this->fontManager->compileStringGeometry(notoSans,
-			                                         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.?,");
+			notoSans->setPointSize(i);
+			std::unique_ptr<RenderBatch> batch = this->fontManager->compileStringGeometry(
+			    *this->notoSans, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.?,", 0, 0);
+
+			Logger::info("Batch Font Size: " + std::to_string(i));
+			for (int j = 0; j < batch->instances.size(); j++) {
+				Logger::info("\tInstance " + std::to_string(j) + ": ");
+				Logger::info("\t\tPosition: " + std::to_string(batch->instances[j].position.x) + ", "
+				             + std::to_string(batch->instances[j].position.y));
+				Logger::info("\t\tSize: " + std::to_string(batch->instances[j].size.x) + ", "
+				             + std::to_string(batch->instances[j].size.y));
+			}
 		}
-		// Bitmap bitmap = notoSans.getBitmapFromCharCode('x');
+		this->notoSans->setPointSize(64);
 
 		// Enable debug logs.
 #ifndef NDEBUG
@@ -46,7 +57,7 @@ namespace Radiant {
 		this->widgetManager = std::make_unique<WidgetManager>(*this->window, *this->stylesheetParser);
 
 		this->vertexBuffer   = renderer->createVertexBuffer(2048);
-		this->instanceBuffer = renderer->createInstanceBuffer(2048);
+		this->instanceBuffer = renderer->createInstanceBuffer(1024 * 100);
 		this->indexBuffer    = renderer->createIndexBuffer(2048);
 		this->uniformBuffer  = renderer->createUniformBuffer(2048);
 
@@ -76,6 +87,8 @@ namespace Radiant {
 		                                          {VK_FORMAT_R32G32B32A32_SFLOAT, 0},
 		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, position)},
 		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, size)},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, uvMin)},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, uvMax)},
 		                                      })
 		        .withInputAssemblyState(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE)
 		        .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_VERTEX_BIT)
@@ -83,6 +96,34 @@ namespace Radiant {
 		        .withRasterizationState(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE,
 		                                {VK_FALSE}, 1.0, VK_FALSE)
 		        .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_FRAGMENT_BIT)
+		        .withColorBlendState({attachmentState}, nullptr)
+		        .withDynamicState({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
+		        .withViewportState(1, 1)
+		        .build());
+
+		this->alphaMapGraphicsPipeline = std::make_unique<VulkanPipeline>(
+		    VulkanGraphicsPipelineBuilder(this->renderer->getDevice())
+		        .withLayout(this->renderer->getDescriptorSetLayouts())
+		        .withRenderingInfo({VK_FORMAT_B8G8R8A8_SRGB}, VK_FORMAT_UNDEFINED, VK_FORMAT_UNDEFINED)
+		        .withVertexBindingDescription(sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX,
+		                                      {
+		                                          {VK_FORMAT_R32G32_SFLOAT, 0},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)},
+		                                      })
+		        .withVertexBindingDescription(sizeof(Instance), VK_VERTEX_INPUT_RATE_INSTANCE,
+		                                      {
+		                                          {VK_FORMAT_R32G32B32A32_SFLOAT, 0},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, position)},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, size)},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, uvMin)},
+		                                          {VK_FORMAT_R32G32_SFLOAT, offsetof(Instance, uvMax)},
+		                                      })
+		        .withInputAssemblyState(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE)
+		        .withShaderSlang("main", "./shaders/main.slang", VK_SHADER_STAGE_VERTEX_BIT)
+		        .withMultisampleState(VK_SAMPLE_COUNT_1_BIT, {VK_FALSE, 0.0}, VK_FALSE, VK_FALSE)
+		        .withRasterizationState(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE,
+		                                {VK_FALSE}, 1.0, VK_FALSE)
+		        .withShaderSlang("main", "./shaders/texture.slang", VK_SHADER_STAGE_FRAGMENT_BIT)
 		        .withColorBlendState({attachmentState}, nullptr)
 		        .withDynamicState({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
 		        .withViewportState(1, 1)
@@ -97,11 +138,6 @@ namespace Radiant {
 
 		this->vertexBuffer->append(verticies);
 		this->indexBuffer->append(indicies);
-
-		TextureAtlas& textureAtlas = this->fontManager->getTextureAtlas();
-		this->fontAtlasGpu = this->renderer->createTexture(textureAtlas.getBuffer(), textureAtlas.getWidth(),
-		                                                   textureAtlas.getHeight(), textureAtlas.getPixelSize());
-		this->fontAtlasGpu->getDescriptorSet();
 	}
 
 	void RadiantEngine::registerProperties() {
@@ -138,6 +174,13 @@ namespace Radiant {
 	}
 
 	void RadiantEngine::update() {
+		if (this->fontManager->isTextureAtlasDirty()) {
+			TextureAtlas& textureAtlas = this->fontManager->getTextureAtlas();
+			this->fontAtlasGpu = this->renderer->createTexture(textureAtlas.getBuffer(), textureAtlas.getWidth(),
+			                                                   textureAtlas.getHeight(), textureAtlas.getPixelSize());
+			this->fontManager->markTextureAtlasClean();
+		}
+
 		RenderBatch batch = this->widgetManager->createRenderBatch();
 		if (!batch.instances.empty()) { // If empty, instanceBuffer does not need to be updated
 			this->instanceBuffer->resetOffset();
@@ -174,6 +217,28 @@ namespace Radiant {
 
 		// Draw
 		renderer->drawIndexed(6, batch.instances.size());
+
+		std::unique_ptr<RenderBatch> charBatch = this->fontManager->compileStringGeometry(
+		    *this->notoSans,
+		    "rijeujsidjciojfiowfjiowedoaojmckafnbhejfowedwklfnbeasgheufioadfnasjdbgergheuirfjeiwfjlaskdgjnkesghehriwaej"
+		    "foaskldjgkefghedlrgheiorjsfjerguhewruigueirofjwefjisrhgeruifhiwjioepfjasiokgohjerjghewuoiafefjwaioeufoiwer"
+		    "gherjfjewikflwjeifoherughewriooooooooowfrbheyutewjirngeruiwjhrfyewiofjgtreidjfrhyuei9dskomfgeruiwdj",
+		    0, 0);
+		VkDeviceSize charInstanceStart = this->instanceBuffer->getOffset();
+
+		if (!charBatch->instances.empty()) { // If empty, instanceBuffer does not need to be updated
+			// this->instanceBuffer->resetOffset();
+			this->instanceBuffer->append(charBatch->instances);
+		}
+
+		renderer->bindPipeline(*this->alphaMapGraphicsPipeline);
+		renderer->bindResource(*this->alphaMapGraphicsPipeline, *this->uniformBuffer, 0);
+		renderer->bindResource(*this->alphaMapGraphicsPipeline, *this->fontAtlasGpu, 1);
+
+		renderer->bindInstanceBuffer(*this->instanceBuffer, charInstanceStart,
+		                             sizeof(Instance) * charBatch->instances.size());
+
+		renderer->drawIndexed(6, charBatch->instances.size());
 
 		renderer->endRendering();
 		renderer->endFrame();

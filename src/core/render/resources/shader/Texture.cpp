@@ -92,7 +92,7 @@ namespace Radiant {
 		toShaderReadOnlyOptimal.dstStageMask     = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
 		toShaderReadOnlyOptimal.subresourceRange = subresourceRange;
 
-		std::vector<VkImageMemoryBarrier2> shaderImageMemoryBarriers{toDstOptimal};
+		std::vector<VkImageMemoryBarrier2> shaderImageMemoryBarriers{toShaderReadOnlyOptimal};
 		commandBuffer.pipelineImageMemoryBarrier(shaderImageMemoryBarriers, 0);
 
 		// End and submit.
