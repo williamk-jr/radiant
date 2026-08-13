@@ -44,7 +44,7 @@ namespace Radiant {
 			 * buffers is complete.
 			 * @param VulkanFence& A reference to a valid vulkan fence to wait on before work can be submitted.
 			 */
-			void submit(std::vector<VulkanCommandBuffer*>&     commandBuffers,
+			void submit(std::span<VulkanCommandBuffer>         commandBuffers,
 			            std::vector<VulkanSemaphoreSubmitInfo> waitSemaphores,
 			            std::vector<VulkanSemaphoreSubmitInfo> signalSemaphores,
 			            VulkanFence*                           fence);
@@ -82,9 +82,9 @@ namespace Radiant {
 			 * @param std::vector<VulkanSemaphore*>& A reference to a vector of valid semaphore pointers to wait on
 			 * before presenting.
 			 */
-			void present(VulkanSwapchain&               swapchain,
-			             std::vector<uint32_t>          imageIndicies,
-			             std::vector<VulkanSemaphore*>& waitSemaphores);
+			void present(VulkanSwapchain&           swapchain,
+			             std::vector<uint32_t>      imageIndicies,
+			             std::span<VulkanSemaphore> waitSemaphores);
 
 			/* Presents an image in the swapchain to a surface.
 			 *

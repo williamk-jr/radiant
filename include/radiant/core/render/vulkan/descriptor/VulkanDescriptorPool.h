@@ -4,6 +4,7 @@
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSetLayout.h"
 
+#include <span>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
@@ -69,7 +70,7 @@ namespace Radiant {
 			 * @return A vector of descriptor sets.
 			 */
 			std::vector<VulkanDescriptorSet>
-			allocateDescriptorSets(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts);
+			allocateDescriptorSets(std::span<VulkanDescriptorSetLayout> descriptorSetLayouts);
 
 			/*
 			 * Allocates descriptor sets.
@@ -97,8 +98,8 @@ namespace Radiant {
 			 * @param std::vector<VulkanCopyDescriptorSet>> A vector of copy instructions for each descriptor to be
 			 * updated.
 			 */
-			void updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites,
-			                          std::vector<VulkanCopyDescriptorSet>  descriptorSetCopies);
+			void updateDescriptorSets(std::span<VulkanWriteDescriptorSet> descriptorSetWrites,
+			                          std::span<VulkanCopyDescriptorSet>  descriptorSetCopies);
 
 			/*
 			 * Updates descriptor sets.
@@ -106,7 +107,7 @@ namespace Radiant {
 			 * @param std::vector<VulkanWriteDescriptorSet>> A vector of write instructions for each descriptor to be
 			 * updated.
 			 */
-			void updateDescriptorSets(std::vector<VulkanWriteDescriptorSet> descriptorSetWrites);
+			void updateDescriptorSets(std::span<VulkanWriteDescriptorSet> descriptorSetWrites);
 
 			/*
 			 * Updates descriptor sets.
@@ -114,15 +115,15 @@ namespace Radiant {
 			 * @param std::vector<VulkanCopyDescriptorSet>> A vector of copy instructions for each descriptor to be
 			 * updated.
 			 */
-			void updateDescriptorSets(std::vector<VulkanCopyDescriptorSet> descriptorSetCopies);
+			void updateDescriptorSets(std::span<VulkanCopyDescriptorSet> descriptorSetCopies);
 
 		private:
 			VkDescriptorPool descriptorPool;
 			VkDevice         device;
 
 			std::vector<VkWriteDescriptorSet>
-			toRawDescriptorWrites(std::vector<VulkanWriteDescriptorSet>& descriptorSetWrites);
+			toRawDescriptorWrites(std::span<VulkanWriteDescriptorSet> descriptorSetWrites);
 			std::vector<VkCopyDescriptorSet>
-			toRawDescriptorCopies(std::vector<VulkanCopyDescriptorSet>& descriptorSetWrites);
+			toRawDescriptorCopies(std::span<VulkanCopyDescriptorSet> descriptorSetWrites);
 	};
 } // namespace Radiant

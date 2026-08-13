@@ -2,6 +2,7 @@
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
 
+#include <span>
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -50,9 +51,9 @@ namespace Radiant {
 			/*
 			 * Frees allocated command buffers.
 			 *
-			 * @param std::vector<VulkanCommandBuffer> command buffers to free.
+			 * @param std::span<VulkanCommandBuffer> command buffers to free.
 			 */
-			void freeCommandBuffers(std::vector<VulkanCommandBuffer> commandBuffers);
+			void freeCommandBuffers(std::span<VulkanCommandBuffer> commandBuffers);
 
 		private:
 			VkCommandPool commandPool;

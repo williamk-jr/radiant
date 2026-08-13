@@ -2,12 +2,13 @@
 
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 
+#include <span>
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-	VulkanDevice::VulkanDevice(VulkanPhysicalDevice&     physicalDevice,
-	                           VulkanSurface&            surface,
-	                           std::vector<const char*>& extensions) {
+	VulkanDevice::VulkanDevice(VulkanPhysicalDevice&  physicalDevice,
+	                           VulkanSurface&         surface,
+	                           std::span<const char*> extensions) {
 		std::vector<VkQueueFamilyProperties2> queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
 
 		uint32_t graphicsQueueFamily = -1;
@@ -60,9 +61,9 @@ namespace Radiant {
 		vkDeviceWaitIdle(this->device);
 	}
 
-	void VulkanDevice::createDevice(VulkanPhysicalDevice&    physicalDevice,
-	                                std::set<uint32_t>&      queueFamilyIndicies,
-	                                std::vector<const char*> extensions) {
+	void VulkanDevice::createDevice(VulkanPhysicalDevice&  physicalDevice,
+	                                std::set<uint32_t>     queueFamilyIndicies,
+	                                std::span<const char*> extensions) {
 		float                                priority = 1.0;
 		std::vector<VkDeviceQueueCreateInfo> deviceQueueInfos;
 		for (uint32_t queueFamilyIndex : queueFamilyIndicies) {

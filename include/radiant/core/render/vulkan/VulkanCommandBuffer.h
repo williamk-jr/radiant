@@ -41,10 +41,10 @@ namespace Radiant {
 			 *
 			 *
 			 */
-			void copyBufferToImage(VulkanBuffer&                   buffer,
-			                       VulkanImage&                    image,
-			                       VkImageLayout                   imageLayout,
-			                       std::vector<VkBufferImageCopy>& copyRegions);
+			void copyBufferToImage(VulkanBuffer&                buffer,
+			                       VulkanImage&                 image,
+			                       VkImageLayout                imageLayout,
+			                       std::span<VkBufferImageCopy> copyRegions);
 
 			/*
 			 * Begins recording command buffer.
@@ -59,8 +59,7 @@ namespace Radiant {
 			 * @param std::vector<VkMemoryBarrier2>& A reference to a vector of memory barriers.
 			 * @param VkDependencyFlags Dependency flags.
 			 */
-			void pipelineMemoryBarrier(std::vector<VkMemoryBarrier2>& memoryBarriers,
-			                           VkDependencyFlags              dependencyFlags);
+			void pipelineMemoryBarrier(std::span<VkMemoryBarrier2> memoryBarriers, VkDependencyFlags dependencyFlags);
 
 			/*
 			 * Inserts image memory barriers.
@@ -68,8 +67,8 @@ namespace Radiant {
 			 * @param std::vector<VkImageMemoryBarrier2>& A reference to a vector of image memory barriers.
 			 * @param VkDependencyFlags Dependency flags.
 			 */
-			void pipelineImageMemoryBarrier(std::vector<VkImageMemoryBarrier2>& memoryBarriers,
-			                                VkDependencyFlags                   dependencyFlags);
+			void pipelineImageMemoryBarrier(std::span<VkImageMemoryBarrier2> memoryBarriers,
+			                                VkDependencyFlags                dependencyFlags);
 
 			/*
 			 * Inserts buffer memory barriers.
@@ -77,8 +76,8 @@ namespace Radiant {
 			 * @param std::vector<VkBufferMemoryBarrier2>& A reference to a vector of buffer memory barriers.
 			 * @param VkDependencyFlags Dependency flags.
 			 */
-			void pipelineBufferMemoryBarrier(std::vector<VkBufferMemoryBarrier2>& memoryBarriers,
-			                                 VkDependencyFlags                    dependencyFlags);
+			void pipelineBufferMemoryBarrier(std::span<VkBufferMemoryBarrier2> memoryBarriers,
+			                                 VkDependencyFlags                 dependencyFlags);
 
 			/*
 			 * Clears the provided image to a color.
@@ -97,11 +96,11 @@ namespace Radiant {
 			 * @param VkRect2D The rectangular area in which to render.
 			 * @param VkRenderingFlags Rendering flags.
 			 */
-			void beginRendering(std::vector<VkRenderingAttachmentInfo>* colorAttachments,
-			                    VkRenderingAttachmentInfo*              depthAttachment,
-			                    VkRenderingAttachmentInfo*              stencilAttachment,
-			                    VkRect2D                                renderArea,
-			                    VkRenderingFlags                        renderingFlags);
+			void beginRendering(std::span<VkRenderingAttachmentInfo> colorAttachments,
+			                    VkRenderingAttachmentInfo*           depthAttachment,
+			                    VkRenderingAttachmentInfo*           stencilAttachment,
+			                    VkRect2D                             renderArea,
+			                    VkRenderingFlags                     renderingFlags);
 
 			/*
 			 * Binds a pipeline to use for rendering.
@@ -149,9 +148,9 @@ namespace Radiant {
 			 * @param uint32_t Index of the first descriptor set to bind.
 			 * @param std::vector<VulkanDescriptorSet>& A reference to a vector of descriptor sets.
 			 */
-			void bindDescriptorSets(VulkanPipeline&                   pipeline,
-			                        uint32_t                          firstSet,
-			                        std::vector<VulkanDescriptorSet>& descriptorSets);
+			void bindDescriptorSets(VulkanPipeline&                pipeline,
+			                        uint32_t                       firstSet,
+			                        std::span<VulkanDescriptorSet> descriptorSets);
 
 			/*
 			 * Binds a descriptor set to a pipepline.
@@ -188,7 +187,7 @@ namespace Radiant {
 			 */
 			void setScissor(uint32_t width, uint32_t height);
 
-			void clearAttachments(std::vector<VkClearAttachment> clearAttachments, std::vector<VkClearRect> clearAreas);
+			void clearAttachments(std::span<VkClearAttachment> clearAttachments, std::span<VkClearRect> clearAreas);
 
 			void clearAttachment(VulkanImage& image, VkClearAttachment clearAttachment);
 

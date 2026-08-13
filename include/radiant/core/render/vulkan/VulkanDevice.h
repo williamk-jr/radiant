@@ -4,6 +4,7 @@
 #include "radiant/core/render/vulkan/VulkanSurface.h"
 
 #include <set>
+#include <span>
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
@@ -15,9 +16,9 @@ namespace Radiant {
 	 */
 	class VulkanDevice {
 		public:
-			VulkanDevice(VulkanPhysicalDevice&     physicalDevice,
-			             VulkanSurface&            surface,
-			             std::vector<const char*>& extensions);
+			VulkanDevice(VulkanPhysicalDevice&  physicalDevice,
+			             VulkanSurface&         surface,
+			             std::span<const char*> extensions);
 
 			VulkanDevice(const VulkanDevice&)            = delete;
 			VulkanDevice& operator=(const VulkanDevice&) = delete;
@@ -52,8 +53,8 @@ namespace Radiant {
 			uint32_t graphicsQueueFamily;
 			uint32_t presentQueueFamily;
 
-			void createDevice(VulkanPhysicalDevice&    physicalDevice,
-			                  std::set<uint32_t>&      queueFamilyIndicies,
-			                  std::vector<const char*> extensions);
+			void createDevice(VulkanPhysicalDevice&  physicalDevice,
+			                  std::set<uint32_t>     queueFamilyIndicies,
+			                  std::span<const char*> extensions);
 	};
 } // namespace Radiant

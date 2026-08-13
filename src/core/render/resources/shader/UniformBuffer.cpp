@@ -29,7 +29,6 @@ namespace Radiant {
 		this->descriptorBufferWrites.push_back(VkDescriptorBufferInfo{this->buffer->get(), currentOffset, size});
 	}
 
-	// TODO Fix uniform buffer writing
 	void UniformBuffer::write() {
 		this->writeBuffer(this->descriptorBufferWrites);
 		this->descriptorBufferWrites.clear();

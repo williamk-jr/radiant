@@ -112,9 +112,7 @@ namespace Radiant {
 			std::vector<VulkanBinarySemaphore> frameFinishedSemaphores;
 
 			std::unique_ptr<ShaderResourceManager> shaderResourceManager;
-
-			// std::unique_ptr<VulkanBuffer>         descriptorBuffer;
-			std::unique_ptr<VulkanDescriptorPool> descriptorPool;
+			std::unique_ptr<VulkanDescriptorPool>  descriptorPool;
 
 			std::unique_ptr<VulkanDescriptorSetLayout> frameDescriptorSetLayout;
 			std::unique_ptr<VulkanDescriptorSetLayout> textureDescriptorSetLayout;

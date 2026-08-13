@@ -11,17 +11,17 @@ namespace Radiant {
 		other.queue = nullptr;
 	}
 
-	void VulkanQueue::submit(std::vector<VulkanCommandBuffer*>&     commandBuffers,
+	void VulkanQueue::submit(std::span<VulkanCommandBuffer>         commandBuffers,
 	                         std::vector<VulkanSemaphoreSubmitInfo> waitSemaphores,
 	                         std::vector<VulkanSemaphoreSubmitInfo> signalSemaphores,
 	                         VulkanFence*                           fence) {
 		std::vector<VkCommandBufferSubmitInfo> commandBufferSubmitInfos;
 		commandBufferSubmitInfos.reserve(commandBuffers.size());
 
-		for (VulkanCommandBuffer* commandBuffer : commandBuffers) {
+		for (VulkanCommandBuffer& commandBuffer : commandBuffers) {
 			VkCommandBufferSubmitInfo commandBufferSubmitInfo{};
 			commandBufferSubmitInfo.sType         = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
-			commandBufferSubmitInfo.commandBuffer = commandBuffer->get();
+			commandBufferSubmitInfo.commandBuffer = commandBuffer.get();
 
 			commandBufferSubmitInfos.push_back(commandBufferSubmitInfo);
 		}
@@ -81,8 +81,7 @@ namespace Radiant {
 	                         std::vector<VulkanSemaphoreSubmitInfo> waitSemaphores,
 	                         std::vector<VulkanSemaphoreSubmitInfo> signalSemaphores,
 	                         VulkanFence*                           fence) {
-		std::vector<VulkanCommandBuffer*> cb{&commandBuffer};
-		this->submit(cb, waitSemaphores, signalSemaphores, fence);
+		this->submit(std::span{&commandBuffer, 1}, waitSemaphores, signalSemaphores, fence);
 	}
 
 	//
@@ -93,14 +92,14 @@ namespace Radiant {
 	//  this->submit(commandBuffer, ws, ss, fence);
 	//}
 
-	void VulkanQueue::present(VulkanSwapchain&               swapchain,
-	                          std::vector<uint32_t>          imageIndicies,
-	                          std::vector<VulkanSemaphore*>& waitSemaphores) {
+	void VulkanQueue::present(VulkanSwapchain&           swapchain,
+	                          std::vector<uint32_t>      imageIndicies,
+	                          std::span<VulkanSemaphore> waitSemaphores) {
 		std::vector<VkSemaphore> rawSemaphore;
 		rawSemaphore.reserve(waitSemaphores.size());
 
-		for (VulkanSemaphore* semaphore : waitSemaphores) {
-			rawSemaphore.emplace_back(semaphore->get());
+		for (VulkanSemaphore& semaphore : waitSemaphores) {
+			rawSemaphore.emplace_back(semaphore.get());
 		}
 
 		std::vector<VkSwapchainKHR> swapchains{swapchain.get()}; // TODO Expand to allow more than once swapchain.
@@ -119,8 +118,7 @@ namespace Radiant {
 	void VulkanQueue::present(VulkanSwapchain&      swapchain,
 	                          std::vector<uint32_t> imageIndicies,
 	                          VulkanSemaphore&      waitSemaphore) {
-		std::vector<VulkanSemaphore*> rawSemaphores{&waitSemaphore};
-		this->present(swapchain, imageIndicies, rawSemaphores);
+		this->present(swapchain, imageIndicies, std::span{&waitSemaphore, 1});
 	}
 
 	void VulkanQueue::waitIdle() {

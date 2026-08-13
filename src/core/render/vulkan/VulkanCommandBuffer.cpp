@@ -25,10 +25,10 @@ namespace Radiant {
 		return this->commandBuffer;
 	}
 
-	void VulkanCommandBuffer::copyBufferToImage(VulkanBuffer&                   buffer,
-	                                            VulkanImage&                    image,
-	                                            VkImageLayout                   imageLayout,
-	                                            std::vector<VkBufferImageCopy>& copyRegions) {
+	void VulkanCommandBuffer::copyBufferToImage(VulkanBuffer&                buffer,
+	                                            VulkanImage&                 image,
+	                                            VkImageLayout                imageLayout,
+	                                            std::span<VkBufferImageCopy> copyRegions) {
 		vkCmdCopyBufferToImage(this->commandBuffer, buffer.get(), image.get(), imageLayout, copyRegions.size(),
 		                       copyRegions.data());
 	}
@@ -44,8 +44,8 @@ namespace Radiant {
 		Validation::verify(vkBeginCommandBuffer(this->commandBuffer, &commandBufferBeginInfo));
 	}
 
-	void VulkanCommandBuffer::pipelineMemoryBarrier(std::vector<VkMemoryBarrier2>& memoryBarriers,
-	                                                VkDependencyFlags              dependencyFlags) {
+	void VulkanCommandBuffer::pipelineMemoryBarrier(std::span<VkMemoryBarrier2> memoryBarriers,
+	                                                VkDependencyFlags           dependencyFlags) {
 		VkDependencyInfo dependencyInfo{};
 		dependencyInfo.sType              = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
 		dependencyInfo.memoryBarrierCount = memoryBarriers.size();
@@ -55,8 +55,8 @@ namespace Radiant {
 		vkCmdPipelineBarrier2(this->commandBuffer, &dependencyInfo);
 	}
 
-	void VulkanCommandBuffer::pipelineImageMemoryBarrier(std::vector<VkImageMemoryBarrier2>& memoryBarriers,
-	                                                     VkDependencyFlags                   dependencyFlags) {
+	void VulkanCommandBuffer::pipelineImageMemoryBarrier(std::span<VkImageMemoryBarrier2> memoryBarriers,
+	                                                     VkDependencyFlags                dependencyFlags) {
 		VkDependencyInfo dependencyInfo{};
 		dependencyInfo.sType                   = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
 		dependencyInfo.imageMemoryBarrierCount = memoryBarriers.size();
@@ -66,8 +66,8 @@ namespace Radiant {
 		vkCmdPipelineBarrier2(this->commandBuffer, &dependencyInfo);
 	}
 
-	void VulkanCommandBuffer::pipelineBufferMemoryBarrier(std::vector<VkBufferMemoryBarrier2>& memoryBarriers,
-	                                                      VkDependencyFlags                    dependencyFlags) {
+	void VulkanCommandBuffer::pipelineBufferMemoryBarrier(std::span<VkBufferMemoryBarrier2> memoryBarriers,
+	                                                      VkDependencyFlags                 dependencyFlags) {
 		VkDependencyInfo dependencyInfo{};
 		dependencyInfo.sType                    = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
 		dependencyInfo.bufferMemoryBarrierCount = memoryBarriers.size();
@@ -87,18 +87,18 @@ namespace Radiant {
 		                     &imageSubresourceRange);
 	}
 
-	void VulkanCommandBuffer::beginRendering(std::vector<VkRenderingAttachmentInfo>* colorAttachments,
-	                                         VkRenderingAttachmentInfo*              depthAttachment,
-	                                         VkRenderingAttachmentInfo*              stencilAttachment,
-	                                         VkRect2D                                renderArea,
-	                                         VkRenderingFlags                        renderingFlags) {
+	void VulkanCommandBuffer::beginRendering(std::span<VkRenderingAttachmentInfo> colorAttachments,
+	                                         VkRenderingAttachmentInfo*           depthAttachment,
+	                                         VkRenderingAttachmentInfo*           stencilAttachment,
+	                                         VkRect2D                             renderArea,
+	                                         VkRenderingFlags                     renderingFlags) {
 		VkRenderingInfo renderingInfo{};
 		renderingInfo.sType                = VK_STRUCTURE_TYPE_RENDERING_INFO;
 		renderingInfo.flags                = renderingFlags;
 		renderingInfo.layerCount           = 1;
 		renderingInfo.renderArea           = renderArea;
-		renderingInfo.colorAttachmentCount = colorAttachments->size();
-		renderingInfo.pColorAttachments    = colorAttachments->data();
+		renderingInfo.colorAttachmentCount = colorAttachments.size();
+		renderingInfo.pColorAttachments    = colorAttachments.data();
 		renderingInfo.pDepthAttachment     = depthAttachment;
 		renderingInfo.pStencilAttachment   = stencilAttachment;
 
@@ -126,9 +126,9 @@ namespace Radiant {
 		vkCmdBindIndexBuffer(this->commandBuffer, buffer.get(), offset, indexType);
 	}
 
-	void VulkanCommandBuffer::bindDescriptorSets(VulkanPipeline&                   pipeline,
-	                                             uint32_t                          firstSet,
-	                                             std::vector<VulkanDescriptorSet>& descriptorSets) {
+	void VulkanCommandBuffer::bindDescriptorSets(VulkanPipeline&                pipeline,
+	                                             uint32_t                       firstSet,
+	                                             std::span<VulkanDescriptorSet> descriptorSets) {
 		std::vector<VkDescriptorSet> rawDescriptorSets;
 		rawDescriptorSets.reserve(descriptorSets.size());
 		for (VulkanDescriptorSet& descriptorSet : descriptorSets) {
@@ -174,8 +174,8 @@ namespace Radiant {
 		vkCmdDrawIndexed(this->commandBuffer, indexCount, instanceCount, 0, 0, 0);
 	}
 
-	void VulkanCommandBuffer::clearAttachments(std::vector<VkClearAttachment> clearAttachments,
-	                                           std::vector<VkClearRect>       clearAreas) {
+	void VulkanCommandBuffer::clearAttachments(std::span<VkClearAttachment> clearAttachments,
+	                                           std::span<VkClearRect>       clearAreas) {
 		vkCmdClearAttachments(this->commandBuffer, clearAttachments.size(), clearAttachments.data(), clearAreas.size(),
 		                      clearAreas.data());
 	}

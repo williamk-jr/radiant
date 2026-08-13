@@ -114,7 +114,7 @@ namespace Radiant {
 		renderArea.extent = {std::min(this->frameBufferSize.width, imageViewExtent.width),
 		                     std::min(this->frameBufferSize.height, imageViewExtent.height)};
 
-		this->commandBuffers[currentFrame].beginRendering(&colorAttachment, nullptr, nullptr, renderArea, 0);
+		this->commandBuffers[currentFrame].beginRendering(colorAttachment, nullptr, nullptr, renderArea, 0);
 	}
 
 	void Renderer::bindPipeline(VulkanPipeline& pipeline) {
@@ -191,7 +191,9 @@ namespace Radiant {
 		clearRect.baseArrayLayer = 0;
 		clearRect.layerCount     = 1;
 
-		this->commandBuffers[currentFrame].clearAttachments({clearAttachment}, {clearRect});
+		std::vector<VkClearAttachment> clearAttachments{clearAttachment};
+		std::vector<VkClearRect>       clearRects{clearRect};
+		this->commandBuffers[currentFrame].clearAttachments(clearAttachments, clearRects);
 	}
 
 	void Renderer::endRendering() {

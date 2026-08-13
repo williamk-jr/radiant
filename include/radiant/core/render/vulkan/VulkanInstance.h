@@ -14,9 +14,9 @@ namespace Radiant {
 	 */
 	class VulkanInstance {
 		public:
-			VulkanInstance(const std::string&              applicationName,
-			               const std::vector<const char*>& extensionNames,
-			               const std::vector<const char*>& layerNames);
+			VulkanInstance(const std::string&     applicationName,
+			               std::span<const char*> extensionNames,
+			               std::span<const char*> layerNames);
 
 			VulkanInstance(const VulkanInstance&)            = delete;
 			VulkanInstance& operator=(const VulkanInstance&) = delete;

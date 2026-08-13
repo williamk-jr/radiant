@@ -1,5 +1,7 @@
 #include "radiant/core/render/vulkan/VulkanCommandPool.h"
 
+#include <span>
+
 namespace Radiant {
 	VulkanCommandPool::VulkanCommandPool(VulkanDevice& device, uint32_t queueFamily) : device(device.get()) {
 		VkCommandPoolCreateInfo commandPoolInfo{};
@@ -49,7 +51,7 @@ namespace Radiant {
 		return std::move(this->allocateCommandBuffers(1, level)[0]);
 	}
 
-	void VulkanCommandPool::freeCommandBuffers(std::vector<VulkanCommandBuffer> commandBuffers) {
+	void VulkanCommandPool::freeCommandBuffers(std::span<VulkanCommandBuffer> commandBuffers) {
 		VkCommandBuffer* rawCommandBuffers = new VkCommandBuffer[commandBuffers.size()];
 
 		for (int i = 0; i < commandBuffers.size(); i++) {
