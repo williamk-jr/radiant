@@ -15,14 +15,14 @@ namespace Radiant {
 		this->buffer.reserve(width * height * pixelSize);
 	}
 
-	void TextureAtlas::addTexture(uint8_t* buffer, uint32_t size, uint32_t width, uint32_t height) {
+	Box TextureAtlas::addTexture(uint8_t* buffer, uint32_t size, uint32_t width, uint32_t height) {
 		if (this->cursorX + width >= this->width) {
-			if (this->cursorY + rowOffset >= this->height) {
-				return; // We cannot go down another line.
+			if (this->cursorY + this->rowOffset >= this->height) {
+				return {-1, -1, -1, -1}; // We cannot go down another line.
 			}
 
 			this->cursorX = 0;
-			this->cursorY += rowOffset + this->padding;
+			this->cursorY += this->rowOffset + this->padding;
 		}
 
 		if (height > this->rowOffset) {
@@ -30,14 +30,16 @@ namespace Radiant {
 		}
 
 		for (int y = 0; y < height; y++) {
-			uint8_t* src = buffer + (width * y * pixelSize);
-			uint8_t* dst = this->buffer.data() + this->cursorX + (this->width * (this->cursorY + y)) * pixelSize;
-
-			// pos = dst + x + (width*y);
+			uint8_t* src = buffer + (width * y * this->pixelSize);
+			uint8_t* dst = this->buffer.data() + this->cursorX + (this->width * (this->cursorY + y)) * this->pixelSize;
 
 			std::copy(src, src + (width * this->pixelSize), dst);
 		}
-		cursorX += (width + this->padding) * this->pixelSize;
+
+		// Get bounds for texture before updating cursor.
+		Box uvBounds = this->getUVBoundsAtCursor(width, height);
+		this->cursorX += (width + this->padding) * this->pixelSize;
+		return uvBounds;
 	}
 
 	uint8_t* TextureAtlas::getBuffer() {

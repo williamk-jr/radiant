@@ -23,8 +23,7 @@ namespace Radiant {
 		size_t width      = bitmap.width;
 		size_t height     = bitmap.rows;
 
-		Box uvBounds = this->textureAtlas->getUVBoundsAtCursor(width, height);
-		this->textureAtlas->addTexture(bitmap.buffer, bufferSize, width, height);
+		Box uvBounds = this->textureAtlas->addTexture(bitmap.buffer, bufferSize, width, height);
 
 		// Logger::info("Char: "+std::to_string((char)identifier.charCode)+
 		//               "\nMin: ("+std::to_string(uvBounds.minX)+",

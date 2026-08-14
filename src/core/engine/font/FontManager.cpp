@@ -72,13 +72,14 @@ namespace Radiant {
 			 */
 			int32_t ascender = size->metrics.ascender >> 6;
 			int32_t bearingX = glyphEntry.left;
-			int32_t bearingY = (glyphEntry.height - glyphEntry.top) + (ascender - glyphEntry.height);
+			int32_t bearingY = (static_cast<int32_t>(glyphEntry.height) - glyphEntry.top)
+			                 + (ascender - static_cast<int32_t>(glyphEntry.height));
 
 			int32_t positionX = x + cursorX + bearingX;
 			int32_t positionY = y + cursorY + bearingY;
 
 			// Logger::info(std::to_string(x));
-			renderBatch->instances.emplace_back(Instance{{0, 0, 0, 255},
+			renderBatch->instances.emplace_back(Instance{{0, 255, 0, 255},
 			                                             {positionX, positionY},
 			                                             {glyphEntry.width, glyphEntry.height},
 			                                             {glyphEntry.uv.minX, glyphEntry.uv.minY},

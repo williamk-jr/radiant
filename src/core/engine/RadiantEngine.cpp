@@ -228,7 +228,6 @@ namespace Radiant {
 		VkDeviceSize charInstanceStart = this->instanceBuffer->getOffset();
 
 		if (!charBatch->instances.empty()) { // If empty, instanceBuffer does not need to be updated
-			// this->instanceBuffer->resetOffset();
 			this->instanceBuffer->append(charBatch->instances);
 		}
 

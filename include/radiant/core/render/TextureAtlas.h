@@ -10,7 +10,7 @@ namespace Radiant {
 		public:
 			TextureAtlas(uint32_t width, uint32_t height, uint32_t pixelSize, uint32_t padding);
 
-			void addTexture(uint8_t* buffer, uint32_t size, uint32_t width, uint32_t height);
+			Box addTexture(uint8_t* buffer, uint32_t size, uint32_t width, uint32_t height);
 
 			uint8_t* getBuffer();
 
@@ -24,8 +24,6 @@ namespace Radiant {
 
 			uint32_t getPixelSize() const;
 
-			Box getUVBoundsAtCursor(uint32_t width, uint32_t height);
-
 		private:
 			std::vector<uint8_t> buffer;
 			uint32_t             width     = 0;
@@ -37,5 +35,7 @@ namespace Radiant {
 			uint32_t rowOffset = 0;
 
 			uint32_t padding = 0;
+
+			Box getUVBoundsAtCursor(uint32_t width, uint32_t height);
 	};
 } // namespace Radiant
