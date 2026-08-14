@@ -30,15 +30,15 @@ namespace Radiant {
 	FontManager::compileStringGeometry(Font& font, std::string str, uint32_t x, uint32_t y) {
 		// Debug::ExecutionProfiler profiler{"compileStringGeometry", true};
 		// profiler.begin();
+		FT_Size size = this->fontCache->lookupPixelFontSize(font.fontFaceIdentifier, 0, font.size);
+		// profiler.end();
 
-		uint32_t                     offsetX     = 0;
-		uint32_t                     offsetY     = 0;
+		uint32_t                     cursorX     = 0;
+		uint32_t                     cursorY     = 0;
 		std::unique_ptr<RenderBatch> renderBatch = std::make_unique<RenderBatch>();
 		renderBatch->instances.reserve(str.size());
 
 		for (char charCode : str) {
-			//  Check if glyph in cache
-
 			// Check if glyph in gpu cache.
 			GlyphIdentifier glyphId = {font.fontFaceIdentifier, (unsigned long)charCode, font.size};
 			if (!fontGpuCache->hasEntry(glyphId)) {
@@ -55,15 +55,37 @@ namespace Radiant {
 			}
 
 			GlyphEntry glyphEntry = this->fontGpuCache->getEntry(glyphId);
+
+			/*
+			 * BearingX and bearingY have the origin (0,0) in the bottom left corner by default.
+			 * However, because most objects in this engine are positioned with the top left corner
+			 * as the origin, we must transform the bearings to do so as well to keep consistency.
+			 *
+			 * BearingX stays unmodified.
+			 * BearingY adds the difference between the character height and the ascender
+			 * to the difference between the character height and bearingY.
+			 *
+			 * This effectively pads the top of the character a certain distance from the origin
+			 * such that characters are positioned as if the bottom left origin+ascender were its bearing
+			 * while still being able to position the text from the top left origin.
+			 *
+			 */
+			int32_t ascender = size->metrics.ascender >> 6;
+			int32_t bearingX = glyphEntry.left;
+			int32_t bearingY = (glyphEntry.height - glyphEntry.top) + (ascender - glyphEntry.height);
+
+			int32_t positionX = x + cursorX + bearingX;
+			int32_t positionY = y + cursorY + bearingY;
+
 			// Logger::info(std::to_string(x));
 			renderBatch->instances.emplace_back(Instance{{0, 0, 0, 255},
-			                                             {x + offsetX, y + offsetY},
+			                                             {positionX, positionY},
 			                                             {glyphEntry.width, glyphEntry.height},
 			                                             {glyphEntry.uv.minX, glyphEntry.uv.minY},
 			                                             {glyphEntry.uv.maxX, glyphEntry.uv.maxY}});
 
-			offsetX += glyphEntry.advance.x >> 16;
-			offsetY += glyphEntry.advance.y >> 16;
+			cursorX += glyphEntry.advance.x >> 16;
+			cursorY += glyphEntry.advance.y >> 16;
 		}
 
 		// profiler.end();

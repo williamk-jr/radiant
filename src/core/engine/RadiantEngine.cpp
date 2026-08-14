@@ -220,7 +220,8 @@ namespace Radiant {
 
 		std::unique_ptr<RenderBatch> charBatch = this->fontManager->compileStringGeometry(
 		    *this->notoSans,
-		    "rijeujsidjciojfiowfjiowedoaojmckafnbhejfowedwklfnbeasgheufioadfnasjdbgergheuirfjeiwfjlaskdgjnkesghehriwaej"
+		    "RLijeujsidjciojfiowfjiowedoaojmckafnbhejfowedwklfnbeasgheufioadfnasjdbgergheuirfjeiwfjlaskdgjnkesghehriwae"
+		    "j"
 		    "foaskldjgkefghedlrgheiorjsfjerguhewruigueirofjwefjisrhgeruifhiwjioepfjasiokgohjerjghewuoiafefjwaioeufoiwer"
 		    "gherjfjewikflwjeifoherughewriooooooooowfrbheyutewjirngeruiwjhrfyewiofjgtreidjfrhyuei9dskomfgeruiwdj",
 		    0, 0);

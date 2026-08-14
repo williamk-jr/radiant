@@ -56,7 +56,7 @@ namespace Radiant {
 			VulkanGraphicsPipelineBuilder& derivativeOf(VulkanPipeline& basePipeline);
 			VulkanGraphicsPipelineBuilder& cacheOf(VulkanPipeline& basePipeline);
 
-			VulkanGraphicsPipelineBuilder& withLayout(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts);
+			VulkanGraphicsPipelineBuilder& withLayout(std::span<VulkanDescriptorSetLayout> descriptorSetLayouts);
 
 			VulkanGraphicsPipelineBuilder& withLayout(std::vector<VkDescriptorSetLayout> descriptorSetLayouts);
 

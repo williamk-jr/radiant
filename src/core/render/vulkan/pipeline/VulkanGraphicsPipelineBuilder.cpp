@@ -41,7 +41,7 @@ namespace Radiant {
 	}
 
 	VulkanGraphicsPipelineBuilder&
-	VulkanGraphicsPipelineBuilder::withLayout(std::vector<VulkanDescriptorSetLayout>& descriptorSetLayouts) {
+	VulkanGraphicsPipelineBuilder::withLayout(std::span<VulkanDescriptorSetLayout> descriptorSetLayouts) {
 		for (VulkanDescriptorSetLayout& descriptorSetLayout : descriptorSetLayouts) {
 			this->descriptorSetLayouts.push_back(descriptorSetLayout.get());
 		}
