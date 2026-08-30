@@ -13,6 +13,9 @@ namespace Radiant {
 
 	enum FontCacheTypes : uint8_t { FONT_CACHE_GLYPH = 0x01, FONT_CACHE_SMALL_BITMAP = 0x02 };
 
+	/**
+	 * Wrapper for Freetype's built-in cache.
+	 */
 	class FontCache {
 		public:
 			FontCache(size_t cacheSize, FontCacheType cacheType);

@@ -26,35 +26,42 @@ namespace Radiant {
 		return {*this->fontCache, {path, 0}};
 	}
 
-	std::unique_ptr<RenderBatch>
-	FontManager::compileStringGeometry(Font& font, std::string str, uint32_t x, uint32_t y) {
-		// Debug::ExecutionProfiler profiler{"compileStringGeometry", true};
-		// profiler.begin();
-		FT_Size size = this->fontCache->lookupPixelFontSize(font.fontFaceIdentifier, 0, font.size);
-		// profiler.end();
+	std::unique_ptr<RenderBatch> FontManager::compileStringGeometry(Font& font, Box boundingBox, std::string str) {
+		FT_Size  size = this->fontCache->lookupPixelFontSize(font.fontFaceIdentifier, 0, font.size);
+		uint32_t x    = (uint32_t)boundingBox.getMinX();
+		uint32_t y    = (uint32_t)boundingBox.getMinY();
 
-		uint32_t                     cursorX     = 0;
-		uint32_t                     cursorY     = 0;
+		uint32_t cursorX = 0;
+		uint32_t cursorY = 0;
+
 		std::unique_ptr<RenderBatch> renderBatch = std::make_unique<RenderBatch>();
 		renderBatch->instances.reserve(str.size());
 
+		// TODO: Wrap text based on words instead of characters.
 		for (char charCode : str) {
-			// Check if glyph in gpu cache.
-			GlyphIdentifier glyphId = {font.fontFaceIdentifier, (unsigned long)charCode, font.size};
-			if (!fontGpuCache->hasEntry(glyphId)) {
-
-				FontCacheNode<FT_Glyph> glyphNode =
-				    this->fontCache->lookupGlyph(font.fontFaceIdentifier, charCode, font.size, font.size);
-				if (glyphNode.isEmpty()) {
-					Logger::info("Could not load char: " + std::to_string(charCode));
-					continue;
-				}
-
-				FT_BitmapGlyph bitmapGlyph = this->toBitmapGlyph(glyphNode.getValue(), FT_RENDER_MODE_NORMAL);
-				fontGpuCache->addEntry(bitmapGlyph, glyphNode.getValue()->advance, glyphId);
+			// Go to new line when encountering new line character.
+			if (charCode == '\n') {
+				int32_t ascender = size->metrics.ascender >> 6;
+				cursorY += ascender;
+				cursorX = 0;
+				continue;
 			}
 
-			GlyphEntry glyphEntry = this->fontGpuCache->getEntry(glyphId);
+			GlyphEntry glyphEntry      = this->getGlyphEntry(font, charCode);
+			int32_t    absoluteCursorX = x + cursorX;
+			int32_t    absoluteCursorY = y + cursorY;
+
+			Box glyphBoundingBox = {(float)absoluteCursorX, (float)absoluteCursorY,
+			                        (float)absoluteCursorX + glyphEntry.width,
+			                        (float)absoluteCursorY + glyphEntry.height};
+
+			bool shouldAdvance = true;
+			if (!boundingBox.containsX(glyphBoundingBox)) {
+				int32_t ascender = size->metrics.ascender >> 6;
+				cursorY += ascender;
+				cursorX       = 0;
+				shouldAdvance = false;
+			}
 
 			/*
 			 * BearingX and bearingY have the origin (0,0) in the bottom left corner by default.
@@ -75,21 +82,21 @@ namespace Radiant {
 			int32_t bearingY = (static_cast<int32_t>(glyphEntry.height) - glyphEntry.top)
 			                 + (ascender - static_cast<int32_t>(glyphEntry.height));
 
-			int32_t positionX = x + cursorX + bearingX;
-			int32_t positionY = y + cursorY + bearingY;
+			int32_t placementX = absoluteCursorX + bearingX;
+			int32_t placementY = absoluteCursorY + bearingY;
 
-			// Logger::info(std::to_string(x));
-			renderBatch->instances.emplace_back(Instance{{0, 255, 0, 255},
-			                                             {positionX, positionY},
+			renderBatch->instances.emplace_back(Instance{{0, 0, 255, 255},
+			                                             {placementX, placementY},
 			                                             {glyphEntry.width, glyphEntry.height},
-			                                             {glyphEntry.uv.minX, glyphEntry.uv.minY},
-			                                             {glyphEntry.uv.maxX, glyphEntry.uv.maxY}});
+			                                             {glyphEntry.uv.getMinX(), glyphEntry.uv.getMinY()},
+			                                             {glyphEntry.uv.getMaxX(), glyphEntry.uv.getMaxY()}});
 
-			cursorX += glyphEntry.advance.x >> 16;
+			if (shouldAdvance) {
+				cursorX += glyphEntry.advance.x >> 16;
+			}
 			cursorY += glyphEntry.advance.y >> 16;
 		}
 
-		// profiler.end();
 		return std::move(renderBatch);
 	}
 
@@ -110,5 +117,23 @@ namespace Radiant {
 			FT_Glyph_To_Bitmap(&glyph, renderMode, nullptr, false);
 		}
 		return (FT_BitmapGlyph)glyph;
+	}
+
+	GlyphEntry FontManager::getGlyphEntry(Font& font, unsigned long charCode) {
+		GlyphIdentifier glyphId = {font.fontFaceIdentifier, (unsigned long)charCode, font.size};
+		if (!fontGpuCache->hasEntry(glyphId)) {
+
+			FontCacheNode<FT_Glyph> glyphNode =
+			    this->fontCache->lookupGlyph(font.fontFaceIdentifier, charCode, font.size, font.size);
+
+			if (glyphNode.isEmpty()) {
+				Logger::info("Could not load char: " + std::to_string(charCode));
+			}
+
+			FT_BitmapGlyph bitmapGlyph = this->toBitmapGlyph(glyphNode.getValue(), FT_RENDER_MODE_NORMAL);
+			fontGpuCache->addEntry(bitmapGlyph, glyphNode.getValue()->advance, glyphId);
+		}
+
+		return this->fontGpuCache->getEntry(glyphId);
 	}
 } // namespace Radiant

@@ -22,11 +22,13 @@ namespace Radiant {
 			TextureAtlas&                getTextureAtlas();
 			bool                         isTextureAtlasDirty();
 			void                         markTextureAtlasClean();
-			std::unique_ptr<RenderBatch> compileStringGeometry(Font& font, std::string str, uint32_t x, uint32_t y);
+			std::unique_ptr<RenderBatch> compileStringGeometry(Font& font, Box boundingBox, std::string str);
 
 		private:
 			std::unique_ptr<FontCache>    fontCache;
 			std::unique_ptr<FontGPUCache> fontGpuCache;
-			FT_BitmapGlyph                toBitmapGlyph(FT_Glyph glyph, FT_Render_Mode renderMode);
+
+			FT_BitmapGlyph toBitmapGlyph(FT_Glyph glyph, FT_Render_Mode renderMode);
+			GlyphEntry     getGlyphEntry(Font& font, unsigned long charCode);
 	};
 } // namespace Radiant

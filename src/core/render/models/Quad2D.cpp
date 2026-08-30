@@ -20,10 +20,10 @@ namespace Radiant {
 
 		this->verticies = {
 		    // Position   UV
-		    {{-1, 1}, {uv.minX, uv.maxY}},  // Top Left
-		    {{1, 1}, {uv.maxX, uv.maxY}},   // Top Right
-		    {{-1, -1}, {uv.minX, uv.minY}}, // Bottom Left
-		    {{1, -1}, {uv.maxX, uv.minY}}   // Bottom Right
+		    {{-1, 1}, {uv.getMinX(), uv.getMaxY()}},  // Top Left
+		    {{1, 1}, {uv.getMaxX(), uv.getMaxY()}},   // Top Right
+		    {{-1, -1}, {uv.getMinX(), uv.getMinY()}}, // Bottom Left
+		    {{1, -1}, {uv.getMaxX(), uv.getMinY()}}   // Bottom Right
 		};
 
 		this->indicies = {0, 2, 3, 0, 1, 3};

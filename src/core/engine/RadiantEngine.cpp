@@ -29,8 +29,9 @@ namespace Radiant {
 
 		for (int i = 8; i <= 16; i++) {
 			notoSans->setPointSize(i);
-			std::unique_ptr<RenderBatch> batch = this->fontManager->compileStringGeometry(
-			    *this->notoSans, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.?,", 0, 0);
+			std::unique_ptr<RenderBatch> batch =
+			    this->fontManager->compileStringGeometry(*this->notoSans, {0, 0, (float)0xFFFFFFFF, (float)0xFFFFFFFF},
+			                                             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.?,");
 
 			Logger::info("Batch Font Size: " + std::to_string(i));
 			for (int j = 0; j < batch->instances.size(); j++) {
@@ -41,7 +42,7 @@ namespace Radiant {
 				             + std::to_string(batch->instances[j].size.y));
 			}
 		}
-		this->notoSans->setPointSize(64);
+		this->notoSans->setPointSize(16);
 
 		// Enable debug logs.
 #ifndef NDEBUG
@@ -57,7 +58,7 @@ namespace Radiant {
 		this->widgetManager = std::make_unique<WidgetManager>(*this->window, *this->stylesheetParser);
 
 		this->vertexBuffer   = renderer->createVertexBuffer(2048);
-		this->instanceBuffer = renderer->createInstanceBuffer(1024 * 100);
+		this->instanceBuffer = renderer->createInstanceBuffer(1024 * 1024);
 		this->indexBuffer    = renderer->createIndexBuffer(2048);
 		this->uniformBuffer  = renderer->createUniformBuffer(2048);
 
@@ -219,12 +220,41 @@ namespace Radiant {
 		renderer->drawIndexed(6, batch.instances.size());
 
 		std::unique_ptr<RenderBatch> charBatch = this->fontManager->compileStringGeometry(
-		    *this->notoSans,
-		    "RLijeujsidjciojfiowfjiowedoaojmckafnbhejfowedwklfnbeasgheufioadfnasjdbgergheuirfjeiwfjlaskdgjnkesghehriwae"
-		    "j"
-		    "foaskldjgkefghedlrgheiorjsfjerguhewruigueirofjwefjisrhgeruifhiwjioepfjasiokgohjerjghewuoiafefjwaioeufoiwer"
-		    "gherjfjewikflwjeifoherughewriooooooooowfrbheyutewjirngeruiwjhrfyewiofjgtreidjfrhyuei9dskomfgeruiwdj",
-		    0, 0);
+		    *this->notoSans, {0, 0, 1000, 1000},
+		    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam a libero vitae mauris accumsan hendrerit "
+		    "et at risus. Nam non ultricies massa. Nulla finibus velit sit amet est lobortis, nec finibus leo dictum. "
+		    "Nunc ut consequat lectus. Curabitur finibus augue magna, ut ornare nisl tristique vitae. Aenean sit amet "
+		    "orci mi. Donec vitae dui cursus, ultrices purus nec, laoreet turpis.\n\n"
+
+		    "In finibus sodales mauris, nec commodo neque porta sit amet. Donec lobortis elit nec dignissim dictum. "
+		    "Pellentesque nisl mauris, porttitor nec ipsum eget, fermentum placerat eros. Curabitur ac sollicitudin "
+		    "sem. Integer in tristique arcu. Nunc massa magna, mollis id nibh id, tristique semper magna. Cras "
+		    "pulvinar lobortis tempor. Donec consequat placerat malesuada. Duis sit amet libero et erat fringilla "
+		    "suscipit vel ac ex. Mauris dignissim volutpat porta.\n\n"
+
+		    "Donec a egestas diam, non porttitor ante. Sed id malesuada lacus, eget imperdiet sem. Mauris nec magna "
+		    "non mauris posuere finibus eget non enim. Fusce consectetur dolor id quam interdum auctor. Vestibulum "
+		    "egestas condimentum diam, at posuere lacus ullamcorper dapibus. Sed efficitur gravida scelerisque. Ut "
+		    "luctus, turpis ut cursus commodo, nibh nisl eleifend tellus, vitae vestibulum arcu mauris in quam. "
+		    "Suspendisse ultricies feugiat massa. Curabitur mauris dolor, varius sit amet quam a, accumsan scelerisque "
+		    "eros. Nunc ipsum enim, suscipit nec dui at, viverra condimentum nunc. Mauris vel posuere nisl, eget "
+		    "pulvinar sapien.\n\n"
+
+		    "Quisque justo felis, porta at odio gravida, fringilla euismod purus. Phasellus vel purus ac nibh volutpat "
+		    "tincidunt in vel elit. Fusce fringilla gravida ex vel tincidunt. Ut congue ornare orci, nec consequat "
+		    "magna viverra id. Vestibulum sed ante eu sem facilisis eleifend ut eget nibh. Curabitur in erat magna. In "
+		    "imperdiet tempor libero aliquet vestibulum. Phasellus dapibus volutpat ligula vel commodo. Fusce faucibus "
+		    "fermentum metus ac pulvinar. Curabitur vel metus fringilla, pharetra turpis et, faucibus nibh. Etiam sit "
+		    "amet massa sed mi blandit tincidunt eget at enim. Nunc justo odio, hendrerit et est nec, ornare sodales "
+		    "nulla.\n\n"
+
+		    "Phasellus ac arcu nec nulla egestas interdum. Aenean vulputate nulla sed rutrum viverra. Proin cursus "
+		    "tellus id sem rutrum luctus eget ac purus. Proin efficitur iaculis auctor. Suspendisse potenti. Cras "
+		    "imperdiet vitae diam quis lacinia. Fusce in est et sapien sodales porttitor a id massa. Suspendisse "
+		    "potenti. Cras iaculis urna leo, mollis congue tortor faucibus eu. Praesent dictum arcu lectus, nec "
+		    "placerat massa elementum a. Ut fermentum imperdiet rhoncus. Sed convallis id dolor vitae tincidunt. "
+		    "Mauris ultrices malesuada diam a tristique. Duis vitae porta lorem. Suspendisse quis condimentum est, non "
+		    "porta nisi. Donec in dolor ligula.\n\n");
 		VkDeviceSize charInstanceStart = this->instanceBuffer->getOffset();
 
 		if (!charBatch->instances.empty()) { // If empty, instanceBuffer does not need to be updated

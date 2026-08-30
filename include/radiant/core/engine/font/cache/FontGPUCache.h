@@ -15,10 +15,25 @@
 #include <utility>
 
 namespace Radiant {
+
+	/**
+	 * An identifier for glyphs in the atlas cache.
+	 */
 	struct GlyphIdentifier {
+			/**
+			 * An identifier for the font that the glyph belongs to.
+			 */
 			FontCacheIdentifier fontId;
-			unsigned long       charCode;
-			uint32_t            size;
+
+			/**
+			 * The glyph's character code.
+			 */
+			unsigned long charCode;
+
+			/**
+			 * The font size in pixels.
+			 */
+			uint32_t size;
 
 			bool operator==(const GlyphIdentifier& other) const {
 				return this->fontId == other.fontId && this->charCode == other.charCode && this->size == other.size;
@@ -34,6 +49,9 @@ namespace Radiant {
 			}
 	};
 
+	/**
+	 * An entry containing the texture atlas position and typographic information of a glyph.
+	 */
 	struct GlyphEntry {
 			Box       uv;
 			size_t    width;
@@ -43,33 +61,59 @@ namespace Radiant {
 			FT_Int    left;
 	};
 
-	/*
-	 * Cache glyphs for use in gpu texture atlas generation.
-	 *
-	 * Glyphs will be cached here as they are found by the font manager.
-	 * The cached glyphs can then be stiched into a texture atlas.
-	 *
-	 * If the cache state has been changed (eg. a new glyph was added),
-	 * the texture atlas will be rebuilt to match its new state.
-	 *
-	 * If the texture atlas cannot simply be recreated with new state appended,
-	 * such as when the atlas must be repacked to fit memory constraints,
-	 * the UV coordinates of every glyph must be updated to match the shifted positions.
+	/**
+	 * Caches glyphs in a texture atlas. Each time a glyph is added, the cache is marked as dirty.
+	 * Applications are expected to decide when to mark the cache as clean.
 	 */
 	class FontGPUCache {
 		public:
 			FontGPUCache();
 
+			/**
+			 * Adds a bitmap to the cache.
+			 *
+			 * @param FT_BitmapGlyph A reference to the bitmap.
+			 * @param FT_Vector How far to advance foward after the bitmap.
+			 * @param GlyphIdentifier A unique identifier for the provided glyph.
+			 */
 			void addEntry(FT_BitmapGlyph& bitmapGlyph, FT_Vector advance, GlyphIdentifier identifier);
 
+			/**
+			 * Retrieves an entry from the cache.
+			 *
+			 * @param GlyphIdentifier A unique identifier for the cached glyph.
+			 * @return A glyph entry.
+			 */
 			GlyphEntry getEntry(GlyphIdentifier identifier);
 
+			/**
+			 * Checks if an entry is in the cache.
+			 *
+			 * @param GlyphIdentifier A unique identifier for the cached glyph.
+			 * @return Whether the glyph is in the cache.
+			 */
 			bool hasEntry(GlyphIdentifier identifier);
 
+			/**
+			 * Checks if the cache has been modified.
+			 * Gives the application control over when to mark this cache as unmodified, as each application may use
+			 * this cache differently.
+			 *
+			 * @return Whether the cache has been modified.
+			 */
 			bool isDirty();
 
+			/**
+			 * Set the cache as unmodified.
+			 * Gives the application control over when to mark this cache as unmodified, as each application may use
+			 * this cache differently.
+			 */
 			void markClean();
 
+			/**
+			 * Retrieves the current texture atlas.
+			 * @return The texture atlas.
+			 */
 			TextureAtlas& getTextureAtlas();
 
 		private:
