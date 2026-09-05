@@ -3,4 +3,6 @@ libs/
 compile_commands.json
 heaptrack*
 
+**/__pycache__
+
 !.clang-format

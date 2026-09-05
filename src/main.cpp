@@ -3,19 +3,11 @@
 #include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/values/Color.h"
 #include "radiant/css/values/Unit.h"
+#include "radiant/util/logger/Logger.h"
 
 #include <memory>
 #include <string>
-#define GLFW_INCLUDE_VULKAN
-
-#include "radiant/util/logger/Logger.h"
-
-#include <GLFW/glfw3.h>
 #include <vector>
-#include <vma/vk_mem_alloc.h>
-#include <vulkan/vk_platform.h>
-#include <vulkan/vulkan.h>
-#include <vulkan/vulkan_core.h>
 
 /* TODO
  *
