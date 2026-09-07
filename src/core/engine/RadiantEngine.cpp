@@ -33,14 +33,14 @@ namespace Radiant {
 			    this->fontManager->compileStringGeometry(*this->notoSans, {0, 0, (float)0xFFFFFFFF, (float)0xFFFFFFFF},
 			                                             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.?,");
 
-			Logger::info("Batch Font Size: " + std::to_string(i));
-			for (int j = 0; j < batch->instances.size(); j++) {
-				Logger::info("\tInstance " + std::to_string(j) + ": ");
-				Logger::info("\t\tPosition: " + std::to_string(batch->instances[j].position.x) + ", "
-				             + std::to_string(batch->instances[j].position.y));
-				Logger::info("\t\tSize: " + std::to_string(batch->instances[j].size.x) + ", "
-				             + std::to_string(batch->instances[j].size.y));
-			}
+			// Logger::info("Batch Font Size: " + std::to_string(i));
+			// for (int j = 0; j < batch->instances.size(); j++) {
+			//	Logger::info("\tInstance " + std::to_string(j) + ": ");
+			//	Logger::info("\t\tPosition: " + std::to_string(batch->instances[j].position.x) + ", "
+			//	             + std::to_string(batch->instances[j].position.y));
+			//	Logger::info("\t\tSize: " + std::to_string(batch->instances[j].size.x) + ", "
+			//	             + std::to_string(batch->instances[j].size.y));
+			// }
 		}
 		this->notoSans->setPointSize(16);
 

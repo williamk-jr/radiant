@@ -18,7 +18,7 @@ namespace Radiant {
 	 */
 	class VulkanPhysicalDevice {
 		public:
-			/*
+			/**
 			 * @param VulkanInstance A valid vulkan instance.
 			 * @param VulkanPhysicalDeviceRequirements A callback containing logic for selecting a valid physical
 			 * device.
@@ -32,26 +32,28 @@ namespace Radiant {
 			VulkanPhysicalDevice& operator=(VulkanPhysicalDevice&&) noexcept = default;
 			~VulkanPhysicalDevice();
 
-			/* @return Returns a raw VkPhysicalDevice. */
+			/**
+			 * @return A raw VkPhysicalDevice.
+			 */
 			VkPhysicalDevice get();
 
-			/*
+			/**
 			 * @return The properties of this physical device.
 			 */
 			void getProperties(VkPhysicalDeviceProperties2* properties);
 
-			/*
-			 * @return Returns a vector of properties for each queue family.
+			/**
+			 * @return A vector of properties for each queue family.
 			 */
 			std::vector<VkQueueFamilyProperties2> getQueueFamilyProperties();
 
-			/*
+			/**
 			 * @param VulkanSurface A reference to a valid vulkan surface.
 			 * @return A vector of avaliable surface formats.
 			 */
 			std::vector<VkSurfaceFormat2KHR> getSurfaceFormats(VulkanSurface& surface);
 
-			/*
+			/**
 			 * @param VulkanSurface A reference to a valid vulkan surface.
 			 * @param uint32_t The index of a queue family as provided by getQueueFamilyProperties().
 			 * @return Whether the provided queue amily supports the provided surface.
@@ -59,6 +61,6 @@ namespace Radiant {
 			bool queueFamilySupportsSurfaceKHR(VulkanSurface& surface, uint32_t queueFamily);
 
 		private:
-			VkPhysicalDevice physicalDevice;
+			VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 	};
 } // namespace Radiant

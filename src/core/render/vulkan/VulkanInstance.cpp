@@ -2,10 +2,14 @@
 
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 
+#include <vulkan/vulkan_core.h>
+
 namespace Radiant {
-	VulkanInstance::VulkanInstance(const std::string&     applicationName,
-	                               std::span<const char*> extensionNames,
-	                               std::span<const char*> layerNames) {
+	VulkanInstance::VulkanInstance(const std::string& applicationName) : VulkanInstance(applicationName, {}, {}) {}
+
+	VulkanInstance::VulkanInstance(const std::string&           applicationName,
+	                               std::span<const char* const> extensionNames,
+	                               std::span<const char* const> layerNames) {
 		VkApplicationInfo applicationInfo  = {};
 		applicationInfo.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 		applicationInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -26,9 +30,9 @@ namespace Radiant {
 		VkInstanceCreateInfo instanceInfo    = {};
 		instanceInfo.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		instanceInfo.enabledLayerCount       = layerNames.size();
-		instanceInfo.ppEnabledLayerNames     = layerNames.data();
+		instanceInfo.ppEnabledLayerNames     = layerNames.size() != 0 ? layerNames.data() : nullptr;
 		instanceInfo.enabledExtensionCount   = extensionNames.size();
-		instanceInfo.ppEnabledExtensionNames = extensionNames.data();
+		instanceInfo.ppEnabledExtensionNames = extensionNames.size() != 0 ? extensionNames.data() : nullptr;
 		instanceInfo.pApplicationInfo        = &applicationInfo;
 		instanceInfo.pNext                   = &debugMessengerInfo;
 
@@ -36,11 +40,26 @@ namespace Radiant {
 	}
 
 	VulkanInstance::VulkanInstance(VulkanInstance&& other) noexcept : instance(other.instance) {
-		other.instance = nullptr;
+		other.instance = VK_NULL_HANDLE;
+	}
+
+	VulkanInstance& VulkanInstance::operator=(VulkanInstance&& other) noexcept {
+		if (this != &other) {
+			if (instance != VK_NULL_HANDLE) {
+				vkDestroyInstance(instance, nullptr);
+			}
+
+			instance       = other.instance;
+			other.instance = VK_NULL_HANDLE;
+		}
+
+		return *this;
 	}
 
 	VulkanInstance::~VulkanInstance() {
-		vkDestroyInstance(this->instance, nullptr);
+		if (this->instance != VK_NULL_HANDLE) {
+			vkDestroyInstance(this->instance, nullptr);
+		}
 	}
 
 	VkInstance VulkanInstance::get() {

@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.h>
+#include <vulkan/vulkan_core.h>
 
 namespace Radiant {
 	/* VulkanInstance
@@ -14,15 +15,17 @@ namespace Radiant {
 	 */
 	class VulkanInstance {
 		public:
-			VulkanInstance(const std::string&     applicationName,
-			               std::span<const char*> extensionNames,
-			               std::span<const char*> layerNames);
+			VulkanInstance(const std::string& applicationName);
+
+			VulkanInstance(const std::string&           applicationName,
+			               std::span<const char* const> extensionNames,
+			               std::span<const char* const> layerNames);
 
 			VulkanInstance(const VulkanInstance&)            = delete;
 			VulkanInstance& operator=(const VulkanInstance&) = delete;
 
 			VulkanInstance(VulkanInstance&&) noexcept;
-			VulkanInstance& operator=(VulkanInstance&&) noexcept = default;
+			VulkanInstance& operator=(VulkanInstance&&) noexcept;
 			~VulkanInstance();
 
 			/*
@@ -31,7 +34,7 @@ namespace Radiant {
 			VkInstance get();
 
 		private:
-			VkInstance instance;
+			VkInstance instance = VK_NULL_HANDLE;
 
 			static VkBool32 debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT      messageSeverity,
 			                              VkDebugUtilsMessageTypeFlagsEXT             messageTypes,

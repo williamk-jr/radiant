@@ -2,4 +2,5 @@ if [[ ! -v VK_ADD_LAYER_PATH ]]; then
   source ~/sdk/VulkanSdk/setup-env.sh
 fi
 
-gdb ~/Projects/C++/Radiant/build/tests/RadiantTests
+# Defer script to python
+python3 ./scripts/python/run_unit_tests.py
