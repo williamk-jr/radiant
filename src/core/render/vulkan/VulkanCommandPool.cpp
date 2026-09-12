@@ -1,6 +1,9 @@
 #include "radiant/core/render/vulkan/VulkanCommandPool.h"
 
+#include "radiant/core/render/vulkan/VulkanResult.h"
+
 #include <span>
+#include <vector>
 
 namespace Radiant {
 	VulkanCommandPool::VulkanCommandPool(VulkanDevice& device, uint32_t queueFamily) : device(device.get()) {
@@ -21,12 +24,13 @@ namespace Radiant {
 		vkDestroyCommandPool(this->device, this->commandPool, nullptr);
 	}
 
-	void VulkanCommandPool::reset(bool recycleResources) {
-		Validation::verify(vkResetCommandPool(this->device, this->commandPool,
-		                                      recycleResources ? VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT : 0));
+	VulkanResult<void> VulkanCommandPool::reset(bool recycleResources) {
+		return vkResetCommandPool(this->device, this->commandPool,
+		                          recycleResources ? VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT : 0);
 	}
 
-	std::vector<VulkanCommandBuffer> VulkanCommandPool::allocateCommandBuffers(int count, VkCommandBufferLevel level) {
+	VulkanResult<std::vector<VulkanCommandBuffer>>
+	VulkanCommandPool::allocateCommandBuffers(int count, VkCommandBufferLevel level) {
 		std::vector<VkCommandBuffer> commandBuffers(count);
 
 		VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
@@ -35,7 +39,7 @@ namespace Radiant {
 		commandBufferAllocateInfo.commandBufferCount = count;
 		commandBufferAllocateInfo.level              = level;
 
-		Validation::verify(vkAllocateCommandBuffers(this->device, &commandBufferAllocateInfo, commandBuffers.data()));
+		VkResult result = vkAllocateCommandBuffers(this->device, &commandBufferAllocateInfo, commandBuffers.data());
 
 		std::vector<VulkanCommandBuffer> wrappedCommandBuffers;
 		wrappedCommandBuffers.reserve(count);
@@ -44,11 +48,12 @@ namespace Radiant {
 			wrappedCommandBuffers.emplace_back(this->device, buffer, this->commandPool);
 		}
 
-		return wrappedCommandBuffers;
+		return {result, std::move(wrappedCommandBuffers)};
 	}
 
-	VulkanCommandBuffer VulkanCommandPool::allocateCommandBuffer(VkCommandBufferLevel level) {
-		return std::move(this->allocateCommandBuffers(1, level)[0]);
+	VulkanResult<VulkanCommandBuffer> VulkanCommandPool::allocateCommandBuffer(VkCommandBufferLevel level) {
+		VulkanResult<std::vector<VulkanCommandBuffer>> result = this->allocateCommandBuffers(1, level);
+		return {result.getResult(), std::move(result.getValue()[0])};
 	}
 
 	void VulkanCommandPool::freeCommandBuffers(std::span<VulkanCommandBuffer> commandBuffers) {

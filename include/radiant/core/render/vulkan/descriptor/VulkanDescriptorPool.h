@@ -1,6 +1,7 @@
 #pragma once
 
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include "radiant/core/render/vulkan/VulkanResult.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSetLayout.h"
 
@@ -69,7 +70,7 @@ namespace Radiant {
 			 * @param std::vector<VulkanDescriptorSetLayout>& A reference to a vector of descriptor set layouts.
 			 * @return A vector of descriptor sets.
 			 */
-			std::vector<VulkanDescriptorSet>
+			VulkanResult<std::vector<VulkanDescriptorSet>>
 			allocateDescriptorSets(std::span<VulkanDescriptorSetLayout> descriptorSetLayouts);
 
 			/*
@@ -79,8 +80,8 @@ namespace Radiant {
 			 * @param uint32_t The number o descriptor sets to allocate with the descriptor set layout.
 			 * @return A vector of descriptor sets.
 			 */
-			std::vector<VulkanDescriptorSet> allocateDescriptorSets(VulkanDescriptorSetLayout& descriptorSetLayout,
-			                                                        uint32_t                   count);
+			VulkanResult<std::vector<VulkanDescriptorSet>>
+			allocateDescriptorSets(VulkanDescriptorSetLayout& descriptorSetLayout, uint32_t count);
 
 			/*
 			 * Allocates a single descriptor set.
@@ -88,7 +89,7 @@ namespace Radiant {
 			 * @param VulkanDescriptorSetLayout A reference to a descriptor set layout.
 			 * @return A descriptor set.
 			 */
-			VulkanDescriptorSet allocateDescriptorSet(VulkanDescriptorSetLayout& descriptorSetLayout);
+			VulkanResult<VulkanDescriptorSet> allocateDescriptorSet(VulkanDescriptorSetLayout& descriptorSetLayout);
 
 			/*
 			 * Updates descriptor sets.

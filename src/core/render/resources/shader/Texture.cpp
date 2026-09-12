@@ -58,7 +58,8 @@ namespace Radiant {
 		copyRegion.imageSubresource = subresource;
 
 		// Preform the copy.
-		VulkanCommandBuffer commandBuffer = commandPool.allocateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+		VulkanCommandBuffer commandBuffer =
+		    commandPool.allocateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY).getValue();
 		commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
 		// Transfer image layout to transfer dst optimal.

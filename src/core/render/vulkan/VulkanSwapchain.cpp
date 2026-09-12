@@ -157,11 +157,11 @@ namespace Radiant {
 
 	VkSurfaceFormat2KHR VulkanSwapchain::findSurfaceFormat(VulkanPhysicalDevice& physicalDevice,
 	                                                       VulkanSurface&        surface) {
-		std::vector<VkSurfaceFormat2KHR> surfaceFormats = physicalDevice.getSurfaceFormats(surface);
+		std::vector<VkSurfaceFormat2KHR> surfaceFormats = physicalDevice.getSurfaceFormats(surface).getValue();
 
 		for (VkSurfaceFormat2KHR& format : surfaceFormats) {
-			if (format.surfaceFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
-			    format.surfaceFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+			if (format.surfaceFormat.format == VK_FORMAT_B8G8R8A8_SRGB
+			    && format.surfaceFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
 				return format;
 			}
 		}

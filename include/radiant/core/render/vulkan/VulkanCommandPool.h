@@ -1,6 +1,7 @@
 #pragma once
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include "radiant/core/render/vulkan/VulkanResult.h"
 
 #include <span>
 #include <vulkan/vulkan_core.h>
@@ -31,7 +32,7 @@ namespace Radiant {
 			 *
 			 * @param bool Whether to recycle resources.
 			 */
-			void reset(bool recycleResources);
+			VulkanResult<void> reset(bool recycleResources);
 
 			/*
 			 * Allocates command buffers.
@@ -39,14 +40,15 @@ namespace Radiant {
 			 * @param int Number of command buffers to allocate.
 			 * @param VkCommandBufferLevel The level allocated command buffers will be.
 			 */
-			std::vector<VulkanCommandBuffer> allocateCommandBuffers(int count, VkCommandBufferLevel level);
+			VulkanResult<std::vector<VulkanCommandBuffer>> allocateCommandBuffers(int                  count,
+			                                                                      VkCommandBufferLevel level);
 
 			/*
 			 * Allocates a single command buffer.
 			 *
 			 * @param VkCommandBufferLevel The level allocated command buffers will be.
 			 */
-			VulkanCommandBuffer allocateCommandBuffer(VkCommandBufferLevel level);
+			VulkanResult<VulkanCommandBuffer> allocateCommandBuffer(VkCommandBufferLevel level);
 
 			/*
 			 * Frees allocated command buffers.

@@ -17,6 +17,20 @@ namespace Radiant {
 		other.commandBuffer = nullptr;
 	}
 
+	VulkanCommandBuffer& VulkanCommandBuffer::operator=(VulkanCommandBuffer&& other) noexcept {
+		if (this != &other) {
+			if (this->commandBuffer != VK_NULL_HANDLE) {
+				vkFreeCommandBuffers(this->device, this->commandPool, 1, &commandBuffer);
+			}
+
+			this->commandBuffer = other.commandBuffer;
+			this->commandPool   = other.commandPool;
+			other.commandBuffer = VK_NULL_HANDLE;
+		}
+
+		return *this;
+	}
+
 	VulkanCommandBuffer::~VulkanCommandBuffer() {
 		vkFreeCommandBuffers(this->device, this->commandPool, 1, &commandBuffer);
 	}
@@ -33,7 +47,7 @@ namespace Radiant {
 		                       copyRegions.data());
 	}
 
-	void VulkanCommandBuffer::begin(VkCommandBufferUsageFlags flags) {
+	VulkanResult<void> VulkanCommandBuffer::begin(VkCommandBufferUsageFlags flags) {
 		// VkCommandBufferInheritanceInfo commandBufferInheritanceInfo{};
 
 		VkCommandBufferBeginInfo commandBufferBeginInfo{};
@@ -41,7 +55,7 @@ namespace Radiant {
 		commandBufferBeginInfo.flags            = flags;
 		commandBufferBeginInfo.pInheritanceInfo = nullptr; // TODO research secondary vs. primary command buffers.
 
-		Validation::verify(vkBeginCommandBuffer(this->commandBuffer, &commandBufferBeginInfo));
+		return vkBeginCommandBuffer(this->commandBuffer, &commandBufferBeginInfo);
 	}
 
 	void VulkanCommandBuffer::pipelineMemoryBarrier(std::span<VkMemoryBarrier2> memoryBarriers,

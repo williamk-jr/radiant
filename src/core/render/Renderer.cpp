@@ -61,8 +61,8 @@ namespace Radiant {
 			this->updateSwapchain = true; // Swapchain updated at the end of frame.
 		}
 
-		VulkanImage&     currentImage     = this->swapchain->getImage(imageIndex.value);
-		VulkanImageView& currentImageView = this->swapchain->getImageView(imageIndex.value);
+		VulkanImage&     currentImage     = this->swapchain->getImage(imageIndex.getValue());
+		VulkanImageView& currentImageView = this->swapchain->getImageView(imageIndex.getValue());
 
 		VkImageSubresourceRange subresourceRange{};
 		subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -88,7 +88,7 @@ namespace Radiant {
 		this->commandBuffers[currentFrame].pipelineImageMemoryBarrier(imageMemoryBarriers, 0);
 
 		// Global render state. Allows usage similar to OpenGL.
-		this->context.imageIndex = imageIndex.value;
+		this->context.imageIndex = imageIndex.getValue();
 		this->context.rendering  = true;
 	}
 
@@ -299,9 +299,10 @@ namespace Radiant {
 		this->graphicsQueue = std::make_unique<VulkanQueue>(*this->device, this->device->getGraphicsQueueFamily(), 0);
 		this->presentQueue  = std::make_unique<VulkanQueue>(*this->device, this->device->getPresentQueueFamily(), 0);
 
-		this->commandPool    = std::make_unique<VulkanCommandPool>(*device, device->getGraphicsQueueFamily());
-		this->commandBuffers = this->commandPool->allocateCommandBuffers(this->swapchain->getImageCount(),
-		                                                                 VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+		this->commandPool = std::make_unique<VulkanCommandPool>(*device, device->getGraphicsQueueFamily());
+		this->commandBuffers =
+		    this->commandPool->allocateCommandBuffers(this->swapchain->getImageCount(), VK_COMMAND_BUFFER_LEVEL_PRIMARY)
+		        .getValue();
 
 		uint32_t imageCount = this->swapchain->getImageCount();
 		this->fences.reserve(imageCount);
@@ -342,7 +343,7 @@ namespace Radiant {
 		Rect2D newFrameBufferSize = window.getFrameBufferSize();
 
 		bool isSurfaceOutOfDate =
-		    (imageIndex.result == VK_ERROR_OUT_OF_DATE_KHR) || (imageIndex.result == VK_SUBOPTIMAL_KHR);
+		    (imageIndex.getResult() == VK_ERROR_OUT_OF_DATE_KHR) || (imageIndex.getResult() == VK_SUBOPTIMAL_KHR);
 
 		bool isFrameBufferResized = (newFrameBufferSize.width != this->frameBufferSize.width)
 		                         || (newFrameBufferSize.height != this->frameBufferSize.height);

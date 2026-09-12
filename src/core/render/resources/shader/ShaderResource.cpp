@@ -12,7 +12,7 @@ namespace Radiant {
 	                               VulkanDescriptorSetLayout& descriptorSetLayout)
 	    : descriptorType(descriptorType) {
 		this->descriptorSet =
-		    std::make_unique<VulkanDescriptorSet>(descriptorPool.allocateDescriptorSet(descriptorSetLayout));
+		    std::make_unique<VulkanDescriptorSet>(descriptorPool.allocateDescriptorSet(descriptorSetLayout).getValue());
 	}
 
 	ShaderResource::ShaderResource(ShaderResource&& other) noexcept

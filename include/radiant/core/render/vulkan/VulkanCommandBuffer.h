@@ -29,7 +29,7 @@ namespace Radiant {
 			VulkanCommandBuffer& operator=(const VulkanCommandBuffer&) = delete;
 
 			VulkanCommandBuffer(VulkanCommandBuffer&&) noexcept;
-			VulkanCommandBuffer& operator=(VulkanCommandBuffer&&) noexcept = default;
+			VulkanCommandBuffer& operator=(VulkanCommandBuffer&&) noexcept;
 			~VulkanCommandBuffer();
 
 			/*
@@ -51,7 +51,7 @@ namespace Radiant {
 			 *
 			 * @param VkCommandBufferUsageFlags Usage flags.
 			 */
-			void begin(VkCommandBufferUsageFlags flags);
+			VulkanResult<void> begin(VkCommandBufferUsageFlags flags);
 
 			/*
 			 * Inserts memory barriers.

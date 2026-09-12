@@ -21,7 +21,7 @@ namespace Radiant {
 				graphicsQueueFamily = i;
 			}
 
-			if (physicalDevice.queueFamilySupportsSurfaceKHR(surface, i)) {
+			if (physicalDevice.queueFamilySupportsSurfaceKHR(surface, i).getValue()) {
 				presentQueueFamily = i;
 			}
 

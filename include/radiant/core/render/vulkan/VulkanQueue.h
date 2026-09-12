@@ -1,6 +1,7 @@
 #pragma once
 
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
+#include "radiant/core/render/vulkan/VulkanResult.h"
 #include "radiant/core/render/vulkan/VulkanSwapchain.h"
 #include "radiant/core/render/vulkan/syncronization/VulkanFence.h"
 #include "radiant/core/render/vulkan/syncronization/VulkanSemaphore.h"
@@ -44,10 +45,10 @@ namespace Radiant {
 			 * buffers is complete.
 			 * @param VulkanFence& A reference to a valid vulkan fence to wait on before work can be submitted.
 			 */
-			void submit(std::span<VulkanCommandBuffer>         commandBuffers,
-			            std::vector<VulkanSemaphoreSubmitInfo> waitSemaphores,
-			            std::vector<VulkanSemaphoreSubmitInfo> signalSemaphores,
-			            VulkanFence*                           fence);
+			VulkanResult<void> submit(std::span<VulkanCommandBuffer>         commandBuffers,
+			                          std::vector<VulkanSemaphoreSubmitInfo> waitSemaphores,
+			                          std::vector<VulkanSemaphoreSubmitInfo> signalSemaphores,
+			                          VulkanFence*                           fence);
 
 			/*
 			 * Submits command buffers for their commands to be executed.
@@ -58,10 +59,10 @@ namespace Radiant {
 			 * buffers is complete.
 			 * @param VulkanFence& A reference to a valid vulkan fence to wait on before work can be submitted.
 			 */
-			void submit(VulkanCommandBuffer&                   commandBuffer,
-			            std::vector<VulkanSemaphoreSubmitInfo> waitSemaphores,
-			            std::vector<VulkanSemaphoreSubmitInfo> signalSemaphores,
-			            VulkanFence*                           fence);
+			VulkanResult<void> submit(VulkanCommandBuffer&                   commandBuffer,
+			                          std::vector<VulkanSemaphoreSubmitInfo> waitSemaphores,
+			                          std::vector<VulkanSemaphoreSubmitInfo> signalSemaphores,
+			                          VulkanFence*                           fence);
 
 			/*
 			 * Submits command buffers for their commands to be executed.
@@ -82,9 +83,9 @@ namespace Radiant {
 			 * @param std::vector<VulkanSemaphore*>& A reference to a vector of valid semaphore pointers to wait on
 			 * before presenting.
 			 */
-			void present(VulkanSwapchain&           swapchain,
-			             std::vector<uint32_t>      imageIndicies,
-			             std::span<VulkanSemaphore> waitSemaphores);
+			VulkanResult<void> present(VulkanSwapchain&           swapchain,
+			                           std::vector<uint32_t>      imageIndicies,
+			                           std::span<VulkanSemaphore> waitSemaphores);
 
 			/* Presents an image in the swapchain to a surface.
 			 *
@@ -92,7 +93,7 @@ namespace Radiant {
 			 * @param std::vector<uint32_t> A vector of image indicies to present from swapchain.
 			 * @param VulkanSemaphore& A reference to a valid semaphore to wait on before presenting.
 			 */
-			void
+			VulkanResult<void>
 			present(VulkanSwapchain& swapchain, std::vector<uint32_t> imageIndicies, VulkanSemaphore& waitSemaphores);
 
 			void waitIdle();

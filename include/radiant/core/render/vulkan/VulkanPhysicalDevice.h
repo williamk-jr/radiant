@@ -1,6 +1,7 @@
 #pragma once
 
 #include "radiant/core/render/vulkan/VulkanInstance.h"
+#include "radiant/core/render/vulkan/VulkanResult.h"
 #include "radiant/core/render/vulkan/VulkanSurface.h"
 
 #include <cstdint>
@@ -40,7 +41,7 @@ namespace Radiant {
 			/**
 			 * @return The properties of this physical device.
 			 */
-			void getProperties(VkPhysicalDeviceProperties2* properties);
+			VkPhysicalDeviceProperties2 getProperties();
 
 			/**
 			 * @return A vector of properties for each queue family.
@@ -51,14 +52,14 @@ namespace Radiant {
 			 * @param VulkanSurface A reference to a valid vulkan surface.
 			 * @return A vector of avaliable surface formats.
 			 */
-			std::vector<VkSurfaceFormat2KHR> getSurfaceFormats(VulkanSurface& surface);
+			VulkanResult<std::vector<VkSurfaceFormat2KHR>> getSurfaceFormats(VulkanSurface& surface);
 
 			/**
 			 * @param VulkanSurface A reference to a valid vulkan surface.
 			 * @param uint32_t The index of a queue family as provided by getQueueFamilyProperties().
 			 * @return Whether the provided queue amily supports the provided surface.
 			 */
-			bool queueFamilySupportsSurfaceKHR(VulkanSurface& surface, uint32_t queueFamily);
+			VulkanResult<bool> queueFamilySupportsSurfaceKHR(VulkanSurface& surface, uint32_t queueFamily);
 
 		private:
 			VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
