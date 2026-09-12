@@ -2,13 +2,15 @@
 
 #include "radiant/util/logger/Logger.h"
 
+#include <string>
+
 namespace Radiant {
-	namespace Validation {
-		void verify(VkResult result) {
+	namespace VulkanUtil {
+		void validate(std::string message, VkResult result) {
 			if (result != VK_SUCCESS) {
-				Logger::fatal("Something went wrong. Vulkan Error Code: " + std::to_string(result),
+				Logger::fatal(message + " Error Code: " + std::to_string(result),
 				              {{"VULKAN", MessageStyle::WHITE}, LogPrefixes::time(MessageStyle::WHITE)});
 			}
 		}
-	} // namespace Validation
+	} // namespace VulkanUtil
 } // namespace Radiant

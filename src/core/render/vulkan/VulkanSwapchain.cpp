@@ -30,6 +30,8 @@ namespace Radiant {
 	                             VkImageUsageFlags         imageUsageFlags,
 	                             VkPresentModeKHR          presentMode,
 	                             VkSwapchainCreateFlagsKHR swapchainFlags) {
+		VkResult result = VK_SUCCESS;
+
 		VkPhysicalDeviceSurfaceInfo2KHR surfaceInfo{};
 		surfaceInfo.sType   = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR;
 		surfaceInfo.surface = surface.get();
@@ -37,7 +39,9 @@ namespace Radiant {
 		VkSurfaceCapabilities2KHR surfaceCapabilities{};
 		surfaceCapabilities.sType = VK_STRUCTURE_TYPE_SURFACE_CAPABILITIES_2_KHR;
 
-		vkGetPhysicalDeviceSurfaceCapabilities2KHR(physicalDevice.get(), &surfaceInfo, &surfaceCapabilities);
+		result = vkGetPhysicalDeviceSurfaceCapabilities2KHR(physicalDevice.get(), &surfaceInfo, &surfaceCapabilities);
+		VulkanUtil::validate("VulkanSwapchain Initialization Error. Failed to retrieve surface capabilities.", result);
+
 		VkSurfaceFormat2KHR surfaceFormat = this->findSurfaceFormat(physicalDevice, surface);
 
 		// VkExtent2D swapchainExtent{surfaceCapabilities.surfaceCapabilities.currentExtent};
@@ -71,16 +75,18 @@ namespace Radiant {
 			swapchainInfo.pQueueFamilyIndices   = nullptr;
 		}
 
-		Validation::verify(vkCreateSwapchainKHR(device.get(), &swapchainInfo, nullptr, &this->swapchain));
+		result = vkCreateSwapchainKHR(device.get(), &swapchainInfo, nullptr, &this->swapchain);
+		VulkanUtil::validate("VulkanSwapchain Initialization Error. Failed to create swapchain.", result);
 
 		uint32_t swapchainImageCount = 0;
-		vkGetSwapchainImagesKHR(device.get(), this->swapchain, &swapchainImageCount, nullptr);
+		result = vkGetSwapchainImagesKHR(device.get(), this->swapchain, &swapchainImageCount, nullptr);
 
 		std::vector<VkImage> rawImages;
 		rawImages.reserve(swapchainImageCount);
 		this->images.reserve(swapchainImageCount);
 		this->imageViews.reserve(swapchainImageCount);
-		vkGetSwapchainImagesKHR(device.get(), this->swapchain, &swapchainImageCount, rawImages.data());
+		result = vkGetSwapchainImagesKHR(device.get(), this->swapchain, &swapchainImageCount, rawImages.data());
+		VulkanUtil::validate("VulkanSwapchain Initialization Error. Failed to get swapchain images.", result);
 
 		VkImageSubresourceRange subresourceRange{};
 		subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;

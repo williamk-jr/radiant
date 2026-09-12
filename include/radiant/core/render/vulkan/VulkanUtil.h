@@ -1,8 +1,9 @@
 #pragma once
+#include <string>
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
-	namespace Validation {
-		void verify(VkResult result);
+	namespace VulkanUtil {
+		void validate(std::string message, VkResult result);
 	}
 } // namespace Radiant

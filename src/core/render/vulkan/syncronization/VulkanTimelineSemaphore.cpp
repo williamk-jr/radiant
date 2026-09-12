@@ -1,5 +1,7 @@
 #include "radiant/core/render/vulkan/syncronization/VulkanTimelineSemaphore.h"
 
+#include "radiant/core/render/vulkan/VulkanResult.h"
+
 namespace Radiant {
 	VulkanTimelineSemaphore::VulkanTimelineSemaphore(VulkanDevice&          device,
 	                                                 VkSemaphoreCreateFlags flags,
@@ -18,20 +20,20 @@ namespace Radiant {
 		return value;
 	}
 
-	void VulkanTimelineSemaphore::signal(uint64_t value) {
+	VulkanResult<void> VulkanTimelineSemaphore::signal(uint64_t value) {
 		VkSemaphoreSignalInfo signalInfo{};
 		signalInfo.sType     = VK_STRUCTURE_TYPE_SEMAPHORE_SIGNAL_INFO;
 		signalInfo.semaphore = this->get();
 		signalInfo.value     = value;
 
-		Validation::verify(vkSignalSemaphore(this->device, &signalInfo));
+		return vkSignalSemaphore(this->device, &signalInfo);
 	}
 
-	void VulkanTimelineSemaphore::waitSemaphores(VulkanDevice&                         device,
-	                                             std::vector<VulkanTimelineSemaphore>& semaphores,
-	                                             std::vector<uint64_t>&                values,
-	                                             VkSemaphoreWaitFlags                  flags,
-	                                             uint64_t                              timeout) {
+	VulkanResult<void> VulkanTimelineSemaphore::waitSemaphores(VulkanDevice&                         device,
+	                                                           std::vector<VulkanTimelineSemaphore>& semaphores,
+	                                                           std::vector<uint64_t>&                values,
+	                                                           VkSemaphoreWaitFlags                  flags,
+	                                                           uint64_t                              timeout) {
 		std::vector<VkSemaphore> rawSemaphores(semaphores.size());
 
 		for (VulkanSemaphore& semaphore : semaphores) {
@@ -45,6 +47,6 @@ namespace Radiant {
 		waitInfo.pValues        = values.data();
 		waitInfo.flags          = flags;
 
-		Validation::verify(vkWaitSemaphores(device.get(), &waitInfo, timeout));
+		return vkWaitSemaphores(device.get(), &waitInfo, timeout);
 	}
 } // namespace Radiant

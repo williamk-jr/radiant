@@ -10,7 +10,8 @@ namespace Radiant {
 		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 		samplerInfo.flags = flags;
 
-		Validation::verify(vkCreateSampler(device.get(), &samplerInfo, nullptr, &this->sampler));
+		VkResult result = vkCreateSampler(device.get(), &samplerInfo, nullptr, &this->sampler);
+		VulkanUtil::validate("VulkanSampler Initialization Error. Failed to create sampler.", result);
 	}
 
 	VulkanSampler::VulkanSampler(VulkanSampler&& other) noexcept : sampler(other.sampler), device(other.device) {

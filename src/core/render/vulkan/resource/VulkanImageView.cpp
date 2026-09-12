@@ -1,5 +1,7 @@
 #include "radiant/core/render/vulkan/resource/VulkanImageView.h"
 
+#include "radiant/core/render/vulkan/VulkanUtil.h"
+
 namespace Radiant {
 	VulkanImageView::VulkanImageView(VulkanDevice&           device,
 	                                 VulkanImage&            image,
@@ -23,7 +25,8 @@ namespace Radiant {
 		imageViewInfo.subresourceRange = subresourceRange;
 		imageViewInfo.flags            = flags;
 
-		vkCreateImageView(device.get(), &imageViewInfo, nullptr, &this->imageView);
+		VkResult result = vkCreateImageView(device.get(), &imageViewInfo, nullptr, &this->imageView);
+		VulkanUtil::validate("VulkanImageView Initialization Error. Failed to create image view.", result);
 
 		this->extent = image.getExtent();
 	}

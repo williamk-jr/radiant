@@ -18,7 +18,8 @@ namespace Radiant {
 		allocatorInfo.flags            = 0;
 		allocatorInfo.pVulkanFunctions = &vulkanFunctions;
 
-		Validation::verify(vmaCreateAllocator(&allocatorInfo, &this->memoryAllocator));
+		VkResult result = vmaCreateAllocator(&allocatorInfo, &this->memoryAllocator);
+		VulkanUtil::validate("VulkanMemoryAllocator Initialization Error. Failed to create memory allocator.", result);
 	}
 
 	VulkanMemoryAllocator::VulkanMemoryAllocator(VulkanMemoryAllocator&& other) noexcept

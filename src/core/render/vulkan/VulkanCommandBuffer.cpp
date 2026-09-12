@@ -1,5 +1,6 @@
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
 
+#include "radiant/core/render/vulkan/VulkanResult.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
 #include "radiant/core/render/vulkan/resource/VulkanBuffer.h"
@@ -213,8 +214,8 @@ namespace Radiant {
 		vkCmdEndRendering(this->commandBuffer);
 	}
 
-	void VulkanCommandBuffer::end() {
-		Validation::verify(vkEndCommandBuffer(this->commandBuffer));
+	VulkanResult<void> VulkanCommandBuffer::end() {
+		return vkEndCommandBuffer(this->commandBuffer);
 	}
 
 	void VulkanCommandBuffer::reset(bool recycleResources) {

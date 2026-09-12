@@ -97,6 +97,7 @@ namespace Radiant {
 		deviceInfo.ppEnabledExtensionNames = extensions.data();
 		deviceInfo.pNext                   = &vulkan13Features;
 
-		Validation::verify(vkCreateDevice(physicalDevice.get(), &deviceInfo, nullptr, &this->device));
+		VkResult result = vkCreateDevice(physicalDevice.get(), &deviceInfo, nullptr, &this->device);
+		VulkanUtil::validate("VulkanDevice Initialization Error. Failed to create device.", result);
 	}
 } // namespace Radiant

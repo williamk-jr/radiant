@@ -1,6 +1,7 @@
 
 #pragma once
 #include "radiant/core/render/vulkan/VulkanDevice.h"
+#include "radiant/core/render/vulkan/VulkanResult.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
 #include "radiant/core/render/vulkan/pipeline/VulkanPipeline.h"
@@ -199,7 +200,7 @@ namespace Radiant {
 			/*
 			 * Stops recording the command buffer.
 			 */
-			void end();
+			VulkanResult<void> end();
 
 			/*
 			 * Resets the command buffer state.

@@ -11,7 +11,8 @@ namespace Radiant {
 		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceInfo.flags = flags;
 
-		Validation::verify(vkCreateFence(device.get(), &fenceInfo, nullptr, &this->fence));
+		VkResult result = vkCreateFence(device.get(), &fenceInfo, nullptr, &this->fence);
+		VulkanUtil::validate("VulkanFence Initialization Error. Failed to create fence.", result);
 	}
 
 	VulkanFence::VulkanFence(VulkanFence&& other) noexcept : fence(other.fence), device(other.device) {

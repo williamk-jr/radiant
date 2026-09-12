@@ -34,8 +34,9 @@ namespace Radiant {
 		VmaAllocationCreateInfo allocationInfo{};
 		allocationInfo.usage = VMA_MEMORY_USAGE_AUTO;
 
-		Validation::verify(
-		    vmaCreateImage(allocator.get(), &imageInfo, &allocationInfo, &this->image, &this->imageMemory, nullptr));
+		VkResult result =
+		    vmaCreateImage(allocator.get(), &imageInfo, &allocationInfo, &this->image, &this->imageMemory, nullptr);
+		VulkanUtil::validate("VulkanImage Initialization Error. Failed to create image.", result);
 	}
 
 	VulkanImage::VulkanImage(VkImage image, VkExtent2D extent) : memoryAllocator(nullptr) {

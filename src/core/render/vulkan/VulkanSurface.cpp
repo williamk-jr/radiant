@@ -5,7 +5,8 @@
 namespace Radiant {
 #ifdef HAS_GLFW
 	VulkanSurface::VulkanSurface(VulkanInstance& instance, GLFWwindow* window) : instance(instance.get()) {
-		Validation::verify(glfwCreateWindowSurface(instance.get(), window, nullptr, &this->surface));
+		VkResult result = glfwCreateWindowSurface(instance.get(), window, nullptr, &this->surface);
+		VulkanUtil::validate("VulkanSurface Initialization Error. Failed to create surface.", result);
 	}
 #endif
 

@@ -36,7 +36,8 @@ namespace Radiant {
 		instanceInfo.pApplicationInfo        = &applicationInfo;
 		instanceInfo.pNext                   = &debugMessengerInfo;
 
-		Validation::verify(vkCreateInstance(&instanceInfo, nullptr, &this->instance));
+		VkResult result = vkCreateInstance(&instanceInfo, nullptr, &this->instance);
+		VulkanUtil::validate("VulkanInstance Initialization Error. Failed to create instance.", result);
 	}
 
 	VulkanInstance::VulkanInstance(VulkanInstance&& other) noexcept : instance(other.instance) {

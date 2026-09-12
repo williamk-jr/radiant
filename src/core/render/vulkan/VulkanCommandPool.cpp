@@ -1,6 +1,7 @@
 #include "radiant/core/render/vulkan/VulkanCommandPool.h"
 
 #include "radiant/core/render/vulkan/VulkanResult.h"
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 
 #include <span>
 #include <vector>
@@ -12,7 +13,8 @@ namespace Radiant {
 		commandPoolInfo.queueFamilyIndex = queueFamily;
 		commandPoolInfo.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // TODO research flags more
 
-		Validation::verify(vkCreateCommandPool(device.get(), &commandPoolInfo, nullptr, &this->commandPool));
+		VkResult result = vkCreateCommandPool(device.get(), &commandPoolInfo, nullptr, &this->commandPool);
+		VulkanUtil::validate("VulkanCommandPool Initialization Error. Failed to create command pool.", result);
 	}
 
 	VulkanCommandPool::VulkanCommandPool(VulkanCommandPool&& other) noexcept

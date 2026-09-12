@@ -1,5 +1,6 @@
 #include "radiant/core/render/vulkan/pipeline/VulkanGraphicsPipelineBuilder.h"
 
+#include "radiant/core/render/vulkan/VulkanUtil.h"
 #include "radiant/util/logger/Logger.h"
 
 #include <array>
@@ -52,7 +53,8 @@ namespace Radiant {
 		pipelineLayoutinfo.pSetLayouts    = this->descriptorSetLayouts.data();
 		pipelineLayoutinfo.flags          = 0;
 
-		vkCreatePipelineLayout(this->device, &pipelineLayoutinfo, nullptr, &this->layout);
+		VkResult result = vkCreatePipelineLayout(this->device, &pipelineLayoutinfo, nullptr, &this->layout);
+		VulkanUtil::validate("VulkanGraphicsPipeline Initialization Error. Failed to create pipeline layout.", result);
 		return *this;
 	}
 
@@ -66,7 +68,8 @@ namespace Radiant {
 		pipelineLayoutinfo.pSetLayouts    = this->descriptorSetLayouts.data();
 		pipelineLayoutinfo.flags          = 0;
 
-		vkCreatePipelineLayout(this->device, &pipelineLayoutinfo, nullptr, &this->layout);
+		VkResult result = vkCreatePipelineLayout(this->device, &pipelineLayoutinfo, nullptr, &this->layout);
+		VulkanUtil::validate("VulkanGraphicsPipeline Initialization Error. Failed to create pipeline layout.", result);
 		return *this;
 	}
 
@@ -308,7 +311,8 @@ namespace Radiant {
 		shaderModuleInfo.pCode    = (uint32_t*)spirv->getBufferPointer();
 
 		VkShaderModule shaderModule;
-		vkCreateShaderModule(this->device, &shaderModuleInfo, nullptr, &shaderModule);
+		VkResult       result = vkCreateShaderModule(this->device, &shaderModuleInfo, nullptr, &shaderModule);
+		VulkanUtil::validate("VulkanGraphicsPipeline Initialization Error. Failed to create shader module.", result);
 		this->shaderModules.push_back(shaderModule);
 
 		const char*                     cStageName = stageName.c_str();
@@ -354,7 +358,10 @@ namespace Radiant {
 		this->createInfo.pNext               = this->createFlags.get();
 
 		VkPipeline graphicsPipeline;
-		vkCreateGraphicsPipelines(this->device, this->cache, 1, &this->createInfo, nullptr, &graphicsPipeline);
+		VkResult   result =
+		    vkCreateGraphicsPipelines(this->device, this->cache, 1, &this->createInfo, nullptr, &graphicsPipeline);
+		VulkanUtil::validate("VulkanGraphicsPipeline Initialization Error. Failed to create graphics pipeline.",
+		                     result);
 
 		return {this->device,       VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline, this->layout, this->cache,
 		        this->shaderModules};

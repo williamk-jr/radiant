@@ -1,5 +1,7 @@
 #include "radiant/core/render/vulkan/resource/VulkanBuffer.h"
 
+#include "radiant/core/render/vulkan/VulkanUtil.h"
+
 #include <cstring>
 
 namespace Radiant {
@@ -19,13 +21,14 @@ namespace Radiant {
 		bufferInfo.flags                 = 0;
 
 		VmaAllocationCreateInfo allocationCreateInfo{};
-		allocationCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |
-		                             VMA_ALLOCATION_CREATE_HOST_ACCESS_ALLOW_TRANSFER_INSTEAD_BIT |
-		                             VMA_ALLOCATION_CREATE_MAPPED_BIT;
+		allocationCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT
+		                           | VMA_ALLOCATION_CREATE_HOST_ACCESS_ALLOW_TRANSFER_INSTEAD_BIT
+		                           | VMA_ALLOCATION_CREATE_MAPPED_BIT;
 		allocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO;
 
-		vmaCreateBuffer(memoryAllocator.get(), &bufferInfo, &allocationCreateInfo, &this->buffer, &this->allocation,
-		                &this->allocationInfo);
+		VkResult result = vmaCreateBuffer(memoryAllocator.get(), &bufferInfo, &allocationCreateInfo, &this->buffer,
+		                                  &this->allocation, &this->allocationInfo);
+		VulkanUtil::validate("VulkanBuffer Initialization Error. Failed to create buffer.", result);
 	}
 
 	VulkanBuffer::VulkanBuffer(VulkanBuffer&& other) noexcept

@@ -8,11 +8,14 @@
 namespace Radiant {
 	VulkanPhysicalDevice::VulkanPhysicalDevice(VulkanInstance&                  instance,
 	                                           VulkanPhysicalDeviceRequirements physicalDeviceRequirements) {
+		VkResult result              = VK_SUCCESS;
 		uint32_t physicalDeviceCount = 0;
-		vkEnumeratePhysicalDevices(instance.get(), &physicalDeviceCount, nullptr);
+		result                       = vkEnumeratePhysicalDevices(instance.get(), &physicalDeviceCount, nullptr);
 
 		std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
-		vkEnumeratePhysicalDevices(instance.get(), &physicalDeviceCount, physicalDevices.data());
+		result = vkEnumeratePhysicalDevices(instance.get(), &physicalDeviceCount, physicalDevices.data());
+		VulkanUtil::validate("VulkanPhysicalDevice Initialization Error. Failed to enumerate physical devices.",
+		                     result);
 
 		for (VkPhysicalDevice& physicalDevice : physicalDevices) {
 			if (physicalDeviceRequirements(physicalDevice)) {
@@ -21,7 +24,8 @@ namespace Radiant {
 			}
 		}
 
-		Logger::fatal("Unable to find a device that meets the provided requirements.");
+		Logger::fatal(
+		    "VulkanPhysicalDevice Initialization Error. Failed to find a device that meets the provided requirements.");
 	}
 
 	VulkanPhysicalDevice::VulkanPhysicalDevice(VulkanPhysicalDevice&& other) noexcept

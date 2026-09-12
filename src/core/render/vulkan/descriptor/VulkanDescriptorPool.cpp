@@ -22,7 +22,8 @@ namespace Radiant {
 		descriptorPoolInfo.flags =
 		    VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT | VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 
-		vkCreateDescriptorPool(device.get(), &descriptorPoolInfo, nullptr, &this->descriptorPool);
+		VkResult result = vkCreateDescriptorPool(device.get(), &descriptorPoolInfo, nullptr, &this->descriptorPool);
+		VulkanUtil::validate("VulkanDescriptorPool Initialization Error. Failed to create descriptor pool.", result);
 	}
 
 	VulkanDescriptorPool::VulkanDescriptorPool(VulkanDescriptorPool&& other) noexcept

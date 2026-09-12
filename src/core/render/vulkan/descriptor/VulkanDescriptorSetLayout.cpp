@@ -29,7 +29,9 @@ namespace Radiant {
 		descriptorSetLayoutInfo.pNext =
 		    flags & VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT ? &bindingFlagsInfo : nullptr;
 
-		Validation::verify(vkCreateDescriptorSetLayout(device.get(), &descriptorSetLayoutInfo, nullptr, &this->layout));
+		VkResult result = vkCreateDescriptorSetLayout(device.get(), &descriptorSetLayoutInfo, nullptr, &this->layout);
+		VulkanUtil::validate("VulkanDescriptorSetLayout Initialization Error. Failed to create descriptor set layout.",
+		                     result);
 	}
 
 	VulkanDescriptorSetLayout::VulkanDescriptorSetLayout(VulkanDescriptorSetLayout&& other) noexcept
