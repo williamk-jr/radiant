@@ -1,5 +1,7 @@
 #include "radiant/core/render/Window.h"
 
+#include <GLFW/glfw3.h>
+
 namespace Radiant {
 	Window::Window(const std::string& title, int width, int height) : title(title) {
 #ifdef HAS_GLFW
@@ -12,6 +14,18 @@ namespace Radiant {
 	Window::~Window() {
 #ifdef HAS_GLFW
 		glfwTerminate();
+#endif
+	}
+
+	void Window::hide() {
+#ifdef HAS_GLFW
+		glfwHideWindow(this->window);
+#endif
+	}
+
+	void Window::show() {
+#ifdef HAS_GLFW
+		glfwShowWindow(this->window);
 #endif
 	}
 

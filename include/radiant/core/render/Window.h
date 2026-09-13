@@ -19,6 +19,10 @@ namespace Radiant {
 
 			std::vector<const char*> getSurfaceExtensions();
 
+			void hide();
+
+			void show();
+
 			Rect2D getWindowSize();
 
 			Rect2D getFrameBufferSize();

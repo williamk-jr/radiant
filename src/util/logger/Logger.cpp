@@ -13,7 +13,7 @@ namespace Radiant {
 		}
 	} // namespace LogPrefixes
 
-	bool Logger::allowExceptions = false;
+	bool Logger::allowExceptions = true;
 	bool Logger::allowColor      = false;
 
 	unsigned short Logger::verbosity = 0;
@@ -59,8 +59,8 @@ namespace Radiant {
 
 	void Logger::fatal(const std::string& message, std::vector<LogPrefix> prefixes) {
 		if (Logger::allowExceptions) {
-			throw std::runtime_error(LogPrefix{"FATAL", MessageStyle::RED}.format() + Logger::formatAll(prefixes) +
-			                         message + "\n");
+			throw std::runtime_error(LogPrefix{"FATAL", MessageStyle::RED}.format() + Logger::formatAll(prefixes)
+			                         + message + "\n");
 		}
 		std::cout << LogPrefix{"FATAL", MessageStyle::RED}.format() << Logger::formatAll(prefixes) << message << "\n";
 	}

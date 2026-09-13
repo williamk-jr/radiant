@@ -3,6 +3,7 @@
 #include "radiant/core/render/vulkan/VulkanResult.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 
+#include <string>
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
@@ -40,7 +41,8 @@ namespace Radiant {
 	}
 
 	VkPhysicalDeviceProperties2 VulkanPhysicalDevice::getProperties() {
-		VkPhysicalDeviceProperties2 properties = {};
+		VkPhysicalDeviceProperties2 properties{};
+		properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
 		vkGetPhysicalDeviceProperties2(this->physicalDevice, &properties);
 		return properties;
 	}

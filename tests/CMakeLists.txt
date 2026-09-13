@@ -2,6 +2,7 @@ add_executable(
   RadiantTests
   unit_tests/core/render/vulkan/VulkanInstanceTest.cpp
   unit_tests/core/render/vulkan/VulkanPhysicalDeviceTest.cpp
+  unit_tests/core/render/vulkan/VulkanSurfaceTest.cpp
   unit_tests/core/render/vulkan/VulkanTestUtil.cpp)
 
 target_link_libraries(

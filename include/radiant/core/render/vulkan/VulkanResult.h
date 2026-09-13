@@ -4,7 +4,7 @@
 
 namespace Radiant {
 	template <typename T>
-	class VulkanResult {
+	class [[nodiscard]] VulkanResult {
 		public:
 			VulkanResult(VkResult result, T value) : result(result), value(std::move(value)) {}
 
@@ -31,7 +31,7 @@ namespace Radiant {
 
 	// Template specialization for void, simply representing a VkResult.
 	template <>
-	class VulkanResult<void> {
+	class [[nodiscard]] VulkanResult<void> {
 		public:
 			VulkanResult(VkResult result) : result(result) {}
 
