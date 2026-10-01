@@ -13,7 +13,15 @@ namespace Radiant {
 		public:
 			Window(const std::string& title, int width, int height);
 
+			Window(const Window&)            = delete;
+			Window& operator=(const Window&) = delete;
+
+			Window(Window&&) noexcept;
+			Window& operator=(Window&&) noexcept;
+
 			~Window();
+
+			static Window createDummy(int width, int height);
 
 			const std::string& getTitle();
 

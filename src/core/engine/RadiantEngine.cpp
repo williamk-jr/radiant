@@ -22,8 +22,9 @@
 
 namespace Radiant {
 	RadiantEngine::RadiantEngine(const std::string& title, uint32_t width, uint32_t height) {
-		this->window      = std::make_unique<Window>(title, width, height);
-		this->fontManager = std::make_unique<FontManager>();
+		this->windowSystem = std::make_unique<WindowSystem>();
+		this->window       = this->windowSystem->createWindow(title, width, height);
+		this->fontManager  = std::make_unique<FontManager>();
 		this->notoSans =
 		    std::make_unique<Font>(this->fontManager->loadFont("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf"));
 

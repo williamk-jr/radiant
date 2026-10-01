@@ -48,6 +48,7 @@ add_library(
   core/render/vulkan/VulkanSwapchain.cpp
   core/render/vulkan/VulkanUtil.cpp
   core/render/Window.cpp
+  core/render/WindowSystem.cpp
   css/ast/abstract_syntax_tree.cpp
   css/Parser.cpp
   css/StyleSheet.cpp

@@ -5,15 +5,32 @@
 namespace Radiant {
 	Window::Window(const std::string& title, int width, int height) : title(title) {
 #ifdef HAS_GLFW
-		glfwInit();
+		// glfwInit();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 #endif
 	}
 
+	Window::Window(Window&& other) noexcept : title(other.title) {
+		this->window = other.window;
+		other.window = nullptr;
+	}
+
+	Window& Window::operator=(Window&& other) noexcept {}
+
+	Window Window::createDummy(int width, int height) {
+#ifdef HAS_GLFW
+		glfwDefaultWindowHints();
+		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+
+		return {"Dummy", width, height};
+#endif
+	}
+
 	Window::~Window() {
 #ifdef HAS_GLFW
-		glfwTerminate();
+		glfwDestroyWindow(this->window);
+		// glfwTerminate();
 #endif
 	}
 

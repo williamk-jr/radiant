@@ -4,6 +4,7 @@
 #include "radiant/core/engine/layout/WidgetManager.h"
 #include "radiant/core/render/Renderer.h"
 #include "radiant/core/render/Window.h"
+#include "radiant/core/render/WindowSystem.h"
 #include "radiant/core/render/resources/shader/UniformBuffer.h"
 #include "radiant/css/Parser.h"
 
@@ -22,6 +23,7 @@ namespace Radiant {
 			void                    update();
 
 		private:
+			std::unique_ptr<WindowSystem>  windowSystem;
 			std::unique_ptr<Window>        window;
 			std::unique_ptr<WidgetManager> widgetManager;
 			std::unique_ptr<FontManager>   fontManager;
