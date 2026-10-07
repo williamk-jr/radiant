@@ -5,6 +5,10 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
+	VulkanLogCallback VulkanInstance::LOG_ERROR   = [](std::string message) { std::cout << message << "\n"; };
+	VulkanLogCallback VulkanInstance::LOG_WARNING = [](std::string message) { std::cout << message << "\n"; };
+	VulkanLogCallback VulkanInstance::LOG_INFO    = [](std::string message) { std::cout << message << "\n"; };
+
 	VulkanInstance::VulkanInstance(const std::string& applicationName) : VulkanInstance(applicationName, {}, {}) {}
 
 	VulkanInstance::VulkanInstance(const std::string&           applicationName,

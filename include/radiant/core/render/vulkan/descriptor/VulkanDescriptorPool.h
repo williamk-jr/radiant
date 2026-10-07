@@ -5,6 +5,7 @@
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSetLayout.h"
 
+#include <algorithm>
 #include <span>
 #include <vector>
 #include <vulkan/vulkan_core.h>

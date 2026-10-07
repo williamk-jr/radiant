@@ -1,20 +1,25 @@
 #pragma once
 
-#include "radiant/util/logger/Logger.h"
-#include "radiant/util/logger/MessageStyle.h"
-
+#include <iostream>
+#include <span>
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
 namespace Radiant {
+	using VulkanLogCallback = void (*)(std::string);
+
 	/* VulkanInstance
 	 *
 	 *  Wrapper class for VkInstance.
 	 */
 	class VulkanInstance {
 		public:
+			static VulkanLogCallback LOG_ERROR;
+			static VulkanLogCallback LOG_WARNING;
+			static VulkanLogCallback LOG_INFO;
+
 			VulkanInstance(const std::string& applicationName);
 
 			VulkanInstance(const std::string&           applicationName,
@@ -40,20 +45,14 @@ namespace Radiant {
 			                              VkDebugUtilsMessageTypeFlagsEXT             messageTypes,
 			                              const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 			                              void*                                       pUserData) {
-				if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
-					Logger::info(pCallbackData->pMessage,
-					             {{"VULKAN", MessageStyle::WHITE},
-					              {pCallbackData->pMessageIdName, MessageStyle::WHITE},
-					              LogPrefixes::time(MessageStyle::WHITE)},
-					             1);
+				if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
+					VulkanInstance::LOG_INFO(pCallbackData->pMessage);
+				} else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+					VulkanInstance::LOG_INFO(pCallbackData->pMessage);
 				} else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-					Logger::warn(pCallbackData->pMessage, {{"VULKAN", MessageStyle::WHITE},
-					                                       {pCallbackData->pMessageIdName, MessageStyle::WHITE},
-					                                       LogPrefixes::time(MessageStyle::WHITE)});
+					VulkanInstance::LOG_WARNING(pCallbackData->pMessage);
 				} else if (messageSeverity <= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-					Logger::error(pCallbackData->pMessage, {{"VULKAN", MessageStyle::WHITE},
-					                                        {pCallbackData->pMessageIdName, MessageStyle::WHITE},
-					                                        LogPrefixes::time(MessageStyle::WHITE)});
+					VulkanInstance::LOG_ERROR(pCallbackData->pMessage);
 				}
 				return VK_FALSE;
 			}

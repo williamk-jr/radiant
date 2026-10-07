@@ -3,7 +3,9 @@
 #include "radiant/core/render/resources/shader/ShaderResource.h"
 #include "radiant/core/render/resources/shader/UniformBuffer.h"
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
+#include "radiant/core/render/vulkan/VulkanInstance.h"
 #include "radiant/core/render/vulkan/pipeline/VulkanPipeline.h"
+#include "radiant/util/logger/Logger.h"
 
 #include <algorithm>
 #include <glm/ext/matrix_float4x4.hpp>
@@ -284,6 +286,30 @@ namespace Radiant {
 	}
 
 	void Renderer::initVulkan(Window& window, bool debug) {
+		VulkanInstance::LOG_INFO = [](std::string message) {
+			Logger::info(message,
+			             {{"VULKAN", MessageStyle::WHITE},
+			              //{pCallbackData->pMessageIdName, MessageStyle::WHITE},
+			              LogPrefixes::time(MessageStyle::WHITE)},
+			             1);
+		};
+
+		VulkanInstance::LOG_WARNING = [](std::string message) {
+			Logger::info(message,
+			             {{"VULKAN", MessageStyle::WHITE},
+			              //{pCallbackData->pMessageIdName, MessageStyle::WHITE},
+			              LogPrefixes::time(MessageStyle::WHITE)},
+			             1);
+		};
+
+		VulkanInstance::LOG_ERROR = [](std::string message) {
+			Logger::info(message,
+			             {{"VULKAN", MessageStyle::WHITE},
+			              //{pCallbackData->pMessageIdName, MessageStyle::WHITE},
+			              LogPrefixes::time(MessageStyle::WHITE)},
+			             1);
+		};
+
 		this->instance =
 		    std::make_unique<VulkanInstance>(window.getTitle(), this->instanceExtensions, this->instanceLayers);
 		this->surface        = std::make_unique<VulkanSurface>(*this->instance, window.getHandle());

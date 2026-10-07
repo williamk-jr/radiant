@@ -1,5 +1,6 @@
 #include "radiant/core/render/vulkan/VulkanCommandBuffer.h"
 
+#include "radiant/core/render/vulkan/VulkanInstance.h"
 #include "radiant/core/render/vulkan/VulkanResult.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorSet.h"
@@ -196,7 +197,7 @@ namespace Radiant {
 	}
 
 	void VulkanCommandBuffer::clearAttachment(VulkanImage& image, VkClearAttachment clearAttachment) {
-		Logger::info("Clear attachment is empty.");
+		VulkanInstance::LOG_WARNING("Clear attachment is empty.");
 		// VkExtent3D imageExtent = image.getExtent();
 		// VkRect2D imageSize{};
 		// imageSize.extent.width = imageExtent.width;
