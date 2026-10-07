@@ -37,13 +37,7 @@ namespace Radiant {
 			waitSemaphoreInfos.reserve(waitSemaphores.size());
 
 			for (VulkanSemaphoreSubmitInfo& i : waitSemaphores) {
-				VkSemaphoreSubmitInfo submitInfo{};
-				submitInfo.sType     = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
-				submitInfo.semaphore = i.semaphore->get();
-				submitInfo.stageMask = i.flags;
-				submitInfo.value     = i.value;
-
-				waitSemaphoreInfos.push_back(submitInfo);
+				waitSemaphoreInfos.push_back(i);
 			}
 
 			submitInfo.waitSemaphoreInfoCount = waitSemaphoreInfos.size();
@@ -56,27 +50,14 @@ namespace Radiant {
 			signalSemaphoreInfos.reserve(signalSemaphores.size());
 
 			for (VulkanSemaphoreSubmitInfo& i : signalSemaphores) {
-				VkSemaphoreSubmitInfo submitInfo{};
-				submitInfo.sType     = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
-				submitInfo.semaphore = i.semaphore->get();
-				submitInfo.stageMask = i.flags;
-				submitInfo.value     = i.value;
-
-				signalSemaphoreInfos.push_back(submitInfo);
+				signalSemaphoreInfos.push_back(i);
 			}
 
 			submitInfo.signalSemaphoreInfoCount = signalSemaphoreInfos.size();
 			submitInfo.pSignalSemaphoreInfos    = signalSemaphoreInfos.data();
 		}
 
-		// Logger::info(std::to_string(waitSemaphores[0].size()));
-		VkResult result = VK_SUCCESS;
-		if (fence == nullptr) {
-			result = vkQueueSubmit2(this->queue, 1, &submitInfo, nullptr);
-		} else {
-			result = vkQueueSubmit2(this->queue, 1, &submitInfo, fence->get());
-		}
-		return result;
+		return vkQueueSubmit2(this->queue, 1, &submitInfo, fence == nullptr ? nullptr : fence->get());
 	}
 
 	VulkanResult<void> VulkanQueue::submit(VulkanCommandBuffer&                   commandBuffer,
@@ -85,14 +66,6 @@ namespace Radiant {
 	                                       VulkanFence*                           fence) {
 		return this->submit(std::span{&commandBuffer, 1}, waitSemaphores, signalSemaphores, fence);
 	}
-
-	//
-	// void VulkanQueue::submit(VulkanCommandBuffer& commandBuffer, VulkanSemaphoreSubmitInfo* waitSemaphore,
-	// VulkanSemaphoreSubmitInfo* signalSemaphore, VulkanFence& fence) {
-	//  std::vector<VulkanSemaphoreSubmitInfo> ws{*waitSemaphore};
-	//  std::vector<VulkanSemaphoreSubmitInfo> ss{*signalSemaphore};
-	//  this->submit(commandBuffer, ws, ss, fence);
-	//}
 
 	VulkanResult<void> VulkanQueue::present(VulkanSwapchain&           swapchain,
 	                                        std::vector<uint32_t>      imageIndicies,

@@ -3,6 +3,7 @@
 #include "radiant/core/render/vulkan/descriptor/VulkanDescriptorPool.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
@@ -22,16 +23,16 @@ namespace Radiant {
 	                                 VkDescriptorType                    descriptorType,
 	                                 std::vector<VkDescriptorBufferInfo> bufferInfo) {
 
-		VkWriteDescriptorSet rawDescriptorWrite = {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		                                           nullptr,
-		                                           this->descriptorSet,
-		                                           descriptorBindingIndex,
-		                                           descriptorArrayElement,
-		                                           (uint32_t)bufferInfo.size(),
-		                                           descriptorType,
-		                                           nullptr,
-		                                           bufferInfo.data(),
-		                                           nullptr};
+		VkWriteDescriptorSet rawDescriptorWrite{};
+		rawDescriptorWrite.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		rawDescriptorWrite.dstSet          = this->descriptorSet;
+		rawDescriptorWrite.dstArrayElement = descriptorArrayElement;
+		rawDescriptorWrite.dstBinding      = descriptorBindingIndex;
+		rawDescriptorWrite.descriptorType  = descriptorType;
+		rawDescriptorWrite.pNext           = nullptr;
+
+		rawDescriptorWrite.descriptorCount = (uint32_t)bufferInfo.size();
+		rawDescriptorWrite.pBufferInfo     = bufferInfo.data();
 
 		vkUpdateDescriptorSets(this->device, 1, &rawDescriptorWrite, 0, nullptr);
 	}
@@ -41,16 +42,16 @@ namespace Radiant {
 	                                 VkDescriptorType                   descriptorType,
 	                                 std::vector<VkDescriptorImageInfo> imageInfo) {
 
-		VkWriteDescriptorSet rawDescriptorWrite = {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		                                           nullptr,
-		                                           this->descriptorSet,
-		                                           descriptorBindingIndex,
-		                                           descriptorArrayElement,
-		                                           (uint32_t)imageInfo.size(),
-		                                           descriptorType,
-		                                           imageInfo.data(),
-		                                           nullptr,
-		                                           nullptr};
+		VkWriteDescriptorSet rawDescriptorWrite{};
+		rawDescriptorWrite.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		rawDescriptorWrite.dstSet          = this->descriptorSet;
+		rawDescriptorWrite.dstArrayElement = descriptorArrayElement;
+		rawDescriptorWrite.dstBinding      = descriptorBindingIndex;
+		rawDescriptorWrite.descriptorType  = descriptorType;
+		rawDescriptorWrite.pNext           = nullptr;
+
+		rawDescriptorWrite.descriptorCount = (uint32_t)imageInfo.size();
+		rawDescriptorWrite.pImageInfo      = imageInfo.data();
 
 		vkUpdateDescriptorSets(this->device, 1, &rawDescriptorWrite, 0, nullptr);
 	}
@@ -60,16 +61,16 @@ namespace Radiant {
 	                                 VkDescriptorType          descriptorType,
 	                                 std::vector<VkBufferView> texelBufferViews) {
 
-		VkWriteDescriptorSet rawDescriptorWrite = {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		                                           nullptr,
-		                                           this->descriptorSet,
-		                                           descriptorBindingIndex,
-		                                           descriptorArrayElement,
-		                                           (uint32_t)texelBufferViews.size(),
-		                                           descriptorType,
-		                                           nullptr,
-		                                           nullptr,
-		                                           texelBufferViews.data()};
+		VkWriteDescriptorSet rawDescriptorWrite{};
+		rawDescriptorWrite.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		rawDescriptorWrite.dstSet          = this->descriptorSet;
+		rawDescriptorWrite.dstArrayElement = descriptorArrayElement;
+		rawDescriptorWrite.dstBinding      = descriptorBindingIndex;
+		rawDescriptorWrite.descriptorType  = descriptorType;
+		rawDescriptorWrite.pNext           = nullptr;
+
+		rawDescriptorWrite.descriptorCount  = (uint32_t)texelBufferViews.size();
+		rawDescriptorWrite.pTexelBufferView = texelBufferViews.data();
 
 		vkUpdateDescriptorSets(this->device, 1, &rawDescriptorWrite, 0, nullptr);
 	}

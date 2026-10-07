@@ -19,6 +19,27 @@ namespace Radiant {
 			std::vector<VkDescriptorBufferInfo> bufferInfo;
 			std::vector<VkDescriptorImageInfo>  imageInfo;
 			std::vector<VkBufferView>           texelBufferViews;
+
+			operator VkWriteDescriptorSet() const {
+				uint32_t descriptorCount =
+				    std::max({this->imageInfo.size(), this->bufferInfo.size(), this->texelBufferViews.size()});
+
+				VkWriteDescriptorSet writeDescriptor{VK_STRUCTURE_TYPE_COPY_DESCRIPTOR_SET,
+				                                     nullptr,
+				                                     this->descriptorSet,
+				                                     this->descriptorBindingIndex,
+				                                     this->descriptorArrayElement,
+				                                     descriptorCount,
+				                                     this->descriptorType,
+
+				                                     this->imageInfo.size() != 0 ? this->imageInfo.data() : nullptr,
+				                                     this->bufferInfo.size() != 0 ? this->bufferInfo.data() : nullptr,
+				                                     this->texelBufferViews.size() != 0 ? this->texelBufferViews.data()
+				                                                                        : nullptr
+
+				};
+				return writeDescriptor;
+			}
 	};
 
 	struct VulkanCopyDescriptorSet {
@@ -30,6 +51,19 @@ namespace Radiant {
 			uint32_t        dstDecriptorBindingIndex;
 			uint32_t        dstDescriptorArrayElement;
 			uint32_t        descriptorCount;
+
+			operator VkCopyDescriptorSet() const {
+				VkCopyDescriptorSet copyDescriptor{};
+				copyDescriptor.sType           = VK_STRUCTURE_TYPE_COPY_DESCRIPTOR_SET;
+				copyDescriptor.srcSet          = this->srcDescriptorSet;
+				copyDescriptor.srcArrayElement = this->srcDescriptorArrayElement;
+				copyDescriptor.srcBinding      = this->srcDecriptorBindingIndex;
+
+				copyDescriptor.dstSet          = this->dstDescriptorSet;
+				copyDescriptor.dstArrayElement = this->dstDescriptorArrayElement;
+				copyDescriptor.dstBinding      = this->dstDecriptorBindingIndex;
+				return copyDescriptor;
+			}
 	};
 
 	/* VulkanDescriptorPool

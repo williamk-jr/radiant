@@ -44,10 +44,9 @@ namespace Radiant {
 
 		VkSurfaceFormat2KHR surfaceFormat = this->findSurfaceFormat(physicalDevice, surface);
 
-		// VkExtent2D swapchainExtent{surfaceCapabilities.surfaceCapabilities.currentExtent};
-		// if (swapchainExtent.width = 0xFFFFFFFF) {
-
-		//}
+		// Wayland support.
+		VkExtent2D swapchainExtent{surfaceCapabilities.surfaceCapabilities.currentExtent};
+		if (swapchainExtent.width == 0xFFFFFFFF) {}
 
 		VkSwapchainCreateInfoKHR swapchainInfo{};
 		swapchainInfo.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -80,6 +79,7 @@ namespace Radiant {
 
 		uint32_t swapchainImageCount = 0;
 		result = vkGetSwapchainImagesKHR(device.get(), this->swapchain, &swapchainImageCount, nullptr);
+		VulkanUtil::validate("VulkanSwapchain Initialization Error. Failed to get swapchain images.", result);
 
 		std::vector<VkImage> rawImages;
 		rawImages.reserve(swapchainImageCount);
@@ -142,7 +142,6 @@ namespace Radiant {
 		uint32_t imageIndex;
 		VkResult result =
 		    vkAcquireNextImageKHR(this->device, this->swapchain, timeout, semaphore->get(), nullptr, &imageIndex);
-		// Validation::verify(result);
 		return {result, imageIndex};
 	}
 

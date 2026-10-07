@@ -3,6 +3,7 @@
 #include "radiant/core/render/vulkan/VulkanResult.h"
 #include "radiant/core/render/vulkan/VulkanUtil.h"
 
+#include <stdexcept>
 #include <string>
 #include <vulkan/vulkan_core.h>
 
@@ -25,7 +26,7 @@ namespace Radiant {
 			}
 		}
 
-		Logger::fatal(
+		throw std::runtime_error(
 		    "VulkanPhysicalDevice Initialization Error. Failed to find a device that meets the provided requirements.");
 	}
 
@@ -66,6 +67,11 @@ namespace Radiant {
 		uint32_t surfaceFormatCount = 0;
 		VkResult result =
 		    vkGetPhysicalDeviceSurfaceFormats2KHR(this->physicalDevice, &surfaceInfo, &surfaceFormatCount, nullptr);
+
+		if (result != VK_SUCCESS) {
+			return {result, {}};
+		}
+
 		std::vector<VkSurfaceFormat2KHR> surfaceFormats(surfaceFormatCount, {VK_STRUCTURE_TYPE_SURFACE_FORMAT_2_KHR});
 		result = vkGetPhysicalDeviceSurfaceFormats2KHR(this->physicalDevice, &surfaceInfo, &surfaceFormatCount,
 		                                               surfaceFormats.data());

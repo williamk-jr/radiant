@@ -14,6 +14,15 @@ namespace Radiant {
 			VulkanSemaphore*      semaphore;
 			VkPipelineStageFlags2 flags;
 			uint64_t              value = 0;
+
+			operator VkSemaphoreSubmitInfo() const {
+				VkSemaphoreSubmitInfo submitInfo{};
+				submitInfo.sType     = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
+				submitInfo.semaphore = this->semaphore->get();
+				submitInfo.stageMask = this->flags;
+				submitInfo.value     = this->value;
+				return submitInfo;
+			}
 	};
 
 	/* VulkanQueue

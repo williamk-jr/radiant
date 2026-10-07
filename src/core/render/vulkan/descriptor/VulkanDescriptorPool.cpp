@@ -135,16 +135,7 @@ namespace Radiant {
 		rawDescriptorWrites.reserve(descriptorSetWrites.size());
 
 		for (VulkanWriteDescriptorSet& descriptorWrite : descriptorSetWrites) {
-			uint32_t descriptorCount = std::max({descriptorWrite.imageInfo.size(), descriptorWrite.bufferInfo.size(),
-			                                     descriptorWrite.texelBufferViews.size()});
-
-			rawDescriptorWrites.emplace_back(VkWriteDescriptorSet{
-			    VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, nullptr, descriptorWrite.descriptorSet,
-			    descriptorWrite.descriptorBindingIndex, descriptorWrite.descriptorArrayElement, descriptorCount,
-			    descriptorWrite.descriptorType,
-			    descriptorWrite.imageInfo.size() != 0 ? descriptorWrite.imageInfo.data() : nullptr,
-			    descriptorWrite.bufferInfo.size() != 0 ? descriptorWrite.bufferInfo.data() : nullptr,
-			    descriptorWrite.texelBufferViews.size() != 0 ? descriptorWrite.texelBufferViews.data() : nullptr});
+			rawDescriptorWrites.push_back(descriptorWrite);
 		}
 		return rawDescriptorWrites;
 	}
@@ -155,11 +146,7 @@ namespace Radiant {
 		rawDescriptorCopies.reserve(descriptorSetCopies.size());
 
 		for (VulkanCopyDescriptorSet& descriptorCopy : descriptorSetCopies) {
-			rawDescriptorCopies.emplace_back(
-			    VkCopyDescriptorSet{VK_STRUCTURE_TYPE_COPY_DESCRIPTOR_SET, nullptr, descriptorCopy.srcDescriptorSet,
-			                        descriptorCopy.srcDecriptorBindingIndex, descriptorCopy.srcDescriptorArrayElement,
-			                        descriptorCopy.dstDescriptorSet, descriptorCopy.dstDecriptorBindingIndex,
-			                        descriptorCopy.dstDescriptorArrayElement, descriptorCopy.descriptorCount});
+			rawDescriptorCopies.push_back(descriptorCopy);
 		}
 		return rawDescriptorCopies;
 	}
