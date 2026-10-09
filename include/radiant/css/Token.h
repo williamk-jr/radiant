@@ -23,11 +23,15 @@ namespace Radiant::StyleSheetParser {
 		public:
 			Token(TokenType type, std::string value);
 
-			TokenType   getType();
-			std::string getValue();
+			bool operator==(const Token& other) const = default;
+
+			TokenType   getType() const;
+			std::string getValue() const;
 
 		private:
 			TokenType   type;
 			std::string value;
 	};
+
+	std::ostream& operator<<(std::ostream& os, const Token& obj);
 } // namespace Radiant::StyleSheetParser

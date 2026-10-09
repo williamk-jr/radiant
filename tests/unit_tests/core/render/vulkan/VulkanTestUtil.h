@@ -1,5 +1,6 @@
 #pragma once
 #include "radiant/core/render/Window.h"
+#include "radiant/core/render/vulkan/VulkanDevice.h"
 #include "radiant/core/render/vulkan/VulkanInstance.h"
 #include "radiant/core/render/vulkan/VulkanPhysicalDevice.h"
 #include "radiant/core/render/vulkan/VulkanSurface.h"
@@ -10,4 +11,6 @@ namespace VulkanTestUtil {
 
 	Radiant::VulkanPhysicalDevice createTestPhysicalDevice(Radiant::VulkanInstance& instance);
 	Radiant::VulkanSurface        createTestSurface(Radiant::VulkanInstance& instance, Radiant::Window& window);
+	Radiant::VulkanDevice         createTestDevice(Radiant::VulkanPhysicalDevice& physicalDevice,
+	                                               Radiant::VulkanSurface&        surface);
 } // namespace VulkanTestUtil

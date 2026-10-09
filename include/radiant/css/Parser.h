@@ -61,6 +61,7 @@ namespace Radiant::StyleSheetParser {
 			std::unordered_map<std::string, StyleSheet> getStyleSheets(std::filesystem::path path);
 
 			std::vector<Token> tokenize(std::filesystem::path file);
+			std::vector<Token> tokenize(std::string contents);
 			static std::string tokenTypeToString(TokenType tokenType);
 
 		private:

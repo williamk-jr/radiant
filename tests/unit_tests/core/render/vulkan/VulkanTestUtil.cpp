@@ -11,7 +11,7 @@ namespace VulkanTestUtil {
 		                                               VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME,
 		                                               VK_EXT_DEBUG_UTILS_EXTENSION_NAME};
 
-		return Radiant::VulkanInstance("Test Application", instanceExtensions, instanceLayers);
+		return {"Test Application", instanceExtensions, instanceLayers};
 	}
 
 	Radiant::VulkanInstance createTestInstance(Radiant::Window& window) {
@@ -24,14 +24,20 @@ namespace VulkanTestUtil {
 			instanceExtensions.push_back(surfaceExtension);
 		}
 
-		return Radiant::VulkanInstance("Test Application", instanceExtensions, instanceLayers);
+		return {"Test Application", instanceExtensions, instanceLayers};
 	}
 
 	Radiant::VulkanPhysicalDevice createTestPhysicalDevice(Radiant::VulkanInstance& instance) {
-		return Radiant::VulkanPhysicalDevice(instance, [](VkPhysicalDevice& physicalDevice) { return true; });
+		return {instance, [](VkPhysicalDevice& physicalDevice) { return true; }};
 	}
 
 	Radiant::VulkanSurface createTestSurface(Radiant::VulkanInstance& instance, Radiant::Window& window) {
-		return Radiant::VulkanSurface(instance, window.getHandle());
+		return {instance, window.getHandle()};
+	}
+
+	Radiant::VulkanDevice createTestDevice(Radiant::VulkanPhysicalDevice& physicalDevice,
+	                                       Radiant::VulkanSurface&        surface) {
+		std::vector<const char*> enabledDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+		return {physicalDevice, surface, enabledDeviceExtensions};
 	}
 } // namespace VulkanTestUtil

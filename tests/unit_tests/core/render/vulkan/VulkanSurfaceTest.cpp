@@ -2,15 +2,15 @@
 
 #include "VulkanTestUtil.h"
 #include "radiant/core/render/Window.h"
+#include "radiant/core/render/WindowSystem.h"
 #include "vulkan/vulkan_core.h"
 
 #include <catch2/catch_test_macros.hpp>
 #include <radiant/core/render/vulkan/VulkanInstance.h>
-#include <vector>
 
 TEST_CASE("Test Vulkan Surface", "[vulkan]") {
-	Radiant::Window window("Testing Window.", 100, 100); // TODO: Option to make window perminantly invisible.
-	window.hide();
+	Radiant::WindowSystem windowSystem{};
+	Radiant::Window       window = Radiant::Window::createDummy(100, 100);
 
 	Radiant::VulkanInstance instance = VulkanTestUtil::createTestInstance(window);
 	Radiant::VulkanSurface  surface  = VulkanTestUtil::createTestSurface(instance, window);

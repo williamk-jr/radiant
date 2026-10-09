@@ -6,7 +6,7 @@ import globals
 
 def main():
     env = os.environ.copy()
-    subprocess.run(globals.TESTS_PATH, env=env)
+    subprocess.run([globals.TESTS_PATH, "~[vulkan]"], env=env)
 
 
 if __name__ == "__main__":

@@ -55,11 +55,18 @@ namespace Radiant::StyleSheetParser {
 		while (std::getline(stream, line)) {
 			fileContents += line;
 		}
+		stream.close();
+
+		return this->tokenize(fileContents);
+	}
+
+	std::vector<Token> Parser::tokenize(std::string contents) {
+		std::vector<Token> tokens;
 
 		std::string currentToken;
 		bool        isString = false;
-		for (int i = 0; i < fileContents.size(); i++) {
-			char currentChar = fileContents.at(i);
+		for (int i = 0; i < contents.size(); i++) {
+			char currentChar = contents.at(i);
 
 			// Ignore whitespace & newlines
 			if ((std::isblank(currentChar) && currentChar != ' ') || currentChar == '\n') {
@@ -79,7 +86,7 @@ namespace Radiant::StyleSheetParser {
 			// Check delimiters
 			switch (currentChar) {
 				case '"':
-					if (fileContents.at(i - 1) != '\\') {
+					if (contents.at(i - 1) != '\\') {
 						this->addToken(tokens, currentToken);
 						currentToken = "";
 						currentToken += '"';
@@ -152,7 +159,6 @@ namespace Radiant::StyleSheetParser {
 			}
 		}
 
-		stream.close();
 		return tokens;
 	};
 
@@ -217,8 +223,8 @@ namespace Radiant::StyleSheetParser {
 	}
 
 	bool Parser::isString(const std::string& token) {
-		return (string_util::startsWith(token, "\"") && string_util::endsWith(token, "\"")) ||
-		       string_util::startsWith(token, "\'") && string_util::endsWith(token, "\'");
+		return (string_util::startsWith(token, "\"") && string_util::endsWith(token, "\""))
+		    || string_util::startsWith(token, "\'") && string_util::endsWith(token, "\'");
 	}
 
 	bool Parser::isUnit(const std::string& token) {
