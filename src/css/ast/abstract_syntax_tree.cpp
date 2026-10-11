@@ -94,7 +94,15 @@ namespace Radiant::StyleSheetParser {
 							std::string tokenValue(valueNode->token.getValue());
 							styleSheetEntry.add(this->valueOfNode(valueNode));
 						}
-						stylesheet.add(propertyNode->token.getValue(), styleSheetEntry);
+
+						// Verify that the property has a corosponding enum mapped.
+						std::string propertyName = propertyNode->token.getValue();
+						if (!AbstractSyntaxTree::PROPERTY_MAP.contains(propertyName)) {
+							Logger::warn("Could not map property: \"" + propertyName + "\"");
+							continue;
+						}
+
+						stylesheet.add(PROPERTY_MAP.at(propertyName), styleSheetEntry);
 					}
 				}
 				stylesheets[node->token.getValue()] = stylesheet;

@@ -44,13 +44,17 @@ namespace Radiant {
 		uint32_t refHeight = parent != nullptr ? parent->getHeight() : 0;
 
 		StyleSheetParser::StyleSheetEntry top =
-		    widget->getStyle("top", {{StyleSheetParser::Unit(0, StyleSheetParser::UnitType::PIXEL)}});
+		    widget->getStyle(StyleSheetParser::StyleSheetProperty::TOP,
+		                     {{StyleSheetParser::Unit(0, StyleSheetParser::UnitType::PIXEL)}});
 		StyleSheetParser::StyleSheetEntry bottom =
-		    widget->getStyle("bottom", {{StyleSheetParser::Unit(0, StyleSheetParser::UnitType::PIXEL)}});
+		    widget->getStyle(StyleSheetParser::StyleSheetProperty::BOTTOM,
+		                     {{StyleSheetParser::Unit(0, StyleSheetParser::UnitType::PIXEL)}});
 		StyleSheetParser::StyleSheetEntry left =
-		    widget->getStyle("left", {{StyleSheetParser::Unit(0, StyleSheetParser::UnitType::PIXEL)}});
+		    widget->getStyle(StyleSheetParser::StyleSheetProperty::LEFT,
+		                     {{StyleSheetParser::Unit(0, StyleSheetParser::UnitType::PIXEL)}});
 		StyleSheetParser::StyleSheetEntry right =
-		    widget->getStyle("right", {{StyleSheetParser::Unit(0, StyleSheetParser::UnitType::PIXEL)}});
+		    widget->getStyle(StyleSheetParser::StyleSheetProperty::RIGHT,
+		                     {{StyleSheetParser::Unit(0, StyleSheetParser::UnitType::PIXEL)}});
 
 		StyleSheetParser::Unit topAbsolute = top.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refHeight);
 		StyleSheetParser::Unit bottomAbsolute =
@@ -80,8 +84,8 @@ namespace Radiant {
 			const LayoutBox& childLayoutBox = child->getLayoutBox();
 
 			// Prevent overflow, wrap to next line
-			if ((offsetX + childLayoutBox.getMarginBoxWidth()) >
-			    (widgetLayoutBox.getContentBoxX() + widgetLayoutBox.getContentBoxWidth())) {
+			if ((offsetX + childLayoutBox.getMarginBoxWidth())
+			    > (widgetLayoutBox.getContentBoxX() + widgetLayoutBox.getContentBoxWidth())) {
 				offsetY += largestHeight;
 				offsetX       = 0;
 				largestHeight = 0;

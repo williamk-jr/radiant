@@ -5,7 +5,6 @@
 
 #include <charconv>
 #include <cstdint>
-#include <variant>
 
 namespace Radiant::StyleSheetParser {
 	StyleSheetValue::StyleSheetValue(StyleSheetVariant value) : value(value) {}

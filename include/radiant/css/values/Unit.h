@@ -23,6 +23,7 @@ namespace Radiant::StyleSheetParser {
 			float    value;
 			UnitType unit;
 
-			static std::unordered_map<std::string, UnitType> UNIT_MAP;
+			inline static const std::unordered_map<std::string, UnitType> UNIT_MAP{{"%", UnitType::PERCENTAGE},
+			                                                                       {"px", UnitType::PIXEL}};
 	};
 } // namespace Radiant::StyleSheetParser

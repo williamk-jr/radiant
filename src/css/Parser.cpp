@@ -4,13 +4,9 @@
 #include "radiant/css/StyleSheetValue.h"
 #include "radiant/css/Token.h"
 #include "radiant/css/ast/abstract_syntax_tree.h"
-#include "radiant/css/ast/ast_node.h"
 #include "radiant/css/values/Color.h"
-#include "radiant/css/values/Function.h"
-#include "radiant/util/logger/Logger.h"
 #include "radiant/util/string_util.h"
 
-#include <algorithm>
 #include <cctype>
 #include <filesystem>
 #include <fstream>

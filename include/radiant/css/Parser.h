@@ -2,6 +2,7 @@
 #pragma once
 #include "radiant/css/StyleSheet.h"
 #include "radiant/css/StyleSheetEntry.h"
+#include "radiant/css/StyleSheetProperty.h"
 #include "radiant/css/StyleSheetValue.h"
 #include "radiant/css/Token.h"
 #include "radiant/css/ast/ast_node.h"
@@ -12,6 +13,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <iostream>
+#include <string>
 #include <unordered_map>
 #include <utility>
 #include <variant>

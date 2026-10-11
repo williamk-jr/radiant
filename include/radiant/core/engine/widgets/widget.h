@@ -3,6 +3,7 @@
 #include "radiant/core/engine/layout/LayoutManager.h"
 #include "radiant/core/render/renderable.h"
 #include "radiant/css/Parser.h"
+#include "radiant/css/StyleSheetProperty.h"
 
 #include <cstdint>
 #include <memory>
@@ -24,34 +25,46 @@ namespace Radiant {
 			       uint32_t                width,
 			       uint32_t                height);
 
-			void                              addStyle(std::string name, StyleSheetParser::StyleSheetEntry entry);
-			StyleSheetParser::StyleSheetEntry getStyle(std::string                       name,
-			                                           StyleSheetParser::StyleSheetEntry defaultEntry);
+			void addStyle(StyleSheetParser::StyleSheetProperty property, StyleSheetParser::StyleSheetEntry entry);
+
+			StyleSheetParser::StyleSheetEntry getStyle(StyleSheetParser::StyleSheetProperty property,
+			                                           StyleSheetParser::StyleSheetEntry    defaultEntry);
 
 			uint32_t getPositionX();
+
 			uint32_t getPositionY();
 
 			uint32_t getWidth();
+
 			uint32_t getHeight();
 
-			LayoutManager&   getLayoutManager();
+			LayoutManager& getLayoutManager();
+
 			const LayoutBox& getLayoutBox();
 
 			void setPositionX(uint32_t x);
+
 			void setPositionY(uint32_t y);
 
 			void setWidth(uint32_t width);
+
 			void setHeight(uint32_t height);
 
 			void setTopOffset(uint32_t offset);
+
 			void setBottomOffset(uint32_t offset);
+
 			void setLeftOffset(uint32_t offset);
+
 			void setRightOffset(uint32_t offset);
 
-			void                    updateLayout();
-			std::vector<Widget*>    getChildren();
+			void updateLayout();
+
+			std::vector<Widget*> getChildren();
+
 			std::shared_ptr<Widget> getParent();
-			void                    addChild(Widget* child);
+
+			void addChild(Widget* child);
 
 			void render() override;
 

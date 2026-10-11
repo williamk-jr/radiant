@@ -38,8 +38,9 @@ namespace Radiant {
 			Widget* currentWidget = widgets.top();
 			widgets.pop();
 
-			StyleSheetParser::StyleSheetEntry backgroundColorEntry =
-			    currentWidget->getStyle("background-color", {{StyleSheetParser::Color(255, 0, 0, 255)}});
+			StyleSheetParser::StyleSheetEntry backgroundColorEntry = currentWidget->getStyle(
+			    StyleSheetParser::StyleSheetProperty::BACKGROUND_COLOR, {{StyleSheetParser::Color(255, 0, 0, 255)}});
+
 			StyleSheetParser::Color backgroundColor =
 			    backgroundColorEntry.get<StyleSheetParser::ValueTypes::COLOR>(0).value();
 

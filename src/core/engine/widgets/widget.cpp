@@ -5,6 +5,7 @@
 #include "radiant/core/engine/layout/WidgetManager.h"
 #include "radiant/css/StyleSheet.h"
 #include "radiant/css/StyleSheetEntry.h"
+#include "radiant/css/StyleSheetProperty.h"
 #include "radiant/css/values/Unit.h"
 #include "radiant/util/logger/Logger.h"
 
@@ -34,14 +35,14 @@ namespace Radiant {
 		this->updateLayout();
 	}
 
-	void Widget::addStyle(std::string name, StyleSheetParser::StyleSheetEntry entry) {
-		this->styleSheet.add(name, entry);
+	void Widget::addStyle(StyleSheetParser::StyleSheetProperty property, StyleSheetParser::StyleSheetEntry entry) {
+		this->styleSheet.add(property, entry);
 		this->updateLayout();
 	}
 
-	StyleSheetParser::StyleSheetEntry Widget::getStyle(std::string                       name,
-	                                                   StyleSheetParser::StyleSheetEntry defaultEntry) {
-		return this->styleSheet.getOrDefault(name, defaultEntry);
+	StyleSheetParser::StyleSheetEntry Widget::getStyle(StyleSheetParser::StyleSheetProperty property,
+	                                                   StyleSheetParser::StyleSheetEntry    defaultEntry) {
+		return this->styleSheet.getOrDefault(property, defaultEntry);
 	}
 
 	uint32_t Widget::getPositionX() {

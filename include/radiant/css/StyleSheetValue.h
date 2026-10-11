@@ -6,7 +6,6 @@
 #include "radiant/css/values/Integer.h"
 #include "radiant/css/values/Unit.h"
 
-#include <cstdint>
 #include <optional>
 #include <string>
 #include <variant>

@@ -6,8 +6,6 @@
 #include <charconv>
 
 namespace Radiant::StyleSheetParser {
-	std::unordered_map<std::string, UnitType> Unit::UNIT_MAP{{"%", UnitType::PERCENTAGE}, {"px", UnitType::PIXEL}};
-
 	Unit::Unit(float value, UnitType unit) : value(value), unit(unit) {}
 
 	float Unit::getValue() {
