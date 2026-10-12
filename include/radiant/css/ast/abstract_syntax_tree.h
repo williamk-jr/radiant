@@ -1,13 +1,12 @@
 #pragma once
 #include "radiant/css/StyleSheet.h"
+#include "radiant/css/StyleSheetFunctions.h"
 #include "radiant/css/StyleSheetProperty.h"
 #include "radiant/css/StyleSheetValue.h"
 #include "radiant/css/Token.h"
 #include "radiant/css/ast/ast_node.h"
 
-#include <filesystem>
-#include <iostream>
-#include <stack>
+#include <functional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -16,6 +15,21 @@ namespace Radiant::StyleSheetParser {
 	struct AstLocation {
 			AstNode* parent = nullptr;
 			int      index  = 0;
+	};
+
+	using RuntimeFunction = std::function<StyleSheetValue(std::vector<StyleSheetValue>)>;
+
+	template <typename R, typename... Args, std::size_t... Is>
+	static R
+	invokeHelper(R (*fn)(Args...), std::vector<StyleSheetValue> params, std::index_sequence<Is...> indexSequence) {
+		return fn(params[Is].get<MapTypeToEnum<Args>::value>().value()...);
+	}
+
+	template <typename R, typename... Args>
+	static RuntimeFunction registerFunction(R (*fn)(Args...)) {
+		return [fn](std::vector<StyleSheetValue> params) {
+			return StyleSheetValue{invokeHelper(fn, params, std::index_sequence_for<Args...>{})};
+		};
 	};
 
 	class AbstractSyntaxTree : public AstNode {
@@ -43,5 +57,8 @@ namespace Radiant::StyleSheetParser {
 			    {"margin-top", StyleSheetProperty::MARGIN_TOP},
 			    {"margin-bottom", StyleSheetProperty::MARGIN_BOTTOM},
 			};
+
+			inline static const std::unordered_map<std::string, RuntimeFunction> FUNCTION_MAP{
+			    {"rgb", registerFunction(&Functions::rgb)}};
 	};
 } // namespace Radiant::StyleSheetParser

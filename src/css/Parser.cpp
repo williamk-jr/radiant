@@ -1,7 +1,6 @@
 #include "radiant/css/Parser.h"
 
 #include "radiant/css/StyleSheet.h"
-#include "radiant/css/StyleSheetValue.h"
 #include "radiant/css/Token.h"
 #include "radiant/css/ast/abstract_syntax_tree.h"
 #include "radiant/css/values/Color.h"
@@ -16,21 +15,6 @@
 #include <vector>
 
 namespace Radiant::StyleSheetParser {
-	void Parser::registerProperty(std::string             name,
-	                              std::vector<ValueTypes> signature,
-	                              StyleSheetEntry         defaultValue,
-	                              PropertyResolver        resolver) {
-		this->propertyRegistry[name] = {signature, defaultValue, resolver};
-	}
-
-	PropertyEntry Parser::getPropertyEntry(std::string name) {
-		return this->propertyRegistry[name];
-	}
-
-	RegisteredFunction Parser::getFunction(std::string name) {
-		return this->functionRegistry[name];
-	}
-
 	std::unordered_map<std::string, StyleSheet> Parser::getStyleSheets(std::filesystem::path path) {
 		std::vector<Token> tokens = this->tokenize(path);
 		AbstractSyntaxTree abstractSyntaxTree(tokens);

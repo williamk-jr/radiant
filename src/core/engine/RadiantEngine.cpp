@@ -143,22 +143,24 @@ namespace Radiant {
 	}
 
 	void RadiantEngine::registerProperties() {
-		this->stylesheetParser->registerProperty("top", {StyleSheetParser::ValueTypes::UNIT},
-		                                         {{StyleSheetParser::Unit{0.0f, StyleSheetParser::UnitType::PIXEL}}},
-		                                         PropertyResolvers::UNIT_LIST_RESOLVER);
-		this->stylesheetParser->registerProperty("bottom", {StyleSheetParser::ValueTypes::UNIT},
-		                                         {{StyleSheetParser::Unit{0.0f, StyleSheetParser::UnitType::PIXEL}}},
-		                                         PropertyResolvers::UNIT_LIST_RESOLVER);
-		this->stylesheetParser->registerProperty("left", {StyleSheetParser::ValueTypes::UNIT},
-		                                         {{StyleSheetParser::Unit{0.0f, StyleSheetParser::UnitType::PIXEL}}},
-		                                         PropertyResolvers::UNIT_LIST_RESOLVER);
-		this->stylesheetParser->registerProperty("right", {StyleSheetParser::ValueTypes::UNIT},
-		                                         {{StyleSheetParser::Unit{0.0f, StyleSheetParser::UnitType::PIXEL}}},
-		                                         PropertyResolvers::UNIT_LIST_RESOLVER);
+		/*
+		    this->stylesheetParser->registerProperty("top", {StyleSheetParser::ValueTypes::UNIT},
+		                                             {{StyleSheetParser::Unit{0.0f,
+		   StyleSheetParser::UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
+		    this->stylesheetParser->registerProperty("bottom", {StyleSheetParser::ValueTypes::UNIT},
+		                                             {{StyleSheetParser::Unit{0.0f,
+		   StyleSheetParser::UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
+		    this->stylesheetParser->registerProperty("left", {StyleSheetParser::ValueTypes::UNIT},
+		                                             {{StyleSheetParser::Unit{0.0f,
+		   StyleSheetParser::UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
+		    this->stylesheetParser->registerProperty("right", {StyleSheetParser::ValueTypes::UNIT},
+		                                             {{StyleSheetParser::Unit{0.0f,
+		   StyleSheetParser::UnitType::PIXEL}}}, PropertyResolvers::UNIT_LIST_RESOLVER);
+		                                         */
 	}
 
 	void RadiantEngine::registerFunctions() {
-		this->stylesheetParser->registerFunction("rgb", &StyleSheetStandardFunctions::rgb);
+		// this->stylesheetParser->registerFunction("rgb", &StyleSheetStandardFunctions::rgb);
 	}
 
 	RadiantEngine::~RadiantEngine() {

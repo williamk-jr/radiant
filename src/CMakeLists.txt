@@ -53,6 +53,7 @@ add_library(
   css/Parser.cpp
   css/StyleSheet.cpp
   css/StyleSheetEntry.cpp
+  css/StyleSheetFunctions.cpp
   css/StyleSheetValue.cpp
   css/Token.cpp
   css/values/Color.cpp
