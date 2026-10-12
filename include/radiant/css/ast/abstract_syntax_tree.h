@@ -36,6 +36,10 @@ namespace Radiant::StyleSheetParser {
 		public:
 			AbstractSyntaxTree(std::vector<Token> tokens);
 
+			AbstractSyntaxTree(std::vector<AstNode*> children);
+
+			// bool operator==(const AbstractSyntaxTree& other) const;
+
 			std::unordered_map<std::string, StyleSheet> toStyleSheets();
 			void                                        display();
 
@@ -61,4 +65,6 @@ namespace Radiant::StyleSheetParser {
 			inline static const std::unordered_map<std::string, RuntimeFunction> FUNCTION_MAP{
 			    {"rgb", registerFunction(&Functions::rgb)}};
 	};
+
+	std::ostream& operator<<(std::ostream& os, const AbstractSyntaxTree& obj);
 } // namespace Radiant::StyleSheetParser

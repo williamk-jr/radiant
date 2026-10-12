@@ -148,4 +148,35 @@ TEST_CASE("Test CSS parser.", "[CSS_Parser]") {
 
 		REQUIRE(parser.tokenize(css) == expectedTokens);
 	}
+
+	SECTION("Nested function property.") {
+		std::string css = "identifier {property: function(param1, param2, function2(param1, param2));}";
+
+		std::vector<Radiant::StyleSheetParser::Token> expectedTokens = {
+		    {Radiant::StyleSheetParser::TokenType::IDENTFIER, "identifier"},
+		    {Radiant::StyleSheetParser::TokenType::BLOCK_OPEN, "{"},
+		    {Radiant::StyleSheetParser::TokenType::IDENTFIER, "property"},
+		    {Radiant::StyleSheetParser::TokenType::COLON, ":"},
+
+		    {Radiant::StyleSheetParser::TokenType::IDENTFIER, "function"},
+		    {Radiant::StyleSheetParser::TokenType::PARAMETER_LIST_OPEN, "("},
+		    {Radiant::StyleSheetParser::TokenType::IDENTFIER, "param1"},
+		    {Radiant::StyleSheetParser::TokenType::PARAMETER_LIST_SEPARATOR, ","},
+		    {Radiant::StyleSheetParser::TokenType::IDENTFIER, "param2"},
+		    {Radiant::StyleSheetParser::TokenType::PARAMETER_LIST_SEPARATOR, ","},
+
+		    {Radiant::StyleSheetParser::TokenType::IDENTFIER, "function2"},
+		    {Radiant::StyleSheetParser::TokenType::PARAMETER_LIST_OPEN, "("},
+		    {Radiant::StyleSheetParser::TokenType::IDENTFIER, "param1"},
+		    {Radiant::StyleSheetParser::TokenType::PARAMETER_LIST_SEPARATOR, ","},
+		    {Radiant::StyleSheetParser::TokenType::IDENTFIER, "param2"},
+		    {Radiant::StyleSheetParser::TokenType::PARAMETER_LIST_CLOSE, ")"},
+
+		    {Radiant::StyleSheetParser::TokenType::PARAMETER_LIST_CLOSE, ")"},
+
+		    {Radiant::StyleSheetParser::TokenType::SEMI_COLON, ";"},
+		    {Radiant::StyleSheetParser::TokenType::BLOCK_CLOSE, "}"}};
+
+		REQUIRE(parser.tokenize(css) == expectedTokens);
+	}
 }

@@ -1,5 +1,6 @@
 add_executable(
   RadiantTests
+  unit_tests/core/css/AbstractSyntaxTreeTest.cpp
   unit_tests/core/css/ParserTest.cpp
   unit_tests/core/render/vulkan/VulkanDeviceTest.cpp
   unit_tests/core/render/vulkan/VulkanInstanceTest.cpp

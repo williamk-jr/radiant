@@ -4,10 +4,12 @@
 #include "radiant/css/ast/ast_node.h"
 #include "radiant/util/logger/Logger.h"
 
+#include <queue>
 #include <stack>
+#include <utility>
 
 namespace Radiant::StyleSheetParser {
-	AbstractSyntaxTree::AbstractSyntaxTree(std::vector<Token> tokens) : AstNode(Token(TokenType::IDENTFIER, "")) {
+	AbstractSyntaxTree::AbstractSyntaxTree(std::vector<Token> tokens) : AstNode(Token(TokenType::IDENTFIER, "root")) {
 		AstNode* parent = this;
 		for (int i = 0; i < tokens.size(); i++) {
 			Token* token     = &tokens.at(i);
@@ -75,6 +77,9 @@ namespace Radiant::StyleSheetParser {
 			}
 		}
 	}
+
+	AbstractSyntaxTree::AbstractSyntaxTree(std::vector<AstNode*> children)
+	    : AstNode(AstNodeType::ROOT, Token(TokenType::IDENTFIER, "root"), children) {}
 
 	std::unordered_map<std::string, StyleSheet> AbstractSyntaxTree::toStyleSheets() {
 		std::unordered_map<std::string, StyleSheet> stylesheets;
@@ -164,5 +169,26 @@ namespace Radiant::StyleSheetParser {
 				nodes.push({child, entry.second + 1});
 			}
 		}
+	}
+
+	std::ostream& operator<<(std::ostream& os, const AbstractSyntaxTree& obj) {
+		std::queue<std::pair<const AstNode*, int>> nodes;
+		nodes.push({&obj, -1});
+
+		while (!nodes.empty()) {
+			std::pair<const AstNode*, int> entry = nodes.front();
+			nodes.pop();
+
+			std::string tabs;
+			for (int i = 0; i < entry.second; i++) {
+				tabs += "  ";
+			}
+			os << tabs << (int)entry.first->type << ": " << entry.first->token.getValue() << "\n";
+
+			for (AstNode* child : entry.first->children) {
+				nodes.push({child, entry.second + 1});
+			}
+		}
+		return os;
 	}
 } // namespace Radiant::StyleSheetParser
