@@ -2,8 +2,8 @@
 #include "radiant/core/engine/widgets/widget.h"
 #include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/StyleSheetProperty.h"
-#include "radiant/css/values/Color.h"
-#include "radiant/css/values/Unit.h"
+#include "radiant/css/types/Color.h"
+#include "radiant/css/types/Unit.h"
 #include "radiant/util/logger/Logger.h"
 
 #include <memory>
@@ -44,11 +44,12 @@ int main() {
 	for (int i = 0; i < 6; i++) {
 		widgets.push_back(std::make_shared<Radiant::Widget>(engine.getRootWidget(), 0, 0, 200, 100));
 
-		widgets[i]->addStyle(Radiant::StyleSheetParser::StyleSheetProperty::LEFT,
-		                     {{Radiant::StyleSheetParser::Unit(10.0, Radiant::StyleSheetParser::UnitType::PIXEL)}});
+		widgets[i]->addStyle(
+		    Radiant::StyleSheetParser::StyleSheetProperty::LEFT,
+		    {{Radiant::StyleSheetParser::Types::Unit(10.0, Radiant::StyleSheetParser::Types::UnitType::PIXEL)}});
 
 		widgets[i]->addStyle(Radiant::StyleSheetParser::StyleSheetProperty::BACKGROUND_COLOR,
-		                     {{Radiant::StyleSheetParser::Color(0, 255, 0, 127)}});
+		                     {{Radiant::StyleSheetParser::Types::Color(0, 255, 0, 127)}});
 	}
 	// testWidget.addStyle("left", {
 	//     {Radiant::StyleSheetParser::Unit(10.0,

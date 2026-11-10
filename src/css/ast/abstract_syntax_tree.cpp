@@ -143,7 +143,7 @@ namespace Radiant::StyleSheetParser {
 				for (int i = 0; i < node->children.size(); i++) {
 					parameters.push_back(this->valueOfNode(node->children[i]));
 				}
-				return StyleSheetValue(Function(tokenValue, parameters));
+				return StyleSheetValue(Types::Function(tokenValue, this->FUNCTION_MAP.at(tokenValue), parameters));
 			}
 			default:
 				Logger::error("Invalid Property Value: \"" + tokenValue + "\"");

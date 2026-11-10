@@ -3,7 +3,7 @@
 #include "radiant/css/StyleSheet.h"
 #include "radiant/css/Token.h"
 #include "radiant/css/ast/abstract_syntax_tree.h"
-#include "radiant/css/values/Color.h"
+#include "radiant/css/types/Color.h"
 #include "radiant/util/string_util.h"
 
 #include <cctype>
@@ -182,7 +182,7 @@ namespace Radiant::StyleSheetParser {
 			return TokenType::STRING;
 		} else if (this->isUnit(token)) {
 			return TokenType::UNIT;
-		} else if (Color::isColor(token)) {
+		} else if (Types::Color::isColor(token)) {
 			return TokenType::COLOR;
 		} else if (string_util::isFloat(token)) {
 			return TokenType::FLOAT;

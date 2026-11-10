@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace Radiant::StyleSheetParser {
+namespace Radiant::StyleSheetParser::Types {
 	enum class Colors : uint32_t {
 		RED   = 0xFF0000FF,
 		GREEN = 0x00FF00FF,
@@ -31,4 +31,4 @@ namespace Radiant::StyleSheetParser {
 			uint32_t                                       rgba;
 			static std::unordered_map<std::string, Colors> COLOR_KEYWORDS;
 	};
-} // namespace Radiant::StyleSheetParser
+} // namespace Radiant::StyleSheetParser::Types

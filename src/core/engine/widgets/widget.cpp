@@ -6,7 +6,7 @@
 #include "radiant/css/StyleSheet.h"
 #include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/StyleSheetProperty.h"
-#include "radiant/css/values/Unit.h"
+#include "radiant/css/types/Unit.h"
 #include "radiant/util/logger/Logger.h"
 
 #include <memory>

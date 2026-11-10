@@ -1,10 +1,10 @@
 #pragma once
 
-#include "radiant/css/values/Color.h"
-#include "radiant/css/values/Float.h"
-#include "radiant/css/values/Function.h"
-#include "radiant/css/values/Integer.h"
-#include "radiant/css/values/Unit.h"
+#include "radiant/css/types/Color.h"
+#include "radiant/css/types/Float.h"
+#include "radiant/css/types/Function.h"
+#include "radiant/css/types/Integer.h"
+#include "radiant/css/types/Unit.h"
 
 #include <optional>
 #include <string>
@@ -13,7 +13,8 @@
 namespace Radiant::StyleSheetParser {
 	enum class ValueTypes { INTEGER, FLOAT, STRING, UNIT, COLOR, FUNCTION };
 
-	typedef std::variant<std::string, Function, Integer, Float, Unit, Color> StyleSheetVariant;
+	typedef std::variant<std::string, Types::Function, Types::Integer, Types::Float, Types::Unit, Types::Color>
+	    StyleSheetVariant;
 
 	template <typename T>
 	struct MapTypeToEnum;
@@ -34,11 +35,11 @@ namespace Radiant::StyleSheetParser {
 	};
 
 	REGISTER_TYPE_MAP(std::string, ValueTypes::STRING);
-	REGISTER_TYPE_MAP(Unit, ValueTypes::UNIT);
-	REGISTER_TYPE_MAP(Integer, ValueTypes::INTEGER);
-	REGISTER_TYPE_MAP(Float, ValueTypes::FLOAT);
-	REGISTER_TYPE_MAP(Color, ValueTypes::COLOR);
-	REGISTER_TYPE_MAP(Function, ValueTypes::FUNCTION);
+	REGISTER_TYPE_MAP(Types::Unit, ValueTypes::UNIT);
+	REGISTER_TYPE_MAP(Types::Integer, ValueTypes::INTEGER);
+	REGISTER_TYPE_MAP(Types::Float, ValueTypes::FLOAT);
+	REGISTER_TYPE_MAP(Types::Color, ValueTypes::COLOR);
+	REGISTER_TYPE_MAP(Types::Function, ValueTypes::FUNCTION);
 #undef REGISTER_TYPE_MAP
 
 	class StyleSheetValue {
@@ -50,6 +51,12 @@ namespace Radiant::StyleSheetParser {
 				using V = MapEnumToType<T>::value;
 				V* unit = std::get_if<V>(&value);
 				return unit == nullptr ? std::nullopt : std::optional<V>{*unit};
+			}
+
+			template <ValueTypes T>
+			constexpr bool isType() {
+				using V = MapEnumToType<T>::value;
+				return std::holds_alternative<V>(this->value);
 			}
 
 			static StyleSheetValue fromString(ValueTypes type, std::string strValue);

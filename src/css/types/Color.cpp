@@ -1,10 +1,10 @@
-#include "radiant/css/values/Color.h"
+#include "radiant/css/types/Color.h"
 
 #include "radiant/util/string_util.h"
 
 #include <string>
 
-namespace Radiant::StyleSheetParser {
+namespace Radiant::StyleSheetParser::Types {
 	std::unordered_map<std::string, Colors> Color::COLOR_KEYWORDS{
 	    {"red", Colors::RED},     {"green", Colors::GREEN}, {"blue", Colors::BLUE},
 	    {"black", Colors::BLACK}, {"white", Colors::WHITE},
@@ -52,4 +52,4 @@ namespace Radiant::StyleSheetParser {
 			return Color(std::stoul("0x" + color.substr(1, color.size()), nullptr, 16));
 		}
 	};
-} // namespace Radiant::StyleSheetParser
+} // namespace Radiant::StyleSheetParser::Types

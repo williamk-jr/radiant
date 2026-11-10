@@ -1,11 +1,11 @@
-#include "radiant/css/values/Unit.h"
+#include "radiant/css/types/Unit.h"
 
 #include "radiant/util/logger/Logger.h"
 #include "radiant/util/string_util.h"
 
 #include <charconv>
 
-namespace Radiant::StyleSheetParser {
+namespace Radiant::StyleSheetParser::Types {
 	Unit::Unit(float value, UnitType unit) : value(value), unit(unit) {}
 
 	float Unit::getValue() {
@@ -41,4 +41,4 @@ namespace Radiant::StyleSheetParser {
 
 		return {value, unitIterator->second};
 	}
-} // namespace Radiant::StyleSheetParser
+} // namespace Radiant::StyleSheetParser::Types

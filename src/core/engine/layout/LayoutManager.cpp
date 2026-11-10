@@ -3,7 +3,7 @@
 #include "radiant/core/engine/widgets/widget.h"
 #include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/StyleSheetValue.h"
-#include "radiant/css/values/Unit.h"
+#include "radiant/css/types/Unit.h"
 #include "radiant/util/logger/Logger.h"
 
 #include <memory>
@@ -45,22 +45,24 @@ namespace Radiant {
 
 		StyleSheetParser::StyleSheetEntry top =
 		    widget->getStyle(StyleSheetParser::StyleSheetProperty::TOP,
-		                     {{StyleSheetParser::Unit(0, StyleSheetParser::UnitType::PIXEL)}});
+		                     {{StyleSheetParser::Types::Unit(0, StyleSheetParser::Types::UnitType::PIXEL)}});
 		StyleSheetParser::StyleSheetEntry bottom =
 		    widget->getStyle(StyleSheetParser::StyleSheetProperty::BOTTOM,
-		                     {{StyleSheetParser::Unit(0, StyleSheetParser::UnitType::PIXEL)}});
+		                     {{StyleSheetParser::Types::Unit(0, StyleSheetParser::Types::UnitType::PIXEL)}});
 		StyleSheetParser::StyleSheetEntry left =
 		    widget->getStyle(StyleSheetParser::StyleSheetProperty::LEFT,
-		                     {{StyleSheetParser::Unit(0, StyleSheetParser::UnitType::PIXEL)}});
+		                     {{StyleSheetParser::Types::Unit(0, StyleSheetParser::Types::UnitType::PIXEL)}});
 		StyleSheetParser::StyleSheetEntry right =
 		    widget->getStyle(StyleSheetParser::StyleSheetProperty::RIGHT,
-		                     {{StyleSheetParser::Unit(0, StyleSheetParser::UnitType::PIXEL)}});
+		                     {{StyleSheetParser::Types::Unit(0, StyleSheetParser::Types::UnitType::PIXEL)}});
 
-		StyleSheetParser::Unit topAbsolute = top.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refHeight);
-		StyleSheetParser::Unit bottomAbsolute =
+		StyleSheetParser::Types::Unit topAbsolute =
+		    top.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refHeight);
+		StyleSheetParser::Types::Unit bottomAbsolute =
 		    bottom.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refHeight);
-		StyleSheetParser::Unit leftAbsolute = left.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refWidth);
-		StyleSheetParser::Unit rightAbsolute =
+		StyleSheetParser::Types::Unit leftAbsolute =
+		    left.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refWidth);
+		StyleSheetParser::Types::Unit rightAbsolute =
 		    right.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refWidth);
 
 		widget->setTopOffset(topAbsolute.getValue());

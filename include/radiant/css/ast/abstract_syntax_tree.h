@@ -17,8 +17,6 @@ namespace Radiant::StyleSheetParser {
 			int      index  = 0;
 	};
 
-	using RuntimeFunction = std::function<StyleSheetValue(std::vector<StyleSheetValue>)>;
-
 	template <typename R, typename... Args, std::size_t... Is>
 	static R
 	invokeHelper(R (*fn)(Args...), std::vector<StyleSheetValue> params, std::index_sequence<Is...> indexSequence) {
@@ -26,7 +24,7 @@ namespace Radiant::StyleSheetParser {
 	}
 
 	template <typename R, typename... Args>
-	static RuntimeFunction registerFunction(R (*fn)(Args...)) {
+	static Types::RuntimeFunction registerFunction(R (*fn)(Args...)) {
 		return [fn](std::vector<StyleSheetValue> params) {
 			return StyleSheetValue{invokeHelper(fn, params, std::index_sequence_for<Args...>{})};
 		};
@@ -37,8 +35,6 @@ namespace Radiant::StyleSheetParser {
 			AbstractSyntaxTree(std::vector<Token> tokens);
 
 			AbstractSyntaxTree(std::vector<AstNode*> children);
-
-			// bool operator==(const AbstractSyntaxTree& other) const;
 
 			std::unordered_map<std::string, StyleSheet> toStyleSheets();
 			void                                        display();
@@ -62,7 +58,7 @@ namespace Radiant::StyleSheetParser {
 			    {"margin-bottom", StyleSheetProperty::MARGIN_BOTTOM},
 			};
 
-			inline static const std::unordered_map<std::string, RuntimeFunction> FUNCTION_MAP{
+			inline static const std::unordered_map<std::string, Types::RuntimeFunction> FUNCTION_MAP{
 			    {"rgb", registerFunction(&Functions::rgb)}};
 	};
 

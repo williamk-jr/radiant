@@ -56,11 +56,11 @@ add_library(
   css/StyleSheetFunctions.cpp
   css/StyleSheetValue.cpp
   css/Token.cpp
-  css/values/Color.cpp
-  css/values/Float.cpp
-  css/values/Function.cpp
-  css/values/Integer.cpp
-  css/values/Unit.cpp
+  css/types/Color.cpp
+  css/types/Float.cpp
+  css/types/Function.cpp
+  css/types/Integer.cpp
+  css/types/Unit.cpp
   util/Box.cpp
   util/debug/ExecutionProfiler.cpp
   util/logger/Logger.cpp

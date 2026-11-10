@@ -1,7 +1,7 @@
 #pragma once
-#include <radiant/css/values/Color.h>
-#include <radiant/css/values/Integer.h>
+#include <radiant/css/types/Color.h>
+#include <radiant/css/types/Integer.h>
 
 namespace Radiant::StyleSheetParser::Functions {
-	Color rgb(Integer red, Integer green, Integer blue, Integer alpha);
+	Types::Color rgb(Types::Integer red, Types::Integer green, Types::Integer blue, Types::Integer alpha);
 } // namespace Radiant::StyleSheetParser::Functions

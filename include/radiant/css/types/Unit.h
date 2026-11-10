@@ -1,11 +1,11 @@
 #pragma once
-#include "radiant/css/values/IValue.h"
+#include "radiant/css/types/IValue.h"
 
 #include <cstdint>
 #include <string>
 #include <unordered_map>
 
-namespace Radiant::StyleSheetParser {
+namespace Radiant::StyleSheetParser::Types {
 	enum class UnitType { PIXEL, PERCENTAGE };
 
 	class Unit : IValue<Unit> {
@@ -26,4 +26,4 @@ namespace Radiant::StyleSheetParser {
 			inline static const std::unordered_map<std::string, UnitType> UNIT_MAP{{"%", UnitType::PERCENTAGE},
 			                                                                       {"px", UnitType::PIXEL}};
 	};
-} // namespace Radiant::StyleSheetParser
+} // namespace Radiant::StyleSheetParser::Types

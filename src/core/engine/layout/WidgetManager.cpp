@@ -5,7 +5,7 @@
 #include "radiant/css/Parser.h"
 #include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/StyleSheetValue.h"
-#include "radiant/css/values/Color.h"
+#include "radiant/css/types/Color.h"
 #include "radiant/util/logger/Logger.h"
 
 #include <memory>
@@ -38,10 +38,11 @@ namespace Radiant {
 			Widget* currentWidget = widgets.top();
 			widgets.pop();
 
-			StyleSheetParser::StyleSheetEntry backgroundColorEntry = currentWidget->getStyle(
-			    StyleSheetParser::StyleSheetProperty::BACKGROUND_COLOR, {{StyleSheetParser::Color(255, 0, 0, 255)}});
+			StyleSheetParser::StyleSheetEntry backgroundColorEntry =
+			    currentWidget->getStyle(StyleSheetParser::StyleSheetProperty::BACKGROUND_COLOR,
+			                            {{StyleSheetParser::Types::Color(255, 0, 0, 255)}});
 
-			StyleSheetParser::Color backgroundColor =
+			StyleSheetParser::Types::Color backgroundColor =
 			    backgroundColorEntry.get<StyleSheetParser::ValueTypes::COLOR>(0).value();
 
 			batch.instances.push_back({

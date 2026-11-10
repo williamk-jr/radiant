@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace Radiant::StyleSheetParser {
+namespace Radiant::StyleSheetParser::Types {
 	class Integer {
 		public:
 			Integer();
@@ -15,4 +15,4 @@ namespace Radiant::StyleSheetParser {
 		private:
 			int32_t value;
 	};
-} // namespace Radiant::StyleSheetParser
+} // namespace Radiant::StyleSheetParser::Types

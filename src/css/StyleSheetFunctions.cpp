@@ -1,7 +1,7 @@
 #include <radiant/css/StyleSheetFunctions.h>
 
 namespace Radiant::StyleSheetParser::Functions {
-	Color rgb(Integer red, Integer green, Integer blue, Integer alpha) {
-		return Color(red, green, blue, alpha);
+	Types::Color rgb(Types::Integer red, Types::Integer green, Types::Integer blue, Types::Integer alpha) {
+		return Types::Color(red, green, blue, alpha);
 	}
 } // namespace Radiant::StyleSheetParser::Functions

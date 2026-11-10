@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Radiant::StyleSheetParser {
+namespace Radiant::StyleSheetParser::Types {
 	class Float {
 		public:
 			Float();
@@ -13,4 +13,4 @@ namespace Radiant::StyleSheetParser {
 		private:
 			float value;
 	};
-} // namespace Radiant::StyleSheetParser
+} // namespace Radiant::StyleSheetParser::Types
