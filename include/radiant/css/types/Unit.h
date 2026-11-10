@@ -1,21 +1,18 @@
 #pragma once
-#include "radiant/css/types/IValue.h"
-
-#include <cstdint>
 #include <string>
 #include <unordered_map>
 
 namespace Radiant::StyleSheetParser::Types {
 	enum class UnitType { PIXEL, PERCENTAGE };
 
-	class Unit : IValue<Unit> {
+	class Unit {
 		public:
 			Unit(float value, UnitType unit);
 
 			float    getValue();
 			UnitType getUnit();
 
-			Unit resolve(float referenceLength) override;
+			Unit resolve(float referenceLength);
 
 			static Unit fromString(std::string str);
 

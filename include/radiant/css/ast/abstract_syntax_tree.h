@@ -6,7 +6,6 @@
 #include "radiant/css/Token.h"
 #include "radiant/css/ast/ast_node.h"
 
-#include <functional>
 #include <string>
 #include <unordered_map>
 #include <vector>

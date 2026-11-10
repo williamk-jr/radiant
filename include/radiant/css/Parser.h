@@ -1,7 +1,6 @@
 
 #pragma once
 #include "radiant/css/StyleSheet.h"
-#include "radiant/css/StyleSheetEntry.h"
 #include "radiant/css/StyleSheetValue.h"
 #include "radiant/css/Token.h"
 #include "radiant/css/ast/ast_node.h"
@@ -12,11 +11,6 @@
 #include <vector>
 
 namespace Radiant::StyleSheetParser {
-
-	struct PropertyEntry {
-			std::vector<ValueTypes> signature;
-			StyleSheetEntry         defaultValue;
-	};
 
 	class Parser {
 		public:

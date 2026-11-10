@@ -2,6 +2,10 @@
 
 #include "radiant/css/Token.h"
 #include "radiant/css/ast/ast_node.h"
+#include "radiant/css/types/Color.h"
+#include "radiant/css/types/Float.h"
+#include "radiant/css/types/Integer.h"
+#include "radiant/css/types/Unit.h"
 #include "radiant/util/logger/Logger.h"
 
 #include <queue>
@@ -121,22 +125,22 @@ namespace Radiant::StyleSheetParser {
 
 		switch (node->type) {
 			case AstNodeType::UNIT: {
-				return StyleSheetValue::fromString(ValueTypes::UNIT, tokenValue);
+				return StyleSheetValue::fromString<Types::Unit>(tokenValue);
 			}
 			case AstNodeType::FLOAT: {
-				return StyleSheetValue::fromString(ValueTypes::FLOAT, tokenValue);
+				return StyleSheetValue::fromString<Types::Float>(tokenValue);
 			}
 			case AstNodeType::INTEGER: {
-				return StyleSheetValue::fromString(ValueTypes::INTEGER, tokenValue);
+				return StyleSheetValue::fromString<Types::Integer>(tokenValue);
 			}
 			case AstNodeType::STRING: {
-				return StyleSheetValue::fromString(ValueTypes::STRING, tokenValue);
+				return StyleSheetValue::fromString<std::string>(tokenValue);
 			}
 			case AstNodeType::IDENTIFIER: {
-				return StyleSheetValue::fromString(ValueTypes::STRING, tokenValue);
+				return StyleSheetValue::fromString<std::string>(tokenValue);
 			}
 			case AstNodeType::COLOR: {
-				return StyleSheetValue::fromString(ValueTypes::COLOR, tokenValue);
+				return StyleSheetValue::fromString<Types::Color>(tokenValue);
 			}
 			case AstNodeType::FUNCTION: {
 				std::vector<StyleSheetValue> parameters;

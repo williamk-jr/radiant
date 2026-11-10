@@ -9,8 +9,6 @@ add_library(
   core/engine/layout/WidgetManager.cpp
   core/engine/LayoutBox.cpp
   core/engine/RadiantEngine.cpp
-  core/engine/StyleSheetPropertyResolvers.cpp
-  core/engine/StyleSheetStandardFunctions.cpp
   core/engine/widgets/widget.cpp
   core/render/Color.cpp
   core/render/models/Model.cpp

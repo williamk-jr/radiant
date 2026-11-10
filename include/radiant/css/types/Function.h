@@ -1,5 +1,4 @@
 #pragma once
-#include "radiant/css/types/IValue.h"
 
 #include <functional>
 #include <string>
@@ -12,11 +11,11 @@ namespace Radiant::StyleSheetParser {
 
 		using RuntimeFunction = std::function<StyleSheetValue(std::vector<StyleSheetValue>)>;
 
-		class Function : IValue<StyleSheetValue> {
+		class Function {
 			public:
 				Function(std::string name, RuntimeFunction function, std::vector<StyleSheetValue> parameters);
 
-				StyleSheetValue resolve(float referenceLength) override;
+				StyleSheetValue resolve(float referenceLength);
 
 			private:
 				std::string                  name;

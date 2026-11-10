@@ -7,41 +7,15 @@
 #include "radiant/css/types/StyleSheetTypes.h"
 #include "radiant/css/types/Unit.h"
 
+#include <charconv>
 #include <optional>
 #include <string>
+#include <type_traits>
 #include <variant>
 
 namespace Radiant::StyleSheetParser {
-	enum class ValueTypes { INTEGER, FLOAT, STRING, UNIT, COLOR, FUNCTION };
-
 	typedef std::variant<std::string, Types::Function, Types::Integer, Types::Float, Types::Unit, Types::Color>
 	    StyleSheetVariant;
-
-	template <typename T>
-	struct MapTypeToEnum;
-
-	template <ValueTypes T>
-	struct MapEnumToType;
-
-/* Macro to create type specializations for mapping between literal and enum types.*/
-#define REGISTER_TYPE_MAP(type, enum_type)                                                                             \
-	template <>                                                                                                        \
-	struct MapTypeToEnum<type> {                                                                                       \
-			static constexpr ValueTypes value = enum_type;                                                             \
-	};                                                                                                                 \
-                                                                                                                       \
-	template <>                                                                                                        \
-	struct MapEnumToType<enum_type> {                                                                                  \
-			using value = type;                                                                                        \
-	};
-
-	REGISTER_TYPE_MAP(std::string, ValueTypes::STRING);
-	REGISTER_TYPE_MAP(Types::Unit, ValueTypes::UNIT);
-	REGISTER_TYPE_MAP(Types::Integer, ValueTypes::INTEGER);
-	REGISTER_TYPE_MAP(Types::Float, ValueTypes::FLOAT);
-	REGISTER_TYPE_MAP(Types::Color, ValueTypes::COLOR);
-	REGISTER_TYPE_MAP(Types::Function, ValueTypes::FUNCTION);
-#undef REGISTER_TYPE_MAP
 
 	class StyleSheetValue {
 		public:
@@ -49,18 +23,35 @@ namespace Radiant::StyleSheetParser {
 
 			template <Types::StyleSheetType T>
 			auto get() {
-				// using V = MapEnumToType<T>::value;
 				T* unit = std::get_if<T>(&value);
 				return unit == nullptr ? std::nullopt : std::optional<T>{*unit};
 			}
 
 			template <Types::StyleSheetType T>
 			constexpr bool isType() {
-				// using V = MapEnumToType<T>::value;
 				return std::holds_alternative<T>(this->value);
 			}
 
-			static StyleSheetValue fromString(ValueTypes type, std::string strValue);
+			template <Types::StyleSheetType T>
+			static StyleSheetValue fromString(std::string strValue) {
+				if constexpr (std::is_same_v<T, Types::Unit>) {
+					return {Types::Unit::fromString(strValue)};
+				} else if constexpr (std::is_same_v<T, Types::Color>) {
+					return {Types::Color::fromString(strValue)};
+				} else if constexpr (std::is_same_v<T, Types::Integer>) {
+					int32_t                integer = 0;
+					std::from_chars_result result =
+					    std::from_chars(strValue.data(), strValue.data() + strValue.size(), integer);
+					return {Types::Integer(integer)};
+				} else if constexpr (std::is_same_v<T, Types::Float>) {
+					float                  floatingPoint = 0.0;
+					std::from_chars_result result =
+					    std::from_chars(strValue.data(), strValue.data() + strValue.size(), floatingPoint);
+					return {Types::Float(floatingPoint)};
+				} else if constexpr (std::is_same_v<T, std::string>) {
+					return {strValue};
+				}
+			}
 
 		private:
 			StyleSheetVariant value;
