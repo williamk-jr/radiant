@@ -4,6 +4,7 @@
 #include "radiant/css/types/Float.h"
 #include "radiant/css/types/Function.h"
 #include "radiant/css/types/Integer.h"
+#include "radiant/css/types/StyleSheetTypes.h"
 #include "radiant/css/types/Unit.h"
 
 #include <optional>
@@ -46,17 +47,17 @@ namespace Radiant::StyleSheetParser {
 		public:
 			StyleSheetValue(StyleSheetVariant value);
 
-			template <ValueTypes T>
+			template <Types::StyleSheetType T>
 			auto get() {
-				using V = MapEnumToType<T>::value;
-				V* unit = std::get_if<V>(&value);
-				return unit == nullptr ? std::nullopt : std::optional<V>{*unit};
+				// using V = MapEnumToType<T>::value;
+				T* unit = std::get_if<T>(&value);
+				return unit == nullptr ? std::nullopt : std::optional<T>{*unit};
 			}
 
-			template <ValueTypes T>
+			template <Types::StyleSheetType T>
 			constexpr bool isType() {
-				using V = MapEnumToType<T>::value;
-				return std::holds_alternative<V>(this->value);
+				// using V = MapEnumToType<T>::value;
+				return std::holds_alternative<T>(this->value);
 			}
 
 			static StyleSheetValue fromString(ValueTypes type, std::string strValue);

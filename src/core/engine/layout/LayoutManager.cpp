@@ -57,13 +57,13 @@ namespace Radiant {
 		                     {{StyleSheetParser::Types::Unit(0, StyleSheetParser::Types::UnitType::PIXEL)}});
 
 		StyleSheetParser::Types::Unit topAbsolute =
-		    top.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refHeight);
+		    top.get<StyleSheetParser::Types::Unit>(0).value().resolve(refHeight);
 		StyleSheetParser::Types::Unit bottomAbsolute =
-		    bottom.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refHeight);
+		    bottom.get<StyleSheetParser::Types::Unit>(0).value().resolve(refHeight);
 		StyleSheetParser::Types::Unit leftAbsolute =
-		    left.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refWidth);
+		    left.get<StyleSheetParser::Types::Unit>(0).value().resolve(refWidth);
 		StyleSheetParser::Types::Unit rightAbsolute =
-		    right.get<StyleSheetParser::ValueTypes::UNIT>(0).value().resolve(refWidth);
+		    right.get<StyleSheetParser::Types::Unit>(0).value().resolve(refWidth);
 
 		widget->setTopOffset(topAbsolute.getValue());
 		widget->setBottomOffset(bottomAbsolute.getValue());

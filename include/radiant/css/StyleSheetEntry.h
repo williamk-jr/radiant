@@ -1,6 +1,7 @@
 #pragma once
 
 #include "radiant/css/StyleSheetValue.h"
+#include "radiant/css/types/StyleSheetTypes.h"
 
 #include <cstddef>
 #include <initializer_list>
@@ -15,7 +16,7 @@ namespace Radiant::StyleSheetParser {
 
 			void add(StyleSheetValue value);
 
-			template <ValueTypes T>
+			template <Types::StyleSheetType T>
 			auto get(size_t index) {
 				return this->values[index].get<T>();
 			}

@@ -1,8 +1,8 @@
 #pragma once
-
 #include <cstdint>
 
 namespace Radiant::StyleSheetParser::Types {
+
 	struct ResolutionContext {};
 
 	template <typename T>

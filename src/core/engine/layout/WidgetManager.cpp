@@ -43,7 +43,7 @@ namespace Radiant {
 			                            {{StyleSheetParser::Types::Color(255, 0, 0, 255)}});
 
 			StyleSheetParser::Types::Color backgroundColor =
-			    backgroundColorEntry.get<StyleSheetParser::ValueTypes::COLOR>(0).value();
+			    backgroundColorEntry.get<StyleSheetParser::Types::Color>(0).value();
 
 			batch.instances.push_back({
 			    {backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(),

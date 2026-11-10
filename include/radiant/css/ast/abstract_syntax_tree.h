@@ -20,7 +20,7 @@ namespace Radiant::StyleSheetParser {
 	template <typename R, typename... Args, std::size_t... Is>
 	static R
 	invokeHelper(R (*fn)(Args...), std::vector<StyleSheetValue> params, std::index_sequence<Is...> indexSequence) {
-		return fn(params[Is].get<MapTypeToEnum<Args>::value>().value()...);
+		return fn(params[Is].get<Args>().value()...);
 	}
 
 	template <typename R, typename... Args>
