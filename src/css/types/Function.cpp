@@ -9,7 +9,7 @@ namespace Radiant::StyleSheetParser::Types {
 	StyleSheetValue Function::resolve(float referenceLength) {
 		std::vector<StyleSheetValue> resolvedParameters;
 
-		for (int i = 0; i < name.length(); i++) {
+		for (int i = 0; i < parameters.size(); i++) {
 			if (this->parameters[i].isType<Types::Function>()) {
 				std::optional<Function> func = this->parameters[i].get<Types::Function>();
 				resolvedParameters.push_back(func.value().resolve(referenceLength));

@@ -28,7 +28,7 @@ namespace Radiant::StyleSheetParser {
 			}
 
 			template <Types::StyleSheetType T>
-			constexpr bool isType() {
+			bool isType() {
 				return std::holds_alternative<T>(this->value);
 			}
 
